@@ -14,7 +14,7 @@ var modules = {
   ssr: false,
 
   server: {
-    port: 8002,
+    port: 8003,
     host: "localhost",
     timing: false,
   },
