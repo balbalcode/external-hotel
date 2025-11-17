@@ -192,6 +192,7 @@ var modules = {
     MODE: process.env.MODE || "",
     REPORT_VERSIONS: process.env.REPORT_VERSIONS || "v3-dynamic-route",
     FRAUD_WEBHOOK: process.env.FRAUD_WEBHOOK || "",
+    TEMP_API: process.env.TEMP_API || "",
     NUXT_PUBLIC_BASE_PATH: NUXT_PUBLIC_BASE_PATH,
   },
 };

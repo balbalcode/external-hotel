@@ -9,7 +9,7 @@ export default {
   data: () => {
     return {
       modal: {
-        form: true,
+        form: false,
       },
     };
   },

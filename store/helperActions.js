@@ -22,3 +22,9 @@ export const subscriptionMethods = mapActions(
 export const productMethods = mapActions("modules/product/storeProduct", [
   "getMembershipProduct",
 ]);
+
+export const resolutionMethods = mapActions(
+  "modules/resolution-center/storeResolutionCenter",
+  ["getDataResolution", "updateDataResolution"]
+);
+
