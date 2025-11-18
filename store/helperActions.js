@@ -28,3 +28,11 @@ export const resolutionMethods = mapActions(
   ["getDataResolution", "updateDataResolution"]
 );
 
+export const eventMethods = mapActions("modules/event/storeEvent", [
+  "getEvent",
+  "getEventDetail",
+  "createEvent",
+  "increaseQuota",
+  "updateEvent",
+  "deleteEvent",
+]);

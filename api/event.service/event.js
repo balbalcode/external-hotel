@@ -11,11 +11,11 @@ export const eventService = {
 
 async function get(filter) {
   let axios = window.$nuxt.$axios;
-  axios.setBaseURL(process.env.API_TEMP_URL);
+  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .get(`/api/temp/event?${helper(filter)}`, { timeout: 25500 })
-      .get(`/api/temp/event?${helper(filter)}`, { timeout: 25500 })
+      .get(`${process.env.TEMP_API}/api/temp/event?${helper(filter)}`, { timeout: 25500 })
       .then((data) => {
         if (data.status === 200) return data.data;
       })
@@ -27,11 +27,11 @@ async function get(filter) {
 
 async function show(id) {
   let axios = window.$nuxt.$axios;
-  axios.setBaseURL(process.env.API_TEMP_URL);
+  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .get(`/api/temp/event/${id}`, { timeout: 25500 })
-      .get(`/api/temp/event/${id}`, { timeout: 25500 })
+      .get(`/ap${process.env.TEMP_API}i/temp/event/${id}`, { timeout: 25500 })
       .then((data) => {
         if (data.status === 200) return data.data;
       })
@@ -43,11 +43,11 @@ async function show(id) {
 
 async function create(data) {
   let axios = window.$nuxt.$axios;
-  axios.setBaseURL(process.env.API_TEMP_URL);
+  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .post(`/api/temp/event`, data, { timeout: 25500 })
-      .post(`/api/temp/event`, data, { timeout: 25500 })
+      .post(`/ap${process.env.TEMP_API}i/temp/event`, data, { timeout: 25500 })
       .then((data) => {
         if (data.status === 200) return data.data;
       })
@@ -59,11 +59,11 @@ async function create(data) {
 
 async function increase(data) {
   let axios = window.$nuxt.$axios;
-  axios.setBaseURL(process.env.API_TEMP_URL);
+  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .post(`/api/temp/event`, data, { timeout: 25500 })
-      .post(`/api/temp/event`, data, { timeout: 25500 })
+      .post(`/ap${process.env.TEMP_API}i/temp/event`, data, { timeout: 25500 })
       .then((data) => {
         if (data.status === 200) return data.data;
       })
@@ -75,11 +75,11 @@ async function increase(data) {
 
 async function update(id, data) {
   let axios = window.$nuxt.$axios;
-  axios.setBaseURL(process.env.API_TEMP_URL);
+  axios.defaults.baseURL = process.env.TEMP_API;
   delete data.id;
   return (
     axios
-      // .put(`/api/temp/event/${id}`, data, { timeout: 25500 })
+      // .put(`/ap${process.env.TEMP_API}i/temp/event/${id}`, data, { timeout: 25500 })
       .put(`/api/temp/event/${id}`, data, { timeout: 25500 })
       .then((data) => {
         if (data.status === 200) return data.data;
@@ -92,11 +92,11 @@ async function update(id, data) {
 
 async function remove(id) {
   let axios = window.$nuxt.$axios;
-  axios.setBaseURL(process.env.API_TEMP_URL);
+  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .delete(`/api/temp/event/${id}`, { timeout: 25500 })
-      .delete(`/api/temp/event/${id}`, { timeout: 25500 })
+      .delete(`${process.env.TEMP_API}/api/temp/event/${id}`, { timeout: 25500 })
       .then((data) => {
         if (data.status === 200) return data.data;
       })

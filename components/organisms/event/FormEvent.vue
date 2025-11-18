@@ -26,8 +26,8 @@
       </div>
       <div class="mt-2 mb-4">
         <input-text-group
-          v-model="form.name"
-          :is_error="$v.form.name.$error"
+          v-model="form.stepsOne.name"
+          :is_error="$v.form.stepsOne.name.$error"
           additional_class_group="my-2"
           additional_class_label="mb-1"
           label_info="Nama event akan dilampirkan pada QR tiket masuk, mohon masukkan nama event dengan benar."
@@ -37,7 +37,7 @@
           placeholder="Contoh: Event Meeting SPN 2024"
           :error_message="[
             {
-              state: $v.form.name.required,
+              state: $v.form.stepsOne.name.required,
               message: 'Nama Event tidak boleh kosong',
             },
           ]"
@@ -48,18 +48,21 @@
 
       <div class="my-4">
         <input-date-group
-          v-model="form.start"
-          :is_error="$v.form.start.$error"
+          type="datetime"
+          disabled_date="before-today"
+          format="DD-MM-YYYY HH:mm"
+          v-model="form.stepsOne.start"
+          :is_error="$v.form.stepsOne.start.$error"
           additional_class_label="mb-1"
           additional_class_group="my-2"
           id="txt_start"
           label="Tanggal Mulai"
-          :is_submitted="form.isSubmitted"
+          :is_submitted="form.stepsOne.isSubmitted"
           placeholder="Masukkan Tanggal Mulai"
           label_info="Tanggal mulai event akan digunakan sebagai acuan awal berlakunya tiket masuk."
           :error_message="[
             {
-              state: $v.form.start.required,
+              state: $v.form.stepsOne.start.required,
               message: 'Tanggal Mulai tidak boleh kosong',
             },
           ]"
@@ -76,33 +79,42 @@
         <div class="d-flex">
           <active-button
             text="1 Hari"
-            type="outline"
+            @click="helper.selectDate = 1"
+            :type="`${helper.selectDate === 1 ? '' : 'outline'}`"
             additional_class="px-5 mt-1"
           />
           <active-button
             text="2 Hari"
-            type="outline"
+            @click="helper.selectDate = 2"
+            :type="`${helper.selectDate === 2 ? '' : 'outline'}`"
             additional_class="px-5 mt-1 ml-1"
           />
           <active-button
             text="3 Hari"
-            type="outline"
+            @click="helper.selectDate = 3"
+            :type="`${helper.selectDate === 3 ? '' : 'outline'}`"
             additional_class="px-5 mt-1 ml-1"
           />
           <active-button
             text="1 Minggu"
-            type="outline"
+            @click="helper.selectDate = 7"
+            :type="`${helper.selectDate === 7 ? '' : 'outline'}`"
             additional_class="px-5 mt-1 ml-1"
           />
           <active-button
             text="Atur Manual"
-            type=""
+            @click="helper.selectDate = 0"
+            :type="`${helper.selectDate === 0 ? '' : 'outline'}`"
             additional_class="px-5 mt-1 ml-1"
           />
         </div>
         <input-date-group
-          v-model="form.end"
-          :is_error="$v.form.end.$error"
+          type="datetime"
+          disabled_date="before-today"
+          format="DD-MM-YYYY HH:mm"
+          v-if="helper.selectDate === 0"
+          v-model="form.stepsOne.end"
+          :is_error="$v.form.stepsOne.end.$error"
           additional_class_group="mt-3 mb-0"
           additional_class_label="mb-1"
           id="txt_end"
@@ -111,7 +123,7 @@
           placeholder="Masukkan Tanggal Berakhir"
           :error_message="[
             {
-              state: $v.form.end.required,
+              state: $v.form.stepsOne.end.required,
               message: 'Tanggal Berakhir tidak boleh kosong',
             },
           ]"
@@ -126,8 +138,8 @@
 
       <div class="my-4">
         <input-textarea-group
-          v-model="form.description"
-          :is_error="$v.form.description.$error"
+          v-model="form.stepsOne.description"
+          :is_error="$v.form.stepsOne.description.$error"
           additional_class_group="my-2"
           additional_class_label="mb-1"
           label_info="Deskripsi event akan ditampilkan pada halaman detail event."
@@ -137,7 +149,7 @@
           placeholder="Masukkan Deskripsi Event"
           :error_message="[
             {
-              state: $v.form.description.required,
+              state: $v.form.stepsOne.description.required,
               message: 'Deskripsi Event tidak boleh kosong',
             },
           ]"
@@ -145,9 +157,23 @@
           :ref="`${id}__description`"
         />
       </div>
+
+      <div class="col-12 text-right" v-if="helper.steps === 1">
+        <active-button
+          text="Lanjutkan ke langkah berikutnya"
+          :is_disabled="helper.isLoading"
+          @click="stepsOne"
+        />
+        <active-button
+          text="Batal"
+          type="outline"
+          @click="$emit('cancel')"
+          additional_class="mr-1 px-3"
+        />
+      </div>
     </div>
 
-    <div>
+    <div v-if="helper.steps > 1" id="stepTwo">
       <div class="mt-4 d-flex">
         <div class="badge badge-pill pt-1 badge-primary">2</div>
         <div class="font-size-12 ml-2 font-weight-bold">Jumlah Tamu Event</div>
@@ -177,8 +203,8 @@
               </div>
               <div class="my-3">
                 <input-text-group
-                  v-model="form.quota.car"
-                  :is_error="$v.form.quota.car.$error"
+                  v-model="form.stepsTwo.quota.car"
+                  :is_error="$v.form.stepsTwo.quota.car.$error"
                   additional_class_group="my-2"
                   additional_class_label="mb-1"
                   id="txt_quota.car"
@@ -189,7 +215,7 @@
                   label_info=""
                   :error_message="[
                     {
-                      state: $v.form.quota.car.required,
+                      state: $v.form.stepsTwo.quota.car.required,
                       message: 'Kuota tidak boleh kosong',
                     },
                   ]"
@@ -199,8 +225,8 @@
               </div>
               <div class="my-3">
                 <input-select-group
-                  v-model="form.product.car"
-                  :is_error="$v.form.product.car.$error"
+                  v-model="form.stepsTwo.product.car"
+                  :is_error="$v.form.stepsTwo.product.car.$error"
                   additional_class_group="my-2"
                   additional_class_label="mb-1"
                   id="sel_product.car"
@@ -213,7 +239,7 @@
                   placeholder="Pilih Member"
                   :error_message="[
                     {
-                      state: $v.form.product.car.required,
+                      state: $v.form.stepsTwo.product.car.required,
                       message: 'Member tidak boleh kosong',
                     },
                   ]"
@@ -231,11 +257,13 @@
                 <p class="text-muted font-size-9 mt-1 text-justify">
                   Perkiraan Tagihan:
                   <strong
-                    >{{ form.quota.car || 0 }}
+                    >{{ form.stepsTwo.quota.car || 0 }}
                     x
                     {{
-                      form.product.car.price
-                        ? $utility.convertToRupiah(form.product.car.price)
+                      form.stepsTwo.product.car.price
+                        ? $utility.convertToRupiah(
+                            form.stepsTwo.product.car.price
+                          )
                         : "0"
                     }}</strong
                   >
@@ -266,8 +294,8 @@
               </div>
               <div class="my-3">
                 <input-text-group
-                  v-model="form.quota.motorcycle"
-                  :is_error="$v.form.quota.motorcycle.$error"
+                  v-model="form.stepsTwo.quota.motorcycle"
+                  :is_error="$v.form.stepsTwo.quota.motorcycle.$error"
                   additional_class_group="my-2"
                   additional_class_label="mb-1"
                   id="txt_quota.motorcycle"
@@ -278,7 +306,7 @@
                   label_info=""
                   :error_message="[
                     {
-                      state: $v.form.quota.motorcycle.required,
+                      state: $v.form.stepsTwo.quota.motorcycle.required,
                       message: 'Kuota tidak boleh kosong',
                     },
                   ]"
@@ -288,8 +316,8 @@
               </div>
               <div class="my-3">
                 <input-select-group
-                  v-model="form.product.motorcycle"
-                  :is_error="$v.form.product.motorcycle.$error"
+                  v-model="form.stepsTwo.product.motorcycle"
+                  :is_error="$v.form.stepsTwo.product.motorcycle.$error"
                   additional_class_group="my-2"
                   additional_class_label="mb-1"
                   id="sel_product.motorcycle"
@@ -302,7 +330,7 @@
                   placeholder="Pilih Member"
                   :error_message="[
                     {
-                      state: $v.form.product.motorcycle.required,
+                      state: $v.form.stepsTwo.product.motorcycle.required,
                       message: 'Member tidak boleh kosong',
                     },
                   ]"
@@ -320,11 +348,13 @@
                 <p class="text-muted font-size-9 mt-1 text-justify">
                   Perkiraan Tagihan:
                   <strong
-                    >{{ form.quota.motorcycle || 0 }}
+                    >{{ form.stepsTwo.quota.motorcycle || 0 }}
                     x
                     {{
-                      form.product.motorcycle.price
-                        ? $utility.convertToRupiah(form.product.motorcycle.price)
+                      form.stepsTwo.product.motorcycle.price
+                        ? $utility.convertToRupiah(
+                            form.stepsTwo.product.motorcycle.price
+                          )
                         : "0"
                     }}</strong
                   >
@@ -334,9 +364,22 @@
           </div>
         </div>
       </div>
+      <div class="col-12 text-right" v-if="helper.steps === 1">
+        <active-button
+          text="Lanjutkan ke langkah berikutnya"
+          :is_disabled="helper.isLoading"
+          @click="stepsOne"
+        />
+        <active-button
+          text="Batal"
+          type="outline"
+          @click="$emit('cancel')"
+          additional_class="mr-1 px-3"
+        />
+      </div>
     </div>
 
-    <div v-if="true">
+    <div v-if="helper.steps > 2">
       <div class="mt-4 d-flex">
         <div class="badge badge-pill pt-1 badge-primary">3</div>
         <div class="font-size-12 ml-2 font-weight-bold">
@@ -357,13 +400,13 @@
                       Daftar Plat Mobil
                     </p>
                     <p class="text-muted font-size-10 my-0">
-                      Kuota: {{ form.quota.car }} Plat Nomor
+                      Kuota: {{ form.stepsTwo.quota.car }} Plat Nomor
                     </p>
                   </div>
                 </div>
               </div>
               <input-tag-group
-                v-model="form.licensePlate.car"
+                v-model="form.stepsThree.licensePlate.car"
                 additional_class_group="my-2"
                 :limit="form.quota.car"
                 :is_error="false"
@@ -392,15 +435,15 @@
                       Daftar Plat Motor
                     </p>
                     <p class="text-muted font-size-10 my-0">
-                      Kuota: {{ form.quota.motorcycle }} Plat Nomor
+                      Kuota: {{ form.stepsTwo.quota.motorcycle }} Plat Nomor
                     </p>
                   </div>
                 </div>
               </div>
               <input-tag-group
-                v-model="form.licensePlate.motorcycle"
+                v-model="form.stepsThree.licensePlate.motorcycle"
                 additional_class_group="my-2"
-                :limit="form.quota.motorcycle"
+                :limit="form.stepsThree.quota.motorcycle"
                 :is_error="false"
                 id="licensePlate.motorcycle"
                 :error_message="false"
@@ -436,6 +479,7 @@
                     additional_class_label="mb-1"
                     id="txt_vip_pass_code"
                     label="Jumlah VIP Pass"
+                    v-model="form.stepsThree.vip_pass"
                     :is_submitted="form.isSubmitted"
                     placeholder="Masukkan Jumlah VIP Pass"
                     label_info=""
@@ -460,7 +504,7 @@
 </template>
 
 <script>
-import { productMethods } from "@/store/helperActions";
+import { productMethods, eventMethods } from "@/store/helperActions";
 import { required } from "vuelidate/lib/validators";
 export default {
   components: {
@@ -481,21 +525,26 @@ export default {
   data: () => ({
     id: "form_event",
     form: {
-      name: "",
-      description: "",
-      start: "",
-      end: "",
-      product: {
-        car: {},
-        motorcycle: {},
+      stepsOne: {
+        name: "",
+        description: "",
+        start: new Date(),
+        end: new Date(),
       },
-      quota: {
-        car: 0,
-        motorcycle: 0,
+      stepsTwo: {
+        product: {
+          car: {},
+          motorcycle: {},
+        },
+        quota: {
+          car: 0,
+          motorcycle: 0,
+        },
       },
-      licensePlate: {
+      stepsThree: {
         car: [],
         motorcycle: [],
+        vip_pass: 0,
       },
       isSubmitted: false,
     },
@@ -512,33 +561,53 @@ export default {
     helper: {
       isLoading: false,
       steps: 1,
+      selectDate: 0,
     },
   }),
   validations: {
     form: {
-      name: { required },
-      description: { required },
-      start: { required },
-      end: { required },
-      product: {
-        car: { required },
-        motorcycle: { required },
+      stepsOne: {
+        name: { required },
+        description: { required },
+        start: { required },
+        end: { required },
       },
-      quota: {
-        car: { required },
-        motorcycle: { required },
+      stepsTwo: {
+        product: {
+          car: { required },
+          motorcycle: { required },
+        },
+        quota: {
+          car: { required },
+          motorcycle: { required },
+        },
       },
     },
   },
   watch: {
-    "form.quota.car"(newVal) {
+    "form.stepsTwo.quota.car"(newVal) {
       if (newVal === "" || newVal === null || newVal === undefined) {
-        this.form.quota.car = 0;
+        this.form.stepsTwo.quota.car = 0;
       }
     },
-    "form.quota.motorcycle"(newVal) {
+    "form.stepsTwo.quota.motorcycle"(newVal) {
       if (newVal === "" || newVal === null || newVal === undefined) {
-        this.form.quota.motorcycle = 0;
+        this.form.stepsTwo.quota.motorcycle = 0;
+      }
+    },
+    "helper.selectDate"(newVal) {
+      if (newVal && newVal !== 0) {
+        let startDate = new Date(this.form.stepsOne.start);
+        let endDate = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate() + newVal,
+          startDate.getHours(),
+          startDate.getMinutes()
+        );
+        this.form.stepsOne.end = endDate;
+      } else {
+        this.form.stepsOne.end = this.form.stepsOne.start;
       }
     },
   },
@@ -547,8 +616,34 @@ export default {
   },
   methods: {
     getMembershipProduct: productMethods.getMembershipProduct,
-    processNextStep() {
-      this.form;
+    createEvent: eventMethods.createEvent,
+
+    stepsOne() {
+      this.form.isSubmitted = true;
+      this.$v.form.stepsOne.$touch();
+      if (!this.$v.form.stepsOne.$invalid) {
+        this.helper.steps = 2;
+        this.$nextTick(() => {
+          const element = document.getElementById("stepTwo");
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      }
+    },
+
+    processNextStepTwo() {
+      this.form.isSubmitted = true;
+      this.$v.form.stepsTwo.$touch();
+      if (!this.$v.form.stepsTwo.$invalid) {
+        this.helper.steps = 3;
+        this.$nextTick(() => {
+          const element = document.getElementById("stepThree");
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+      }
     },
 
     async processSubmitForm() {
@@ -596,6 +691,7 @@ export default {
         const { values } = await this.getMembershipProduct(PAYLOAD);
         this.processDivideProductByType(values);
       } catch (error) {
+        console.error(error);
         this.options.product = {
           car: [],
           motorcycle: [],
@@ -608,6 +704,139 @@ export default {
         this.helper.isLoading = false;
       }
     },
+  },
+
+  setPayloadTrxCar(transactionId) {
+    return {
+      ip_address: "",
+      image: "",
+      user_id: "f9854601-a497-4666-9af6-a4f61d4e0c1a",
+      spot_id: this.$utility.getSpotId(),
+      transaction_id: transactionId,
+      handshake: "",
+      rf_id: "",
+      time_in: 1753372662840,
+      time_out: "",
+      vehicle_code: "MB5",
+      grace_period: true,
+      trx_code: "E3F778",
+      flag: "casual",
+      type: "checkin",
+      gate_code: "gtin-LPMPMB-1",
+      additional_data: "",
+      payment_method: "GRACE_PERIOD",
+      price_lock: 0,
+      overnight_price: 0,
+      amount: 0,
+      cash_payment_payload: "",
+      provider_type: "",
+      queue_id: "",
+      lpr_category: false,
+      lpr_processed_time: 0,
+      lpr_response_time: 0,
+      lpr_license_number: false,
+      lpr_license_color: false,
+      lpr_license_date: false,
+      lpr_vehicle_brand: "",
+      lpr_vehicle_brand_name: "",
+      lpr_vehicle_color: "",
+      lpr_details: {},
+      source: "",
+      is_multiple_overstay: false,
+      is_manless_lpr: false,
+    };
+  },
+
+  setPayloadTrxMotorcycle() {
+    return {
+      ip_address: "",
+      image: "",
+      user_id: "f9854601-a497-4666-9af6-a4f61d4e0c1a",
+      spot_id: this.$utility.getSpotId(),
+      transaction_id: transactionId,
+      handshake: "",
+      rf_id: "",
+      time_in: 1753372662840,
+      time_out: "",
+      vehicle_code: "MT5",
+      grace_period: true,
+      trx_code: "E3F778",
+      flag: "casual",
+      type: "checkin",
+      gate_code: "gtin-LPMPMB-1",
+      additional_data: "",
+      payment_method: "GRACE_PERIOD",
+      price_lock: 0,
+      overnight_price: 0,
+      amount: 0,
+      cash_payment_payload: "",
+      provider_type: "",
+      queue_id: "",
+      lpr_category: false,
+      lpr_processed_time: 0,
+      lpr_response_time: 0,
+      lpr_license_number: false,
+      lpr_license_color: false,
+      lpr_license_date: false,
+      lpr_vehicle_brand: "",
+      lpr_vehicle_brand_name: "",
+      lpr_vehicle_color: "",
+      lpr_details: {},
+      source: "",
+      is_multiple_overstay: false,
+      is_manless_lpr: false,
+    };
+  },
+
+  async processSavingTransaction(data, vehicleCode) {
+    try {
+      this.helper.isLoading = true;
+      const PAYLOAD = {
+        id: this.$utility.generateUUID(),
+        spot_id: this.$utility.getSpotId(),
+        vehicle_code: vehicleCode,
+        license_number: data,
+        time_in: new Date(data.start).getTime(),
+        type: "checkin",
+        flag: "casual",
+        grace_period: true,
+      }
+      
+    } catch (error) {
+      this.$utility.setErrorContextSentry(error);
+      this.$sentry.captureMessage(
+        `${error.message} at processSavingTransaction in FormEvent`
+      );
+    } finally {
+      this.helper.isLoading = false;
+    }
+  },
+
+  async processGenerateTransaction() {
+    try {
+      this.helper.isLoading = true;
+      
+    } catch (error) {
+      this.$utility.setErrorContextSentry(error);
+      this.$sentry.captureMessage(
+        `${error.message} at processGenerateTransaction in FormEvent`
+      );
+    } finally {
+      this.helper.isLoading = false;
+    }
+  },
+
+  async processSaveEvent() {
+    try {
+      this.helper.isLoading = true;
+    } catch (error) {
+      this.$utility.setErrorContextSentry(error);
+      this.$sentry.captureMessage(
+        `${error.message} at processSaveEvent in FormEvent`
+      );
+    } finally {
+      this.helper.isLoading = false;
+    }
   },
 };
 </script>

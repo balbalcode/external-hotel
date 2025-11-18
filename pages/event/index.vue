@@ -8,18 +8,31 @@ export default {
   },
   data: () => {
     return {
+      selected: null,
       modal: {
         form: false,
+        quota: false,
       },
     };
   },
   methods: {
-    processCancelForm() {
-      this.modal.form = false;
+    toggleModalQuota(data) {
+      this.selected = null;
+      if (data) {
+        this.selected = data;
+      }
+      this.modal.quota = !this.modal.quota;
     },
+
+    toggleModalForm() {
+      this.modal.form = !this.modal.form;
+    },
+
     processRefreshState() {
-      // this.$refs.tableEvent.processFetchData();
-      this.processCancelForm();
+      this.$refs.tableEvent.processGetDataEvent();
+      this.modal.form = false;
+      this.modal.quota = false;
+      this.selected = null;
     },
   },
 };
@@ -42,10 +55,10 @@ export default {
         />
       </div>
     </div>
-    <table-event ref="tableEvent" />
+    <table-event ref="tableEvent" @addQuota="toggleModalQuota" />
     <plain-modal
       id="formEvent"
-      @close="processCancelForm"
+      @close="modal.form = false"
       v-model="modal.form"
       size="lg"
       test_id="modal-form-product"
@@ -54,7 +67,21 @@ export default {
         ref="formEvent"
         :data="selected"
         @saved="processRefreshState"
-        @cancel="processCancelForm"
+        @cancel="modal.form = false"
+      />
+    </plain-modal>
+
+    <plain-modal
+      id="modalQuota"
+      v-model="modal.quota"
+      @close="modal.quota = false"
+      size="md"
+      test_id="modal-add-quota-event"
+    >
+      <form-event-quota
+        :data="selected"
+        @saved="processRefreshState"
+        @cancel="modal.quota = false"
       />
     </plain-modal>
   </div>

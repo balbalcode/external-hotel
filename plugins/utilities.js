@@ -179,7 +179,7 @@ export default {
 
   getSpotId() {
     try {
-      let spots = JSON.parse(jscookie.get("selected_spots"));
+      let spots = JSON.parse(jscookie.get("corporate"));
       return spots.value;
     } catch (error) {
       alert("here getSpotId! ");
