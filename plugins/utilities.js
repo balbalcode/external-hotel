@@ -180,7 +180,7 @@ export default {
   getSpotId() {
     try {
       let spots = JSON.parse(jscookie.get("corporate"));
-      return spots.value;
+      return spots.spot_id;
     } catch (error) {
       alert("here getSpotId! ");
       // window.location.href = "/logout?type=fault"
@@ -189,19 +189,29 @@ export default {
 
   getCompanyId() {
     try {
-      let spots = JSON.parse(jscookie.get("selected_spots"));
-      return spots.company;
+      let spots = JSON.parse(jscookie.get("corporate"));
+      return spots.corporate_detail?.spot_detail?.company_id ?? "";
     } catch (error) {
       alert("here getCompanyId! ");
       // window.location.href = "/logout?type=fault"
     }
   },
 
-  getSelectedSpot() {
+  getCorporateId() {
     try {
-      return JSON.parse(jscookie.get("selected_spots"));
+      let spots = JSON.parse(jscookie.get("corporate"));
+      return spots.corporate_detail.id ?? "";
     } catch (error) {
-      alert("here getSelectedSpot! ");
+      alert("here getCompanyId! ");
+      // window.location.href = "/logout?type=fault"
+    }
+  },
+
+  getCorporateData() {
+    try {
+      return JSON.parse(jscookie.get("corporate"));
+    } catch (error) {
+      alert("here getCorporateData! ");
       // window.location.href = "/logout?type=fault"
     }
   },
@@ -686,17 +696,6 @@ export default {
       window.$nuxt.$sentry.captureMessage(
         "error compareTwoString in utilities"
       );
-    }
-  },
-
-  getSpotTimezone() {
-    try {
-        alert("timezone")
-    //   let selected_spot = this.getSelectedSpot();
-      return selected_spot.timezone ?? "Asia/Jakarta";
-    } catch (error) {
-      this.setErrorContextSentry(error);
-      window.$nuxt.$sentry.captureMessage("error getSpotTimezone in utilities");
     }
   },
 

@@ -36,3 +36,15 @@ export const eventMethods = mapActions("modules/event/storeEvent", [
   "updateEvent",
   "deleteEvent",
 ]);
+
+export const guestMethods = mapActions("modules/guest/storeGuest", [
+  "getGuest",
+  "getGuestDetail",
+  "createGuest",
+  "readOcr",
+  "updateGuest",
+  "deleteGuest",
+  "createMembership",
+  "getEmployeeDetail",
+  "createEmployee",
+]);

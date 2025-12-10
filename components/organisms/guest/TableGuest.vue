@@ -613,7 +613,12 @@
 </template>
 
 <script>
-export default {};
+export default {
+  components: {
+    ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
+    DropdownButton: () => import("@utilities/atoms/button/DropdownButton"),
+  },
+};
 </script>
 
 <style></style>

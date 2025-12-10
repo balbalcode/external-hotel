@@ -3,7 +3,7 @@ export default {
   components: {
     PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
-    FormGuest: () => import("@/components/organisms/guest/FormGuest"),
+    FormGuest: () => import("@/components/templates/guest/FormGuest"),
     TableGuest: () => import("@/components/organisms/guest/TableGuest"),
   },
   data: () => {
