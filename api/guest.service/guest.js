@@ -19,6 +19,7 @@ async function get(filter) {
         timeout: 25500,
       })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -35,6 +36,7 @@ async function show(id) {
       // .get(`/api/temp/guest/${id}`, { timeout: 25500 })
       .get(`/ap${process.env.TEMP_API}i/temp/guest/${id}`, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -51,6 +53,7 @@ async function create(data) {
       // .post(`/api/temp/guest`, data, { timeout: 25500 })
       .post(`/ap${process.env.TEMP_API}i/temp/guest`, data, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -67,6 +70,7 @@ async function increase(data) {
       // .post(`/api/temp/guest`, data, { timeout: 25500 })
       .post(`/ap${process.env.TEMP_API}i/temp/guest`, data, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -84,6 +88,7 @@ async function update(id, data) {
       // .put(`/ap${process.env.TEMP_API}i/temp/guest/${id}`, data, { timeout: 25500 })
       .put(`/api/temp/guest/${id}`, data, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -102,6 +107,7 @@ async function remove(id) {
         timeout: 25500,
       })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -116,6 +122,8 @@ async function ocr(data) {
   return axios
     .post(`${process.env.OCR_URL}/read`, data, { timeout: 25500 })
     .then((data) => {
+      axios.defaults.baseURL = process.env.baseUrl;
+      axios.defaults.baseURL = process.env.baseUrl;
       if (data.status === 200) return data.data;
     })
     .catch((error) => {

@@ -18,19 +18,18 @@
           Isi data tamu dengan benar dan lengkap
         </p>
       </div>
-
-      <form-guest-room
-        @submit="processStepOne"
-        @cancel="passCancelToParent"
-        v-if="helper.currentStep === 1"
-      />
-      <form-guest-information
-        :data="form.stepOne"
-        @submit="processStepTwo"
-        @cancel="passCancelToParent"
-        :is-passed="helper.currentStep > 2"
-      />
     </div>
+    <form-guest-room
+      @submit="processStepOne"
+      @cancel="passCancelToParent"
+      v-if="helper.currentStep === 1"
+    />
+    <form-guest-information
+      :data="form.stepOne"
+      @submit="processStepTwo"
+      @cancel="passCancelToParent"
+      :is-passed="helper.currentStep > 2"
+    />
     <div></div>
   </div>
 </template>
@@ -47,7 +46,19 @@ export default {
   data: () => {
     return {
       form: {
-        stepOne: {}, // ocr file upload { ocrFile, ocrResult}
+        stepOne: {
+          ocrFile:
+            "hotel/ocr-files/4a685e9e-c236-4850-85d1-a2534277cd65/29026c62-911e-41c5-b16b-f59e871d7af3.jpeg",
+          ocrResult: {
+            room_number: "1001",
+            guest_name: "DASWAND; SULTONI MR",
+            arrival_date: "16/07/25",
+            arrival_time: "21.03",
+            departure_date: "19/07/25",
+            departure_time: "12.00",
+            card_type: "New Card (Guest)",
+          },
+        }, // ocr file upload { ocrFile, ocrResult}
         stepTwo: {}, // matching result {based }
         stepThree: {}, // transaction data
         stepFour: {}, // membership &  card reading { data, membershipData}
@@ -55,7 +66,7 @@ export default {
       logger: {},
       helper: {
         CORPORATE: {},
-        currentStep: 1,
+        currentStep: 2,
         isLoading: false,
       },
     };

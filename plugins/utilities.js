@@ -34,7 +34,7 @@ export default {
   },
   convertToRupiah(number) {
     if (!number) return "0";
-    number = number.toString();
+  number = number.toString();
 
     const negative = number[0] && number[0] === "-";
     number = number.replace(/[^0-9]/g, "");
@@ -190,7 +190,7 @@ export default {
   getCompanyId() {
     try {
       let spots = JSON.parse(jscookie.get("corporate"));
-      return spots.corporate_detail?.spot_detail?.company_id ?? "";
+      return spots?.company_id ?? "";
     } catch (error) {
       alert("here getCompanyId! ");
       // window.location.href = "/logout?type=fault"
@@ -200,7 +200,7 @@ export default {
   getCorporateId() {
     try {
       let spots = JSON.parse(jscookie.get("corporate"));
-      return spots.corporate_detail.id ?? "";
+      return spots.id ?? "";
     } catch (error) {
       alert("here getCompanyId! ");
       // window.location.href = "/logout?type=fault"
