@@ -34,7 +34,7 @@ export default {
   },
   convertToRupiah(number) {
     if (!number) return "0";
-  number = number.toString();
+    number = number.toString();
 
     const negative = number[0] && number[0] === "-";
     number = number.replace(/[^0-9]/g, "");
@@ -372,8 +372,7 @@ export default {
       .PRODUCT_LIST;
     // checking is the product state has a row or not
     if (!data || !data.values || !data.values.length) {
-      let spot_id = JSON.parse(jscookie.get("selected_spots"));
-      spot_id = spot_id.value;
+      let spot_id = this.getSpotId();
       let payload = {
         spot_id: spot_id,
         filter: [
@@ -388,7 +387,7 @@ export default {
       };
       // re call to get product list
       data = await window.$nuxt.$store.dispatch(
-        "modules/product/storeProduct/getMembershipProduct",
+        "modules/product/storeProduct/getMembershipDictionary",
         payload
       );
     }
@@ -404,14 +403,11 @@ export default {
   async isProductAvailable(id) {
     let available = false;
     try {
-      const payload = {
-        spot_id: this.getSpotId(),
-        membership_id: id,
-      };
-      const product = await window.$nuxt.$store.dispatch(
-        "modules/product/storeProduct/getMembershipProductDetail",
-        payload
-      );
+      let product =
+        await window.$nuxt.$store.state.modules.product.storeProduct.PRODUCT_LIST?.values?.find(
+          (item) => item.id === id
+        );
+
       if (product) {
         if (!product.limit) available = true;
         else if (product.availability) available = true;
@@ -432,6 +428,9 @@ export default {
       name: `${product.name} - Rp ${this.convertToRupiah(product.price)}`,
       price: product.price,
       is_complimentary: product.is_complimentary === "YES",
+      period: product.period,
+      vehicle_code: product.vehicle_code,
+      values: product.values,
     };
   },
 

@@ -123,7 +123,6 @@ async function ocr(data) {
     .post(`${process.env.OCR_URL}/read`, data, { timeout: 25500 })
     .then((data) => {
       axios.defaults.baseURL = process.env.baseUrl;
-      axios.defaults.baseURL = process.env.baseUrl;
       if (data.status === 200) return data.data;
     })
     .catch((error) => {

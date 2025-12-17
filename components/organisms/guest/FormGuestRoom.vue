@@ -98,16 +98,7 @@
               :is_disabled="helper.loading.ocrFile || !form.ocrFile"
               @click="processReadOcrResult()"
             />
-            <active-button
-              text="Berikutnya"
-              @click="
-                $emit('submit', {
-                  ocrFile: form.ocrFile,
-                  ocrResult: resultOcr,
-                })
-              "
-              v-else
-            />
+            <active-button text="Mengalihkan..." :is_disabled="true" v-else />
             <active-button
               text="Batal"
               type="outline"
@@ -140,13 +131,48 @@ export default {
       helper: {
         resultOcr: null,
         fieldsOcr: [
-          { label: "Room Number", isPrimary: true, key: "room_number" },
-          { label: "Guest Name", isPrimary: false, key: "guest_name" },
-          { label: "Card Type", isPrimary: false, key: "card_type" },
-          { label: "Arrival Date", isPrimary: true, key: "arrival_date" },
-          { label: "Departure Date", isPrimary: true, key: "departure_date" },
-          { label: "Arrival Time", isPrimary: false, key: "arrival_time" },
-          { label: "Departure Time", isPrimary: false, key: "departure_time" },
+          {
+            label: "Room Number",
+            isPrimary: true,
+            key: "room_number",
+            object: "name",
+          },
+          {
+            label: "Guest Name",
+            isPrimary: false,
+            key: "guest_name",
+            object: "",
+          },
+          {
+            label: "Card Type",
+            isPrimary: false,
+            key: "card_type",
+            object: "",
+          },
+          {
+            label: "Arrival Date",
+            isPrimary: true,
+            key: "arrival_date",
+            object: "start",
+          },
+          {
+            label: "Departure Date",
+            isPrimary: true,
+            key: "departure_date",
+            object: "end",
+          },
+          {
+            label: "Arrival Time",
+            isPrimary: false,
+            key: "arrival_time",
+            object: "",
+          },
+          {
+            label: "Departure Time",
+            isPrimary: false,
+            key: "departure_time",
+            object: "",
+          },
         ],
         isOcrValid: false,
         isUploadedOcr: false,
@@ -177,6 +203,16 @@ export default {
       this.form.isSubmitted = true;
     },
 
+    processMakeOcrResultMapped(values) {
+      const mappedResult = {};
+      this.helper.fieldsOcr.forEach((field) => {
+        if (field.object) {
+          mappedResult[field.object] = values[field.key];
+        }
+      });
+      return mappedResult;
+    },
+
     processValidateOcrResult(values) {
       const extractedFields = Object.keys(values);
       const isValid = this.helper.fieldsOcr
@@ -184,7 +220,10 @@ export default {
         .every((field) => extractedFields.includes(field.key));
       if (isValid) {
         this.helper.isOcrValid = true;
-        this.resultOcr = values;
+        this.$emit("submit", {
+          ocrFile: this.form.ocrFile,
+          data: values,
+        });
       } else {
         this.helper.isOcrValid = false;
         this.helper.isUploadedOcr = true;
@@ -207,7 +246,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processReadOcrResult in FormGuestRoom`
         );
-        // window.location.reload();
+        window.location.reload();
       } finally {
         this.helper.loading.ocrFile = false;
       }

@@ -7,9 +7,33 @@ const state = () => ({
 const getters = {};
 
 const actions = {
+  async getMembershipDictionary({ commit, dispatch }, payload) {
+    return await productService
+      .dictionary(
+        payload.spot_id,
+        payload.filter,
+        payload.pagination,
+        payload.order
+      )
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        dispatch(
+          "modules/utility/storeUtility/setDefaultErrorAlert",
+          {
+            message: error.response.data.message,
+            opener: payload.opener,
+          },
+          { root: true }
+        );
+        throw error;
+      });
+  },
+
   async getMembershipProduct({ commit, dispatch }, payload) {
     return await productService
-      .get(payload.spot_id, payload.filter, payload.pagination, payload.order)
+      .get(payload)
       .then((data) => {
         return data;
       })

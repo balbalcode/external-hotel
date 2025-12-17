@@ -21,6 +21,7 @@ export const subscriptionMethods = mapActions(
 
 export const productMethods = mapActions("modules/product/storeProduct", [
   "getMembershipProduct",
+  "getMembershipDictionary",
 ]);
 
 export const resolutionMethods = mapActions(

@@ -15,8 +15,11 @@ async function get(filter) {
   return (
     axios
       // .get(`/api/temp/event?${helper(filter)}`, { timeout: 25500 })
-      .get(`${process.env.TEMP_API}/api/temp/event?${helper(filter)}`, { timeout: 25500 })
+      .get(`${process.env.TEMP_API}/api/temp/event?${helper(filter)}`, {
+        timeout: 25500,
+      })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -33,6 +36,7 @@ async function show(id) {
       // .get(`/api/temp/event/${id}`, { timeout: 25500 })
       .get(`/ap${process.env.TEMP_API}i/temp/event/${id}`, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -49,6 +53,7 @@ async function create(data) {
       // .post(`/api/temp/event`, data, { timeout: 25500 })
       .post(`/ap${process.env.TEMP_API}i/temp/event`, data, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -65,6 +70,7 @@ async function increase(data) {
       // .post(`/api/temp/event`, data, { timeout: 25500 })
       .post(`/ap${process.env.TEMP_API}i/temp/event`, data, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -82,6 +88,7 @@ async function update(id, data) {
       // .put(`/ap${process.env.TEMP_API}i/temp/event/${id}`, data, { timeout: 25500 })
       .put(`/api/temp/event/${id}`, data, { timeout: 25500 })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {
@@ -96,8 +103,11 @@ async function remove(id) {
   return (
     axios
       // .delete(`/api/temp/event/${id}`, { timeout: 25500 })
-      .delete(`${process.env.TEMP_API}/api/temp/event/${id}`, { timeout: 25500 })
+      .delete(`${process.env.TEMP_API}/api/temp/event/${id}`, {
+        timeout: 25500,
+      })
       .then((data) => {
+        axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
       })
       .catch((error) => {

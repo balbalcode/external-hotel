@@ -52,7 +52,6 @@ export default {
     >
       <form-guest
         ref="FormGuest"
-        :data="selected"
         @saved="processRefreshState"
         @cancel="processCancelForm"
       />
