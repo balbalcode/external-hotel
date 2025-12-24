@@ -1,12 +1,13 @@
+import { helper } from "./../config/helper";
 export const employeeService = {
-  show,
+  get,
   create,
 };
 
-async function show(company_id, employee_id) {
+async function get(company_id, payload) {
   let axios = window.$nuxt.$axios;
   return axios
-    .get(`/v1/company/${company_id}/employee/${employee_id}`, {
+    .get(`/v1/company/${company_id}/employee?${helper(payload)}`, {
       timeout: 25500,
     })
     .then((data) => {

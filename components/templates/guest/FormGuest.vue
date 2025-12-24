@@ -1,6 +1,6 @@
 <template>
   <div class="p-2" ref="formGuest">
-    <div class="d-flex">
+    <!-- <div class="d-flex">
       <div class="mt-1">
         <i
           class="ic-user-plus-02 font-size-20 text-info rounded-circle"
@@ -18,7 +18,7 @@
           Isi data tamu dengan benar dan lengkap
         </p>
       </div>
-    </div>
+    </div> -->
     <form-guest-room
       @submit="processStepOne"
       @cancel="passCancelToParent"
@@ -30,14 +30,14 @@
       @cancel="passCancelToParent"
       :is-passed="helper.currentStep > 2"
     /> -->
-    <form-guest-membership
+    <!-- <form-guest-membership
       :data="form.stepTwo"
       @submit="processStepThree"
       @cancel="passCancelToParent"
       v-if="helper.currentStep > 2"
       :is-passed="helper.currentStep > 3"
-    />
-    <div></div>
+    /> -->
+    <form-guest-process />
   </div>
 </template>
 
@@ -51,6 +51,8 @@ export default {
     FormGuestMembership: () =>
       import("@/components/organisms/guest/FormGuestMembership"),
     FormGuestRoom: () => import("@/components/organisms/guest/FormGuestRoom"),
+    FormGuestProcess: () =>
+      import("@/components/organisms/guest/FormGuestProcess"),
   },
   data: () => {
     return {
@@ -106,6 +108,7 @@ export default {
         CORPORATE: {},
         currentStep: 3,
         isLoading: false,
+        savingProcess: 0,
       },
     };
   },
@@ -193,6 +196,22 @@ export default {
       };
     },
 
+    setPayloadLogsTransaction() {
+      return {
+        guestName: "",
+        guestCheckin: "",
+        guestCheckout: "",
+        type: "HOTEL_GUEST", // HOTEL_GUEST / HOTEL_BENEFIT
+        ocrFile: "",
+        transactionId: "",
+        membershipId: "",
+        oldMembershipId: "",
+        employeeId: "",
+        rfid: "",
+        meta: "",
+      };
+    },
+
     passCancelToParent() {
       this.$emit("cancel");
     },
@@ -233,12 +252,6 @@ export default {
     async processSubmitData() {
       await this.processSaveMembership();
     },
-
-    // 3 steps to saving:
-    //   -> save data
-    //   -> cancel transaction / change to x
-    //   -> create log for audit trail (serverless)
-    //   -> create membership with card which get
   },
 };
 </script>

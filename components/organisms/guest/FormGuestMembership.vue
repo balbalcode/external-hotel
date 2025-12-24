@@ -5,11 +5,6 @@
       <div class="font-size-12 ml-2 font-weight-bold">Kendaraan</div>
     </div>
 
-    <pre>
-      {{ $v.filter }}
-      </pre
-    >
-
     <div class="row">
       <div class="col-12 col-lg-12 mb-2">
         <p class="font-weight-bold my-0">Pencarian kendaraan pengguna</p>
@@ -94,30 +89,95 @@
         </div>
       </div>
       <div class="col-12 col-lg-8 my-1">
-        <input-text-group
-          v-model="filter.key"
-          :is_error="$v.filter.key.$error"
-          label_info=""
-          id="txt_key"
-          additional_class_group="my-1 mx-1 d-none"
-          additional_class_label="my-0 font-size-11 font-weight-bold d-none"
-          size="sm"
-          v-if="helper.selectedFinder !== 'key'"
-          label="Kode Transaksi"
-          :is_submitted="filter.isSubmitted"
-          @submit="processSubmitSearch"
-          placeholder="Contoh: AB2356"
-          :error_message="[
-            {
-              state: $v.filter.key.required,
-              message: 'Kode Transaksi tidak boleh kosong',
-            },
-          ]"
-          :test_id="`${id}__key`"
-          :ref="`${id}__key`"
-        />
         <div class="rounded border border-secondary-90 h-100">
-          <div class="h-100 d-flex justify-content-center align-items-center">
+          <div class="p-1" v-if="data.selectedTransaction.id">
+            <div class="col-12 font-size-12 font-weight-bold mt-2">
+              Kendaraan Tamu Ditemukan
+            </div>
+            <div class="row rounded mb-1 p-1 m-0">
+              <div class="col-lg-2 p-2">
+                <div class="position-relative">
+                  <img
+                    :src="data.selectedTransaction.image_url"
+                    class="img-fluid cursor-pointer"
+                    @mouseenter="helper.showTooltip = true"
+                    @mouseleave="helper.showTooltip = false"
+                  />
+                  <div
+                    v-if="helper.showTooltip"
+                    class="position-absolute bg-white border shadow-sm p-1"
+                    style="
+                      bottom: 100%;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      z-index: 1000;
+                      margin-bottom: 5px;
+                    "
+                  >
+                    <img
+                      :src="data.selectedTransaction.image_url"
+                      style="width: 180px; height: 180px; object-fit: cover"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-10 p-0">
+                <div class="d-flex h-100 align-items-center">
+                  <div>
+                    <p class="my-1 text-muted font-size-10">Kode Tiket</p>
+                    <p class="my-1 font-weight-bold">
+                      {{ data.selectedTransaction.search_key }}
+                    </p>
+                  </div>
+                  <div class="ml-3">
+                    <p class="my-1 text-muted font-size-10">Waktu Masuk</p>
+                    <p class="my-1 font-weight-bold">
+                      {{
+                        $utility.formatDateMoment(
+                          data.selectedTransaction.time_in,
+                          "DD-MM-YYYY HH:mm:ss"
+                        )
+                      }}
+                    </p>
+                  </div>
+                  <div class="ml-3">
+                    <p class="my-1 text-muted font-size-10">Jenis Kendaraan</p>
+                    <p class="my-1 font-weight-bold">
+                      {{ data.selectedTransaction.vehicle_code }}
+                    </p>
+                  </div>
+                  <div class="ml-3">
+                    <p class="my-1 text-muted font-size-10">Akses Masuk</p>
+                    <p class="my-1 font-weight-bold">
+                      {{
+                        data.selectedTransaction.emoney_card_id
+                          ? "E-Money"
+                          : "Tiket"
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row p-2 mx-0 mt-n2">
+              <div class="col-lg-12 bg-light p-2 rounded mx-1">
+                <p class="font-size-12 font-weight-bold my-0">
+                  <i class="bx bx-error-circle"></i>
+                  Scan Kartu Kamar atau Kartu Khusus
+                </p>
+                <p class="text-muted font-size-11 mb-0 mt-1">
+                  Gunakan kartu kamar atau kartu khusus untuk memberikan parkir
+                  gratis kendaraan tamu dan Pastikan anda telah memeriksa data
+                  kendaraan tamu dengan benar sebelum memberikan parkir gratis.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div
+            v-else
+            class="h-100 d-flex justify-content-center align-items-center"
+          >
             <div
               :class="`text-center ${
                 helper.selectedFinder !== 'id' ? 'd-none' : ''
@@ -132,7 +192,7 @@
               </p>
 
               <active-button
-                text="Mulai Scan E-Money"
+                text="Mulai Scan Tiket "
                 size="sm"
                 additional_class="px-3 py-1 mt-2 font-size-11 font-weight-bold"
                 @click="modal.scanner = true"
@@ -175,8 +235,8 @@
               <div class="d-flex justify-content-center text-left mt-1">
                 <div>
                   <input-text-group
-                    v-model="filter.key"
-                    :is_error="$v.filter.key.$error"
+                    v-model="filter.transaction.key"
+                    :is_error="$v.filter.transaction.key.$error"
                     label_info=""
                     id="txt_key"
                     additional_class_group="my-1 mx-1"
@@ -188,15 +248,15 @@
                     placeholder="Contoh: AB2356"
                     :error_message="[
                       {
-                        state: $v.filter.key.required,
+                        state: $v.filter.transaction.key.required,
                         message: 'Kode Transaksi tidak boleh kosong',
                       },
                       {
-                        state: $v.filter.key.minLength,
+                        state: $v.filter.transaction.key.minLength,
                         message: 'Kode Transaksi tidak kurang dari 6 karakter',
                       },
                       {
-                        state: $v.filter.key.maxLength,
+                        state: $v.filter.transaction.key.maxLength,
                         message:
                           'Kode Transaksi tidak boleh lebih dari 6 karakter',
                       },
@@ -215,18 +275,81 @@
                 </div>
               </div>
             </div>
-            <div class=""></div>
-            <div class=""></div>
           </div>
         </div>
       </div>
+      <div
+        class="col-12 col-lg-6 mt-2 px-2 h-100 d-flex flex-column justify-content-center"
+      >
+        <input-text-group
+          v-model="filter.membership.rfid"
+          :is_error="$v.filter.membership.rfid.$error"
+          label_info=""
+          id="txt_rfid"
+          additional_class_group="my-1 mx-1"
+          additional_class_label="my-0 font-size-11 font-weight-bold"
+          size="sm"
+          label="Kode Kartu"
+          :is_submitted="filter.isSubmitted"
+          @submit="processSubmitSearch"
+          placeholder="Contoh: AB2356"
+          :error_message="[
+            {
+              state: $v.filter.membership.rfid.required,
+              message: 'Kode Kartu tidak boleh kosong',
+            },
+          ]"
+          :test_id="`${id}__rfid`"
+          :ref="`${id}__rfid`"
+        />
+        <p class="my-0 font-size-10 text-muted">
+          <i class="bx bx-error-circle"></i>
+          Anda belum memindai kartu kamar atau kartu khusus untuk memberikan
+          parkir gratis pada kendaraan tamu.
+        </p>
+      </div>
+      <div class="col-12 col-lg-6 text-right mt-2 px-2">
+        <!-- :is_disabled="!data.selectedTransaction.id" -->
+        <active-button text="Scan Kartu Kamar" @click="processStartScanRFID" />
+        <active-button
+          text="Batal"
+          type="outline"
+          @click="$emit('cancel')"
+          additional_class="mr-1 px-3"
+        />
+      </div>
     </div>
+
     <ModalScannerQrcode v-model="modal.scanner" @update="processGetScannedQR" />
+    <!-- hidden input -->
+    <input-text-group
+      v-model="filter.transaction.key"
+      :is_error="$v.filter.transaction.key.$error"
+      label_info=""
+      id="txt_key"
+      additional_class_group="my-1 mx-1 d-none"
+      additional_class_label="my-0 font-size-11 font-weight-bold d-none"
+      size="sm"
+      v-if="helper.selectedFinder !== 'key'"
+      label="Kode Transaksi"
+      :is_submitted="filter.isSubmitted"
+      @submit="processSubmitSearch"
+      placeholder="Contoh: AB2356"
+      :error_message="[
+        {
+          state: $v.filter.transaction.key.required,
+          message: 'Kode Transaksi tidak boleh kosong',
+        },
+      ]"
+      :test_id="`${id}__key`"
+      :ref="`${id}__key`"
+    />
   </div>
 </template>
 
 <script>
 import { minLength, maxLength, required } from "vuelidate/lib/validators";
+import { resolutionMethods } from "@/store/helperActions";
 export default {
   components: {
     InputTextGroup: () =>
@@ -243,11 +366,17 @@ export default {
         isNewMembership: false,
         rfId: "",
         cardId: "",
-        selectedTransacition: {},
+        selectedTransaction: {},
       },
       filter: {
-        key: "",
-        isSubmitted: false,
+        membership: {
+          rfid: "",
+          isSubmitted: false,
+        },
+        transaction: {
+          key: "",
+          isSubmitted: false,
+        },
       },
       modal: {
         scanner: false,
@@ -258,38 +387,66 @@ export default {
           transaction: false,
           membership: false,
         },
+        showTooltip: false,
         selectedFinder: "rfid",
       },
     };
   },
+  watch: {
+    "helper.selectedFinder": {
+      deep: true,
+      handler() {
+        this.data = {
+          isNewMembership: false,
+          rfId: "",
+          cardId: "",
+          selectedTransaction: {},
+        };
+        this.filter.transaction = {
+          key: "",
+          isSubmitted: false,
+        };
+        this.$v.filter.$reset();
+      },
+      immediate: false,
+    },
+  },
   validations() {
     return {
       filter: {
-        key: {
-          required,
-          ...(this.helper.selectedFinder === "key" && {
-            minLength: minLength(6),
-            maxLength: maxLength(6),
-          }),
+        transaction: {
+          key: {
+            required,
+            ...(this.helper.selectedFinder === "key" && {
+              minLength: minLength(6),
+              maxLength: maxLength(6),
+            }),
+          },
+        },
+        membership: {
+          rfid: { required },
         },
       },
     };
   },
   methods: {
+    getDataResolution: resolutionMethods.getDataResolution,
+    updateDataResolution: resolutionMethods.updateDataResolution,
+
     setPayloadTransaction() {
       let payload = {
-        filter: [{ key: "spot_id", value: this.$utility.getSpotId() }],
+        filter: [
+          { key: "spot_id", value: this.$utility.getSpotId() },
+          { key: "values", value: this.filter.transaction.key },
+        ],
       };
 
       if (this.helper.selectedFinder === "id") {
-        payload.filter.push({ key: "id", value: this.filter.key });
+        payload.filter.push({ key: "type", value: "id" });
       } else if (this.helper.selectedFinder === "rfid") {
-        payload.filter.push({ key: "rfid", value: this.filter.key });
+        payload.filter.push({ key: "type", value: "rfid" });
       } else if (this.helper.selectedFinder === "key") {
-        payload.filter.push({
-          key: "key",
-          value: this.filter.key,
-        });
+        payload.filter.push({ key: "type", value: "key" });
       }
 
       return payload;
@@ -299,7 +456,7 @@ export default {
       return {
         filter: [
           { key: "spot_id", value: this.$utility.getSpotId() },
-          { key: "rfid", value: this.filter.key },
+          { key: "rfid", value: this.filter.membership.rfid },
           { key: "company_id", value: this.$utility.getCompanyId() },
         ],
       };
@@ -310,24 +467,57 @@ export default {
       document.getElementById("input-txt_key").focus();
     },
 
+    processStartScanRFID() {
+      this.helper.loading.emoney = true;
+      document.getElementById("input-txt_rfid").focus();
+    },
+
     processSubmitSearch() {
-      this.filter.isSubmitted = true;
-      this.$v.filter.$touch();
-      if (!this.$v.filter.$invalid) {
+      this.filter.transaction.isSubmitted = true;
+      this.$v.filter.transaction.$touch();
+      if (!this.$v.filter.transaction.$invalid) {
         this.processSearchTransaction();
       }
     },
 
     processGetScannedQR(value) {
-      this.filter.key = value;
+      value = value.split(".");
+      this.filter.transaction.key = value[0];
       this.processSubmitSearch();
     },
 
-    processSearchTransaction() {
+    processSubmitSearch() {
+      this.filter.membership.isSubmitted = true;
+      this.$v.filter.membership.$touch();
+      if (!this.$v.filter.membership.$invalid) {
+        this.processSearchMembership();
+      }
+    },
+
+    async processSearchMembership() {
       try {
-        const payload = this.setPayloadTransaction();
-        alert(JSON.stringify(payload));
+        this.helper.loading.membership = true;
+        const payload = this.setPayloadMembership();
+        const { values, total_values } = await this.getDataResolution(payload);
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processSearchMembership in FormGuestMembership`
+        );
+      } finally {
+        this.helper.loading.membership = false;
+      }
+    },
+
+    async processSearchTransaction() {
+      try {
         this.helper.loading.transaction = true;
+        const payload = this.setPayloadTransaction();
+        const { values, total_values } = await this.getDataResolution(payload);
+        this.transaction = values;
+        if (total_values === 1) {
+          this.data.selectedTransaction = values[0];
+        }
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(

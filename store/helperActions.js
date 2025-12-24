@@ -46,6 +46,6 @@ export const guestMethods = mapActions("modules/guest/storeGuest", [
   "updateGuest",
   "deleteGuest",
   "createMembership",
-  "getEmployeeDetail",
+  "getEmployee",
   "createEmployee",
 ]);

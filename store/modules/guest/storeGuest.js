@@ -163,11 +163,14 @@ const actions = {
       });
   },
 
-  async getEmployeeDetail({ commit, dispatch }, payload) {
+  async getEmployee({ commit, dispatch }, payload) {
+    if (!payload.filter) payload.filter = [];
+    if (!payload.pagination) payload.pagination = {};
+    if (!payload.order) payload.order = {};
     return await employeeService
-      .show(payload.company_id, payload.id)
+      .get(payload.company_id, payload)
       .then((data) => {
-        return data.values;
+        return data;
       })
       .catch((error) => {
         dispatch(
