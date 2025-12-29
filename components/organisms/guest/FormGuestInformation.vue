@@ -133,7 +133,7 @@
             <p class="font-size-12 mb-0">
               Total Menginap:
               <span class="font-weight-bold">
-                {{ helper.differentDays }}
+                {{ parseInt(helper.differentDays) - 1 }}
               </span>
               Malam
             </p>

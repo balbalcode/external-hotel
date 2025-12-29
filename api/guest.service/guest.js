@@ -129,3 +129,5 @@ async function ocr(data) {
       return Promise.reject(error);
     });
 }
+
+

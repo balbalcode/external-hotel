@@ -286,7 +286,7 @@
           :is_error="$v.filter.membership.rfid.$error"
           label_info=""
           id="txt_rfid"
-          additional_class_group="my-1 mx-1"
+          additional_class_group="my-1 mx-1 d-none"
           additional_class_label="my-0 font-size-11 font-weight-bold"
           size="sm"
           label="Kode Kartu"
@@ -309,7 +309,6 @@
         </p>
       </div>
       <div class="col-12 col-lg-6 text-right mt-2 px-2">
-        <!-- :is_disabled="!data.selectedTransaction.id" -->
         <active-button text="Scan Kartu Kamar" @click="processStartScanRFID" />
         <active-button
           text="Batal"

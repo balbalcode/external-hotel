@@ -49,3 +49,8 @@ export const guestMethods = mapActions("modules/guest/storeGuest", [
   "getEmployee",
   "createEmployee",
 ]);
+
+export const ocrMethods = mapActions("modules/ocr/storeOcr", [
+  "getFormatOCR",
+  "readOCR",
+]);

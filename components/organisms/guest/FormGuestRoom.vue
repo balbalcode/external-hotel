@@ -16,11 +16,13 @@
               </p>
             </div>
             <div>
-              <active-button
-                text="Pertinjau format file"
-                additional_class="font-size-10 px-3 py-1 mt-2"
-                icon="bx bx-link-external"
-              />
+              <a :href="helper.sampleFile" target="_blank">
+                <active-button
+                  text="Pertinjau format file"
+                  additional_class="font-size-10 px-3 py-1 mt-2"
+                  icon="bx bx-link-external"
+                />
+              </a>
               <p class="my-1 text-muted font-size-8 mt-1 mb-0">
                 *Hubungi pengelola untuk merubah format file
               </p>
@@ -113,7 +115,7 @@
 </template>
 
 <script>
-import { guestMethods } from "@/store/helperActions";
+import { ocrMethods } from "@/store/helperActions";
 export default {
   components: {
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
@@ -130,51 +132,9 @@ export default {
       },
       helper: {
         resultOcr: null,
-        fieldsOcr: [
-          {
-            label: "Room Number",
-            isPrimary: true,
-            key: "room_number",
-            object: "name",
-          },
-          {
-            label: "Guest Name",
-            isPrimary: false,
-            key: "guest_name",
-            object: "",
-          },
-          {
-            label: "Card Type",
-            isPrimary: false,
-            key: "card_type",
-            object: "",
-          },
-          {
-            label: "Arrival Date",
-            isPrimary: true,
-            key: "arrival_date",
-            object: "start",
-          },
-          {
-            label: "Departure Date",
-            isPrimary: true,
-            key: "departure_date",
-            object: "end",
-          },
-          {
-            label: "Arrival Time",
-            isPrimary: false,
-            key: "arrival_time",
-            object: "",
-          },
-          {
-            label: "Departure Time",
-            isPrimary: false,
-            key: "departure_time",
-            object: "",
-          },
-        ],
+        fieldsOcr: [],
         isOcrValid: false,
+        sampleFile: "",
         isUploadedOcr: false,
         loading: {
           ocrFile: false,
@@ -183,8 +143,12 @@ export default {
       },
     };
   },
+  mounted() {
+    this.processGetFormatOcr();
+  },
   methods: {
-    readOcr: guestMethods.readOcr,
+    readOCR: ocrMethods.readOCR,
+    getFormatOCR: ocrMethods.getFormatOCR,
 
     setPayloadOcr() {
       return {
@@ -235,11 +199,35 @@ export default {
       }
     },
 
+    async processGetFormatOcr() {
+      try {
+        this.helper.loading.ocrFile = true;
+        const payload = {
+          filter: [
+            { key: "corporate_id", value: this.$utility.getCorporateId() },
+          ],
+        };
+        const { values } = await this.getFormatOCR(payload);
+        this.helper.fieldsOcr = JSON.parse(values[0].fields);
+        this.helper.sampleFile = `${this.$utility.getBaseAssetUrl()}/${
+          values[0].ocrFile
+        }`;
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetFormatOcr in FormGuestRoom`
+        );
+        window.location.reload();
+      } finally {
+        this.helper.loading.ocrFile = false;
+      }
+    },
+
     async processReadOcrResult() {
       try {
         this.helper.loading.ocrFile = true;
         const PAYLOAD = this.setPayloadOcr();
-        const { values } = await this.readOcr(PAYLOAD);
+        const { values } = await this.readOCR(PAYLOAD);
         this.processValidateOcrResult(values);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
