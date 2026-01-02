@@ -195,6 +195,7 @@
                 text="Mulai Scan Tiket "
                 size="sm"
                 additional_class="px-3 py-1 mt-2 font-size-11 font-weight-bold"
+                :is_disabled="helper.loading.transaction"
                 @click="modal.scanner = true"
               />
             </div>
@@ -212,8 +213,9 @@
                 Arahkan E-Money ke reader untuk melakukan scan secara otomatis.
               </p>
               <active-button
-                text="Mulai Scan Tiket "
+                text="Mulai Scan E-Money"
                 size="sm"
+                :is_disabled="helper.loading.transaction"
                 additional_class="px-3 py-1 mt-2 font-size-11 font-weight-bold"
                 @click="processStartScanEmoney"
               />
@@ -244,7 +246,7 @@
                     size="sm"
                     label="Kode Transaksi"
                     :is_submitted="filter.isSubmitted"
-                    @submit="processSubmitSearch"
+                    @submit="processSubmitTransaction"
                     placeholder="Contoh: AB2356"
                     :error_message="[
                       {
@@ -268,8 +270,9 @@
                 <div>
                   <active-button
                     text="Cari"
+                    :is_disabled="helper.loading.transaction"
                     size="sm"
-                    @click="processSubmitSearch"
+                    @click="processSubmitTransaction"
                     additional_class="px-3 py-1 mt-1  font-size-11 font-weight-bold"
                   />
                 </div>
@@ -279,39 +282,66 @@
         </div>
       </div>
       <div
-        class="col-12 col-lg-6 mt-2 px-2 h-100 d-flex flex-column justify-content-center"
+        class="col-12 col-lg-6 mt-2 h-100 d-flex flex-column justify-content-center"
       >
-        <input-text-group
-          v-model="filter.membership.rfid"
-          :is_error="$v.filter.membership.rfid.$error"
-          label_info=""
-          id="txt_rfid"
-          additional_class_group="my-1 mx-1 d-none"
-          additional_class_label="my-0 font-size-11 font-weight-bold"
-          size="sm"
-          label="Kode Kartu"
-          :is_submitted="filter.isSubmitted"
-          @submit="processSubmitSearch"
-          placeholder="Contoh: AB2356"
-          :error_message="[
-            {
-              state: $v.filter.membership.rfid.required,
-              message: 'Kode Kartu tidak boleh kosong',
-            },
-          ]"
-          :test_id="`${id}__rfid`"
-          :ref="`${id}__rfid`"
-        />
-        <p class="my-0 font-size-10 text-muted">
+        <p
+          class="my-0 font-size-10 text-muted"
+          v-if="!helper.loading.membership && !helper.wasCheckCard"
+        >
           <i class="bx bx-error-circle"></i>
           Anda belum memindai kartu kamar atau kartu khusus untuk memberikan
           parkir gratis pada kendaraan tamu.
         </p>
+
+        <p
+          class="my-0 font-size-10 text-muted"
+          v-else-if="!helper.loading.membership && helper.wasCheckCard"
+        >
+          <i class="bx bx-check-circle"></i>
+          Kartu kamar berhasil dipindai. Kode Kartu: {{ data.rfId }}
+        </p>
+
+        <p
+          class="my-0 font-size-10 text-muted"
+          v-else-if="helper.loading.membership"
+        >
+          <i class="bx bx-spinner bx-spin"></i>
+          Memproses kartu, mohon tunggu...
+        </p>
       </div>
       <div class="col-12 col-lg-6 text-right mt-2 px-2">
-        <active-button text="Scan Kartu Kamar" @click="processStartScanRFID" />
+        <template v-if="data.selectedTransaction.id">
+          <active-button
+            v-if="!helper.loading.membership && helper.wasCheckCard"
+            text="Proses Benefit Parkir"
+            test_id="btn_start_scan_rfid"
+            id="btn_start_scan_rfid"
+            ref="btn_start_scan_rfid"
+            @click="processSubmitForm"
+          />
+          <active-button
+            v-if="!helper.loading.membership"
+            :text="`${
+              helper.wasCheckCard ? 'Pindai Ulang Kartu' : 'Scan Kartu Sekarang'
+            }`"
+            :type="helper.wasCheckCard ? 'outline' : ''"
+            test_id="btn_start_scan_rfid"
+            id="btn_start_scan_rfid"
+            ref="btn_start_scan_rfid"
+            @click="processStartScanRFID"
+          />
+          <active-button
+            v-else
+            text="Scan Kartu Sekarang"
+            test_id="btn_loading_scan_rfid"
+            id="btn_loading_scan_rfid"
+            ref="btn_loading_scan_rfid"
+            is_disabled
+          />
+        </template>
         <active-button
           text="Batal"
+          data
           type="outline"
           @click="$emit('cancel')"
           additional_class="mr-1 px-3"
@@ -321,34 +351,61 @@
 
     <ModalScannerQrcode v-model="modal.scanner" @update="processGetScannedQR" />
     <!-- hidden input -->
-    <input-text-group
-      v-model="filter.transaction.key"
-      :is_error="$v.filter.transaction.key.$error"
-      label_info=""
-      id="txt_key"
-      additional_class_group="my-1 mx-1 d-none"
-      additional_class_label="my-0 font-size-11 font-weight-bold d-none"
-      size="sm"
-      v-if="helper.selectedFinder !== 'key'"
-      label="Kode Transaksi"
-      :is_submitted="filter.isSubmitted"
-      @submit="processSubmitSearch"
-      placeholder="Contoh: AB2356"
-      :error_message="[
-        {
-          state: $v.filter.transaction.key.required,
-          message: 'Kode Transaksi tidak boleh kosong',
-        },
-      ]"
-      :test_id="`${id}__key`"
-      :ref="`${id}__key`"
-    />
+    <div style="width: 1px !important; height: 1px; overflow: hidden">
+      <input-text-group
+        v-model="filter.transaction.key"
+        :is_error="$v.filter.transaction.key.$error"
+        label_info=""
+        id="txt_key"
+        additional_class_group="my-1 mx-1"
+        additional_class_label="my-0 font-size-11 font-weight-bold d-none"
+        size="sm"
+        v-if="helper.selectedFinder !== 'key'"
+        label="Kode Transaksi"
+        :is_submitted="filter.isSubmitted"
+        @submit="processSubmitTransaction"
+        placeholder="Contoh: AB2356"
+        :error_message="[
+          {
+            state: $v.filter.transaction.key.required,
+            message: 'Kode Transaksi tidak boleh kosong',
+          },
+        ]"
+        :test_id="`${id}__key`"
+        :ref="`${id}__key`"
+      />
+    </div>
+
+    <div style="width: 1px !important; height: 1px; overflow: hidden">
+      <input-text-group
+        v-model="filter.membership.rfid"
+        :is_error="$v.filter.membership.rfid.$error"
+        v-if="data.selectedTransaction.id"
+        label_info=""
+        id="txt_rfid"
+        additional_class_group="my-1 mx-1"
+        additional_class_label="my-0 font-size-11 font-weight-bold d-none"
+        size="sm"
+        label="Kode Kartu"
+        :is_submitted="filter.isSubmitted"
+        @submit="processSubmitMembership"
+        placeholder="Contoh: AB2356"
+        :error_message="[
+          {
+            state: $v.filter.membership.rfid.required,
+            message: 'Kode Kartu tidak boleh kosong',
+          },
+        ]"
+        :test_id="`${id}__rfid`"
+        :ref="`${id}__rfid`"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import { minLength, maxLength, required } from "vuelidate/lib/validators";
-import { resolutionMethods } from "@/store/helperActions";
+import { resolutionMethods, guestMethods } from "@/store/helperActions";
 export default {
   components: {
     InputTextGroup: () =>
@@ -386,6 +443,7 @@ export default {
           transaction: false,
           membership: false,
         },
+        wasCheckCard: false,
         showTooltip: false,
         selectedFinder: "rfid",
       },
@@ -431,6 +489,7 @@ export default {
   methods: {
     getDataResolution: resolutionMethods.getDataResolution,
     updateDataResolution: resolutionMethods.updateDataResolution,
+    getMembership: guestMethods.getMembership,
 
     setPayloadTransaction() {
       let payload = {
@@ -442,8 +501,6 @@ export default {
 
       if (this.helper.selectedFinder === "id") {
         payload.filter.push({ key: "type", value: "id" });
-      } else if (this.helper.selectedFinder === "rfid") {
-        payload.filter.push({ key: "type", value: "rfid" });
       } else if (this.helper.selectedFinder === "key") {
         payload.filter.push({ key: "type", value: "key" });
       }
@@ -456,8 +513,12 @@ export default {
         filter: [
           { key: "spot_id", value: this.$utility.getSpotId() },
           { key: "rfid", value: this.filter.membership.rfid },
-          { key: "company_id", value: this.$utility.getCompanyId() },
+          { key: "history", value: true },
         ],
+        pagination: {
+          page: 1,
+          per_page: 10,
+        },
       };
     },
 
@@ -467,11 +528,31 @@ export default {
     },
 
     processStartScanRFID() {
-      this.helper.loading.emoney = true;
+      this.helper.loading.membership = true;
+      this.helper.wasCheckCard = false;
+      this.filter.membership.isSubmitted = false;
+      this.$v.filter.membership.$reset();
+      this.filter.membership.rfid = "";
+      this.data.isNewMembership = false;
+      this.data.rfId = "";
+      this.data.cardId = "";
       document.getElementById("input-txt_rfid").focus();
     },
 
-    processSubmitSearch() {
+    processSubmitForm() {
+      this.$emit("submit", {
+        data: {
+          transactionData: this.data.selectedTransaction,
+          transactionId: this.data.selectedTransaction.id,
+          isNewMembership: this.data.isNewMembership,
+          rfId: this.data.rfId,
+          cardId: this.data.cardId,
+          oldMembershipId: this.data.selectedTransaction.membership_id,
+        },
+      });
+    },
+
+    processSubmitTransaction() {
       this.filter.transaction.isSubmitted = true;
       this.$v.filter.transaction.$touch();
       if (!this.$v.filter.transaction.$invalid) {
@@ -482,10 +563,10 @@ export default {
     processGetScannedQR(value) {
       value = value.split(".");
       this.filter.transaction.key = value[0];
-      this.processSubmitSearch();
+      this.processSubmitTransaction();
     },
 
-    processSubmitSearch() {
+    processSubmitMembership() {
       this.filter.membership.isSubmitted = true;
       this.$v.filter.membership.$touch();
       if (!this.$v.filter.membership.$invalid) {
@@ -496,9 +577,22 @@ export default {
     async processSearchMembership() {
       try {
         this.helper.loading.membership = true;
+        this.helper.wasCheckCard = true;
         const payload = this.setPayloadMembership();
-        const { values, total_values } = await this.getDataResolution(payload);
+        const { values, total_values } = await this.getMembership(payload);
+        if (total_values > 0) {
+          this.data.isNewMembership = false;
+          this.data.rfId = values[0].rfid;
+          this.data.cardId = values[0].card_id;
+        } else {
+          this.data.isNewMembership = true;
+          this.data.rfId = this.filter.membership.rfid;
+          this.data.cardId = "";
+        }
       } catch (error) {
+        this.data.isNewMembership = true;
+        this.data.rfId = this.filter.membership.rfid;
+        this.data.cardId = "";
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processSearchMembership in FormGuestMembership`
@@ -514,7 +608,7 @@ export default {
         const payload = this.setPayloadTransaction();
         const { values, total_values } = await this.getDataResolution(payload);
         this.transaction = values;
-        if (total_values === 1) {
+        if (total_values > 0) {
           this.data.selectedTransaction = values[0];
         }
       } catch (error) {

@@ -118,7 +118,6 @@ export default {
   },
   methods: {
     createMembership: guestMethods.createMembership,
-    // getEmployeeDetail: guestMethods.getEmployeeDetail,
     createEmployee: guestMethods.createEmployee,
 
     processStepOne(data) {
@@ -152,7 +151,7 @@ export default {
     setPayloadCreationMembership() {
       return {
         spot_id: this.$utility.getSpotId(),
-        name: `${this.helper.CORPORATE.name} - ${this.form.stepFour.data.rfid}`,
+        name: `${this.helper.CORPORATE.name} - ${this.form.stepFour.data.rfId}`,
         identification_number: this.form.identification_number.trim(),
         email: "",
         phone_number: "",
@@ -161,7 +160,7 @@ export default {
         motorcycle: [],
         card: {
           card_id: this.form.stepFour.data.cardId,
-          rf_id: this.form.stepFour.data.rfiId,
+          rf_id: this.form.stepFour.data.rfId,
           product_id: this.form.stepTwo.data.productId.id,
           employee_id: this.form.stepFour.data.employeeId,
           license_plate: this.form.stepFour.data.licensePlate,
@@ -181,8 +180,8 @@ export default {
     setPayloadExtendMembership() {
       return {
         card_id: this.form.stepFour.data.cardId,
-        rf_id: this.form.stepFour.data.rfiId,
-        product_id: this.form.stepFour.data.productId.id,
+        rf_id: this.form.stepFour.data.rfId,
+        product_id: this.form.stepTwo.data.productId.id,
         employee_id: this.form.stepFour.data.employeeId,
         license_plate: this.form.stepFour.data.licensePlate,
         start: this.$utility.formatDateMoment(
@@ -208,7 +207,7 @@ export default {
         membershipId: "",
         oldMembershipId: "",
         employeeId: "",
-        rfid: "",
+        rfId: "",
         meta: "",
       };
     },

@@ -163,12 +163,13 @@ const actions = {
       });
   },
 
-  async getEmployee({ commit, dispatch }, payload) {
+  async getMembership({ commit, dispatch }, payload) {
     if (!payload.filter) payload.filter = [];
     if (!payload.pagination) payload.pagination = {};
     if (!payload.order) payload.order = {};
-    return await employeeService
-      .get(payload.company_id, payload)
+    console.log(payload);
+    return await membershipService
+      .get(payload.filter, payload.pagination, payload.order)
       .then((data) => {
         return data;
       })
