@@ -22,28 +22,33 @@
     <form-guest-room
       @submit="processStepOne"
       @cancel="passCancelToParent"
-      v-if="helper.currentStep === 1"
+      v-if="helper.currentStep === 1 && helper.currentStep < 4"
     />
     <form-guest-information
       :data="form.stepOne"
       @submit="processStepTwo"
       @cancel="passCancelToParent"
-      v-if="helper.currentStep > 1"
+      v-if="helper.currentStep > 1 && helper.currentStep < 4"
       :is-passed="helper.currentStep > 2"
     />
     <form-guest-membership
       :data="form.stepTwo"
       @submit="processStepThree"
       @cancel="passCancelToParent"
-      v-if="helper.currentStep > 2"
+      v-if="helper.currentStep > 2 && helper.currentStep < 4"
       :is-passed="helper.currentStep > 3"
     />
-    <!-- <form-guest-process /> -->
+    <form-guest-process
+      v-if="helper.currentStep === 4"
+      :saving-logs="saved"
+      :step-one="form.stepOne"
+      :step-two="form.stepTwo"
+      :step-three="form.stepThree"
+    />
   </div>
 </template>
 
 <script>
-import { guestMethods, ocrMethods } from "@/store/helperActions";
 
 export default {
   components: {
@@ -106,6 +111,12 @@ export default {
           stepThree: false,
           stepFour: false,
         },
+        saved: {
+          membership: false,
+          transactionId: false,
+          creation: false,
+          membership: false,
+        },
         CORPORATE: {},
         currentStep: 1,
         isLoading: false,
@@ -117,8 +128,6 @@ export default {
     this.helper.CORPORATE = this.$utility.getCorporateData();
   },
   methods: {
-    createMembership: guestMethods.createMembership,
-    createEmployee: guestMethods.createEmployee,
 
     processStepOne(data) {
       this.form.stepOne = data;
@@ -133,124 +142,6 @@ export default {
     processStepThree(data) {
       this.form.stepThree = data;
       this.helper.currentStep = 4;
-    },
-
-    processStepFour(data) {
-      this.form.stepFour = data;
-      this.helper.currentStep = 5;
-    },
-
-    setPayloadTransaction() {
-      return {
-        transaction_id: this.form.stepThree.transaction_id,
-        method: "flag_problem",
-        reason: `TAMU_HOTEL-${this.helper.CORPORATE.id}-${this.logger.id}`,
-      };
-    },
-
-    setPayloadCreationMembership() {
-      return {
-        spot_id: this.$utility.getSpotId(),
-        name: `${this.helper.CORPORATE.name} - ${this.form.stepFour.data.rfId}`,
-        identification_number: this.form.identification_number.trim(),
-        email: "",
-        phone_number: "",
-        company_id: this.$utility.getCompanyId(),
-        status: true,
-        motorcycle: [],
-        card: {
-          card_id: this.form.stepFour.data.cardId,
-          rf_id: this.form.stepFour.data.rfId,
-          product_id: this.form.stepTwo.data.productId.id,
-          employee_id: this.form.stepFour.data.employeeId,
-          license_plate: this.form.stepFour.data.licensePlate,
-          start: this.$utility.formatDateMoment(
-            this.form.stepFour.data.start,
-            "YYYY-MM-DD HH:mm:ss"
-          ),
-          hour_start: this.form.stepFour.data.hourStart,
-          reference: "HOTEL-GUEST-TRANSACTION",
-          payment_method: "INVOICE",
-          payment_receipt: "",
-          paid_date: "",
-        },
-      };
-    },
-
-    setPayloadExtendMembership() {
-      return {
-        card_id: this.form.stepFour.data.cardId,
-        rf_id: this.form.stepFour.data.rfId,
-        product_id: this.form.stepTwo.data.productId.id,
-        employee_id: this.form.stepFour.data.employeeId,
-        license_plate: this.form.stepFour.data.licensePlate,
-        start: this.$utility.formatDateMoment(
-          this.form.stepFour.data.start,
-          "YYYY-MM-DD HH:mm:ss"
-        ),
-        hour_start: this.form.stepFour.data.hourStart,
-        reference: "HOTEL-GUEST-TRANSACTION",
-        payment_method: "INVOICE",
-        payment_receipt: "",
-        paid_date: "",
-      };
-    },
-
-    setPayloadLogsTransaction() {
-      return {
-        guestName: "",
-        guestCheckin: "",
-        guestCheckout: "",
-        type: "HOTEL_GUEST", // HOTEL_GUEST / HOTEL_BENEFIT
-        ocrFile: "",
-        transactionId: "",
-        membershipId: "",
-        oldMembershipId: "",
-        employeeId: "",
-        rfId: "",
-        meta: "",
-      };
-    },
-
-    passCancelToParent() {
-      this.$emit("cancel");
-    },
-
-    async processCancelTransaction() {
-      this.helper.isLoading = true;
-      const PAYLOAD = this.setPayloadTransaction();
-      try {
-        await guestMethods.processTransactionFlag(PAYLOAD);
-      } catch (error) {
-        this.$utility.setErrorContextSentry(error);
-        this.$sentry.captureMessage(
-          `${error.message} at processCancelTransaction in FormGuest`
-        );
-      } finally {
-        this.helper.isLoading = false;
-      }
-    },
-
-    async processExtendMembership() {
-      const PAYLOAD = this.setPayloadExtendMembership();
-      try {
-        await guestMethods.processExtendMembership(PAYLOAD);
-      } catch (error) {
-        this.$utility.setErrorContextSentry(error);
-        this.$sentry.captureMessage(
-          `${error.message} at processExtendMembership in FormGuest`
-        );
-      }
-    },
-
-    processSaveMembership() {
-      if (this.form.stepFour.membershipData.id) {
-      } else {
-      }
-    },
-
-    async processSubmitData() {
-      await this.processSaveMembership();
     },
   },
 };

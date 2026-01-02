@@ -423,6 +423,7 @@ export default {
         rfId: "",
         cardId: "",
         selectedTransaction: {},
+        selectedMembership: {},
       },
       filter: {
         membership: {
@@ -542,12 +543,12 @@ export default {
     processSubmitForm() {
       this.$emit("submit", {
         data: {
-          transactionData: this.data.selectedTransaction,
+          selectedTransaction: this.data.selectedTransaction,
           transactionId: this.data.selectedTransaction.id,
           isNewMembership: this.data.isNewMembership,
           rfId: this.data.rfId,
           cardId: this.data.cardId,
-          oldMembershipId: this.data.selectedTransaction.membership_id,
+          selectedMembership: this.data.selectedMembership,
         },
       });
     },
@@ -584,6 +585,7 @@ export default {
           this.data.isNewMembership = false;
           this.data.rfId = values[0].rfid;
           this.data.cardId = values[0].card_id;
+          this.selectedMembership = values[0];
         } else {
           this.data.isNewMembership = true;
           this.data.rfId = this.filter.membership.rfid;

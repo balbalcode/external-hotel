@@ -170,6 +170,8 @@
 <script>
 import Lottie from "vue-lottie";
 import animationData from "~/static/animationData.json";
+import { guestMethods } from "@/store/helperActions";
+
 export default {
   components: {
     Lottie,
@@ -183,16 +185,157 @@ export default {
       };
     },
   },
+  props: {
+    stepOne: {
+      type: Object,
+      required: true,
+    },
+    stepTwo: {
+      type: Object,
+      required: true,
+    },
+    stepThree: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
+    // Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-in ke server -> create log
+    // Berhasil menyimpan data log informasi kendaraan tamu seperti nomor plat, jenis kendaraan, dan waktu masuk ke server -> change transaction
+    // Berhasil menyimpan data log informasi transaksi yang digunakan oleh tamu sebelumnya ke server -> update member / create member
+    // Berhasil menyimpan data log aktivitas aktivasi ke server -> update log
     return {
-      currentProcess: 2,
+      currentProcess: 0,
     };
   },
   methods: {
+    createMembership: guestMethods.createMembership,
+    createEmployee: guestMethods.createEmployee,
+
     nextProcess() {
       if (this.currentProcess < 5) {
         this.currentProcess++;
       }
+    },
+
+    setPayloadTransaction() {
+      return {
+        transaction_id: this.stepThree.transaction_id,
+        method: "flag_problem",
+        reason: `TAMU_HOTEL-${this.helper.CORPORATE.id}-${this.logger.id}`,
+      };
+    },
+
+    setPayloadCreationMembership() {
+      return {
+        spot_id: this.$utility.getSpotId(),
+        name: `${this.helper.CORPORATE.name} - ${this.stepFour.data.rfId}`,
+        identification_number: this.identification_number.trim(),
+        email: "",
+        phone_number: "",
+        company_id: this.$utility.getCompanyId(),
+        status: true,
+        motorcycle: [],
+        card: {
+          card_id: this.stepFour.data.cardId,
+          rf_id: this.stepFour.data.rfId,
+          product_id: this.stepTwo.data.productId.id,
+          employee_id: this.stepFour.data.employeeId,
+          license_plate: this.stepFour.data.licensePlate,
+          start: this.$utility.formatDateMoment(
+            this.stepFour.data.start,
+            "YYYY-MM-DD HH:mm:ss"
+          ),
+          hour_start: this.stepFour.data.hourStart,
+          reference: "HOTEL-GUEST-TRANSACTION",
+          payment_method: "INVOICE",
+          payment_receipt: "",
+          paid_date: "",
+        },
+      };
+    },
+
+    setPayloadExtendMembership() {
+      return {
+        card_id: this.stepFour.data.cardId,
+        rf_id: this.stepFour.data.rfId,
+        product_id: this.stepTwo.data.productId.id,
+        employee_id: this.stepFour.data.employeeId,
+        license_plate: this.stepFour.data.licensePlate,
+        start: this.$utility.formatDateMoment(
+          this.stepFour.data.start,
+          "YYYY-MM-DD HH:mm:ss"
+        ),
+        hour_start: this.stepFour.data.hourStart,
+        reference: "HOTEL-GUEST-TRANSACTION",
+        payment_method: "INVOICE",
+        payment_receipt: "",
+        paid_date: "",
+      };
+    },
+
+    setPayloadLogsTransactionCreate() {
+      // this is the first step before saving or subitting all data (TRX START)
+      return {
+        guestRoom: this.stepTwo.data.name,
+        guestCheckin: this.stepTwo.data.start,
+        guestCheckout: this.stepTwo.data.end,
+        type: "HOTEL_GUEST", // HOTEL_GUEST / HOTEL_BENEFIT
+        ocrFile: this.stepOne.ocrFile,
+        ocrResult: this.stepOne.data,
+        transactionId: this.stepThree.data.selectedTransaction.id,
+        membershipId: "", // WILL BE FILLED AFTER CREATING MEMBERSHIP
+        oldMembershipId: !this.stepThree.data.isNewMembership
+          ? this.stepThree.data.selectedMembership.id
+          : "",
+        employeeId: !this.stepThree.data.isNewMembership
+          ? this.stepThree.data.selectedMembership.employee_id
+          : "",
+        rfId: this.stepThree.data.rfId,
+        meta: JSON.stringify({
+          stepOne: this.stepOne,
+          stepTwo: this.stepTwo,
+          stepThree: this.stepThree,
+        }),
+      };
+    },
+
+    setPayloadLogsTransactionUpdate() {
+      return {
+        id: this.logger.id,
+        membershipId: this.stepFour.data.id,
+      };
+    },
+
+    async processCancelTransaction() {
+      this.helper.isLoading = true;
+      const PAYLOAD = this.setPayloadTransaction();
+      try {
+        await guestMethods.processTransactionFlag(PAYLOAD);
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processCancelTransaction in FormGuest`
+        );
+      } finally {
+        this.helper.isLoading = false;
+      }
+    },
+
+    async processExtendMembership() {
+      const PAYLOAD = this.setPayloadExtendMembership();
+      try {
+        await guestMethods.processExtendMembership(PAYLOAD);
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processExtendMembership in FormGuest`
+        );
+      }
+    },
+
+    async processSubmitData() {
+      await this.processSaveMembership();
     },
   },
 };
