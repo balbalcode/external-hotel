@@ -513,7 +513,7 @@ export default {
       return {
         filter: [
           { key: "spot_id", value: this.$utility.getSpotId() },
-          { key: "rfid", value: this.filter.membership.rfid },
+          { key: "rf_id", value: this.filter.membership.rfid },
           { key: "history", value: true },
         ],
         pagination: {
@@ -583,9 +583,9 @@ export default {
         const { values, total_values } = await this.getMembership(payload);
         if (total_values > 0) {
           this.data.isNewMembership = false;
-          this.data.rfId = values[0].rfid;
-          this.data.cardId = values[0].card_id;
-          this.selectedMembership = values[0];
+          this.data.rfId = values[0].employee_detail.rf_id;
+          this.data.cardId = values[0].employee_detail.card_id;
+          this.data.selectedMembership = values[0];
         } else {
           this.data.isNewMembership = true;
           this.data.rfId = this.filter.membership.rfid;

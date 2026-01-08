@@ -49,14 +49,6 @@ const actions = {
     return await guestService
       .create(payload)
       .then((data) => {
-        dispatch(
-          "modules/utility/storeUtility/setDefaultSuccessAlert",
-          {
-            message: data.message,
-            opener: payload.opener,
-          },
-          { root: true }
-        );
         return data;
       })
       .catch((error) => {
@@ -97,14 +89,6 @@ const actions = {
     return await guestService
       .update(payload.id, payload)
       .then((data) => {
-        dispatch(
-          "modules/utility/storeUtility/setDefaultSuccessAlert",
-          {
-            message: data.message,
-            opener: payload.opener,
-          },
-          { root: true }
-        );
         return data;
       })
       .catch((error) => {

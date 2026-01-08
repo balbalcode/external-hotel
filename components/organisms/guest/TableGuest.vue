@@ -1,5 +1,8 @@
 <template>
   <div class="bg-white rounded-lg shadow p-3 mt-3">
+    <pre>
+      {{ data }}
+    </pre>
     <div class="d-flex justify-content-between mb-3">
       <div>
         <h5 class="font-weight-bold align-self-center font-size-16 mb-3">
@@ -23,9 +26,7 @@
           <tr class="border-bottom-table">
             <th class="text-dark">Nomor Kamar</th>
             <th class="text-dark">Plat Nomor 1</th>
-            <th class="text-dark">Plat Nomor 2</th>
             <th class="text-dark">Nomor Kartu</th>
-            <th class="text-dark">Nama</th>
             <th class="text-dark">Produk</th>
             <th class="text-dark">Tanggal Masuk</th>
             <th class="text-dark">Tanggal Keluar</th>
@@ -34,538 +35,32 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>B-101</td>
+          <tr v-for="(logs, index) in data" :key="index">
+            <td>{{ logs.guestName }}</td>
             <td>
               <span class="border border-gray-70 rounded px-2 py-1">
-                B0001SPN
+                {{ logs.licensePlate }}
               </span>
             </td>
+            <td>{{ logs.rfid }}</td>
+            <td></td>
             <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                B0001SPN
-              </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Agus Firmansyah</td>
-            <td>Tamu Inap Hotel 1 Hari</td>
-            <td>27 Februari 2026 14:00</td>
-            <td>28 Februari 2026 16:00</td>
-            <td>Admin Bekasi</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>B-102</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                B0002SPN
-              </span>
+              {{
+                $utility.formatDateMoment(
+                  logs.guestCheckin,
+                  "DD-MM-YYYY HH:mm:ss"
+                )
+              }}
             </td>
             <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                B0003SPN
-              </span>
+              {{
+                $utility.formatDateMoment(
+                  logs.guestCheckout,
+                  "DD-MM-YYYY HH:mm:ss"
+                )
+              }}
             </td>
-            <td>RFID HERE</td>
-            <td>Siti Nurhaliza</td>
-            <td>Tamu Inap Hotel 2 Hari</td>
-            <td>27 Februari 2026 15:00</td>
-            <td>29 Februari 2026 12:00</td>
-            <td>Admin Jakarta</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>B-103</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                D1234ABC
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1"> - </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Budi Santoso</td>
-            <td>Tamu Inap Hotel 3 Hari</td>
-            <td>26 Februari 2026 16:30</td>
-            <td>01 Maret 2026 10:00</td>
-            <td>Admin Surabaya</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>A-201</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                F5678DEF
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                F9876GHI
-              </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Maya Kartika</td>
-            <td>Tamu Inap Hotel 1 Hari</td>
-            <td>27 Februari 2026 13:00</td>
-            <td>28 Februari 2026 11:00</td>
-            <td>Admin Bandung</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>C-305</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                H1122JKL
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1"> - </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Dedi Kurniawan</td>
-            <td>Tamu Inap Hotel 4 Hari</td>
-            <td>25 Februari 2026 14:00</td>
-            <td>01 Maret 2026 12:00</td>
-            <td>Admin Medan</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>A-105</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                L3344MNO
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                L5566PQR
-              </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Rina Marlina</td>
-            <td>Tamu Inap Hotel 2 Hari</td>
-            <td>26 Februari 2026 15:30</td>
-            <td>28 Februari 2026 14:00</td>
-            <td>Admin Semarang</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>B-204</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                N7788STU
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1"> - </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Teguh Prasetyo</td>
-            <td>Tamu Inap Hotel 1 Hari</td>
-            <td>27 Februari 2026 16:00</td>
-            <td>28 Februari 2026 15:00</td>
-            <td>Admin Yogyakarta</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>C-108</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                P9900VWX
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                P1122YZA
-              </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Indah Permata</td>
-            <td>Tamu Inap Hotel 5 Hari</td>
-            <td>24 Februari 2026 13:30</td>
-            <td>01 Maret 2026 11:30</td>
-            <td>Admin Malang</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>A-302</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                R3344BCD
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1"> - </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Wahyu Hidayat</td>
-            <td>Tamu Inap Hotel 2 Hari</td>
-            <td>26 Februari 2026 17:00</td>
-            <td>28 Februari 2026 13:00</td>
-            <td>Admin Solo</td>
-            <td class="text-center">
-              <dropdown-button
-                text=""
-                size="sm"
-                variant="gray"
-                type="outline"
-                additional_class="p-0"
-                caret="font-size-20 bx bx-dots-vertical-rounded"
-                :has_custom_action="true"
-              >
-                <active-button
-                  icon="ic-user-01"
-                  icon_size="16"
-                  text="Perpanjang"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-clock-fast-forward"
-                  icon_size="16"
-                  text="Hentikan"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-                <active-button
-                  icon="ic-dataflow-03"
-                  icon_size="16"
-                  text="Cetak Kartu Baru"
-                  variant="light"
-                  type="outline"
-                  additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                  align="rtl"
-                />
-              </dropdown-button>
-            </td>
-          </tr>
-          <tr>
-            <td>B-306</td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                T5566EFG
-              </span>
-            </td>
-            <td>
-              <span class="border border-gray-70 rounded px-2 py-1">
-                T7788HIJ
-              </span>
-            </td>
-            <td>RFID HERE</td>
-            <td>Lestari Putri</td>
-            <td>Tamu Inap Hotel 3 Hari</td>
-            <td>25 Februari 2026 12:00</td>
-            <td>28 Februari 2026 10:00</td>
-            <td>Admin Denpasar</td>
+            <td>{{ logs.create_by }}</td>
             <td class="text-center">
               <dropdown-button
                 text=""
@@ -613,10 +108,130 @@
 </template>
 
 <script>
+import { guestMethods, productMethods } from "@/store/helperActions";
 export default {
   components: {
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
     DropdownButton: () => import("@utilities/atoms/button/DropdownButton"),
+  },
+  data() {
+    return {
+      data: [],
+      helper: {
+        loading: false,
+      },
+      options: {
+        product: [],
+        productCompany: [],
+        productDictionary: [],
+      },
+      pagination: {
+        page: 1,
+        per_page: 10,
+        total: 0,
+      },
+    };
+  },
+  async mounted() {
+    await this.processGetOptionsDictionary();
+    await this.processGetOptionsProduct();
+    this.processFillingOptionsProduct();
+    this.processGetData();
+  },
+  methods: {
+    getGuest: guestMethods.getGuest,
+    getMembershipProduct: productMethods.getMembershipProduct,
+
+    setPayloadGuest() {
+      return {
+        filter: [{ key: "corporateId", value: this.$utility.getCorporateId() }],
+        pagination: {
+          page: this.pagination.page,
+          per_page: this.pagination.per_page,
+        },
+      };
+    },
+
+    processFillingOptionsProduct() {
+      this.options.product = this.options.productCompany.map((opt) => {
+        const dictionary = this.options.productDictionary.find(
+          (item) => item.id === opt.productId
+        );
+        return {
+          ...opt,
+          values: dictionary ? dictionary.values : "Unknown Product",
+          period: dictionary ? dictionary.period : "day",
+        };
+      });
+    },
+
+    processFindData(data, step, key) {
+      const DATA = JSON.parse(data);
+      return DATA[step] ? DATA[step].data[key] : null;
+    },
+
+    processFormatData(data) {
+      return data.map((item) => {
+        return {
+          ...item,
+          licensePlate: this.processFindData(
+            item.meta,
+            "stepTwo",
+            "licensePlate"
+          ),
+        };
+      });
+    },
+
+    async processGetOptionsProduct() {
+      try {
+        this.helper.loading = true;
+        const { values } = await this.getMembershipProduct(
+          this.setPayloadProduct()
+        );
+        this.options.productCompany = values;
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetOptionsProduct in TableGuest`
+        );
+      } finally {
+        this.helper.loading = false;
+      }
+    },
+
+    async processGetOptionsDictionary() {
+      try {
+        this.helper.loading = true;
+        this.options.productDictionary =
+          await this.$utility.getOptionProductMembership();
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetOptionsDictionary in FormGuestInformation`
+        );
+      } finally {
+        this.helper.loading = false;
+      }
+    },
+
+    async processGetData() {
+      try {
+        this.helper.loading = true;
+        const payload = this.setPayloadGuest();
+        const { values, total_values } = await this.getGuest(payload);
+        this.data = this.processFormatData(values);
+        this.pagination.total = total_values;
+      } catch (error) {
+        console.log(error);
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetData in TableGuest`
+        );
+      } finally {
+        this.helper.loading = false;
+      }
+    },
   },
 };
 </script>

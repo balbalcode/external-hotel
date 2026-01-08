@@ -227,53 +227,7 @@ export default {
         productDictionary: [],
       },
       helper: {
-        fieldsOcr: [
-          {
-            label: "Room Number",
-            isPrimary: true,
-            key: "room_number",
-            object: "name",
-            format: "string",
-          },
-          {
-            label: "Guest Name",
-            isPrimary: false,
-            key: "guest_name",
-            object: "",
-          },
-          {
-            label: "Card Type",
-            isPrimary: false,
-            key: "card_type",
-            object: "",
-          },
-          {
-            label: "Arrival Date",
-            isPrimary: true,
-            key: "arrival_date",
-            object: "start",
-            format: "DD/MM/YY",
-          },
-          {
-            label: "Departure Date",
-            isPrimary: true,
-            key: "departure_date",
-            object: "end",
-            format: "DD/MM/YY",
-          },
-          {
-            label: "Arrival Time",
-            isPrimary: false,
-            key: "arrival_time",
-            object: "",
-          },
-          {
-            label: "Departure Time",
-            isPrimary: false,
-            key: "departure_time",
-            object: "",
-          },
-        ],
+        fieldsOcr: [],
         differentDays: 0,
         loading: {
           product: false,

@@ -16,10 +16,10 @@
 
       <div class="col-12 col-lg-8">
         <div class="d-flex align-items-top my-3">
-          <div v-if="currentProcess >= 2" class="text-success">
+          <div v-if="helper.currentProcess >= 2" class="text-success">
             <i class="bx bx-check-circle font-size-20"></i>
           </div>
-          <div v-else-if="currentProcess === 1" class="text-dark">
+          <div v-else-if="helper.currentProcess === 1" class="text-dark">
             <i class="bx bx-loader-alt bx-spin font-size-20"></i>
           </div>
           <div v-else class="text-secondary">
@@ -29,9 +29,9 @@
             <p
               class="font-size-13 mt-n1 mb-0"
               :class="
-                currentProcess >= 2
+                helper.currentProcess >= 2
                   ? 'text-success'
-                  : currentProcess === 1
+                  : helper.currentProcess === 1
                   ? 'text-dark'
                   : 'text-secondary'
               "
@@ -41,9 +41,9 @@
               </span>
               <span class="d-block font-size-9">
                 {{
-                  currentProcess >= 2
+                  helper.currentProcess >= 2
                     ? "Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-in ke server"
-                    : currentProcess === 1
+                    : helper.currentProcess === 1
                     ? "Sistem sedang menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-in ke server"
                     : "Menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-in ke server"
                 }}
@@ -53,10 +53,10 @@
         </div>
 
         <div class="d-flex align-items-top my-3">
-          <div v-if="currentProcess >= 3" class="text-success">
+          <div v-if="helper.currentProcess >= 3" class="text-success">
             <i class="bx bx-check-circle font-size-20"></i>
           </div>
-          <div v-else-if="currentProcess === 2" class="text-dark">
+          <div v-else-if="helper.currentProcess === 2" class="text-dark">
             <i class="bx bx-loader-alt bx-spin font-size-20"></i>
           </div>
           <div v-else class="text-secondary">
@@ -66,9 +66,9 @@
             <p
               class="font-size-13 mt-n1 mb-0"
               :class="
-                currentProcess >= 3
+                helper.currentProcess >= 3
                   ? 'text-success'
-                  : currentProcess === 2
+                  : helper.currentProcess === 2
                   ? 'text-dark'
                   : 'text-secondary'
               "
@@ -78,9 +78,9 @@
               </span>
               <span class="d-block font-size-9">
                 {{
-                  currentProcess >= 3
+                  helper.currentProcess >= 3
                     ? "Berhasil menyimpan data log informasi kendaraan tamu seperti nomor plat, jenis kendaraan, dan waktu masuk ke server"
-                    : currentProcess === 2
+                    : helper.currentProcess === 2
                     ? "Sistem sedang menyimpan data log informasi kendaraan tamu seperti nomor plat, jenis kendaraan, dan waktu masuk ke server"
                     : "Menyimpan data log informasi kendaraan tamu seperti nomor plat, jenis kendaraan, dan waktu masuk ke server"
                 }}
@@ -90,10 +90,10 @@
         </div>
 
         <div class="d-flex align-items-top my-3">
-          <div v-if="currentProcess >= 4" class="text-success">
+          <div v-if="helper.currentProcess >= 4" class="text-success">
             <i class="bx bx-check-circle font-size-20"></i>
           </div>
-          <div v-else-if="currentProcess === 3" class="text-dark">
+          <div v-else-if="helper.currentProcess === 3" class="text-dark">
             <i class="bx bx-loader-alt bx-spin font-size-20"></i>
           </div>
           <div v-else class="text-secondary">
@@ -103,9 +103,9 @@
             <p
               class="font-size-13 mt-n1 mb-0"
               :class="
-                currentProcess >= 4
+                helper.currentProcess >= 4
                   ? 'text-success'
-                  : currentProcess === 3
+                  : helper.currentProcess === 3
                   ? 'text-dark'
                   : 'text-secondary'
               "
@@ -115,9 +115,9 @@
               </span>
               <span class="d-block font-size-9">
                 {{
-                  currentProcess >= 4
+                  helper.currentProcess >= 4
                     ? "Berhasil menyimpan data log informasi transaksi yang digunakan oleh tamu sebelumnya ke server"
-                    : currentProcess === 3
+                    : helper.currentProcess === 3
                     ? "Sistem sedang menyimpan data log informasi transaksi yang digunakan oleh tamu sebelumnya ke server"
                     : "Menyimpan data log informasi transaksi yang digunakan oleh tamu sebelumnya ke server"
                 }}
@@ -127,10 +127,10 @@
         </div>
 
         <div class="d-flex align-items-top my-3">
-          <div v-if="currentProcess >= 4" class="text-success">
+          <div v-if="helper.currentProcess >= 5" class="text-success">
             <i class="bx bx-check-circle font-size-20"></i>
           </div>
-          <div v-else-if="currentProcess === 3" class="text-dark">
+          <div v-else-if="helper.currentProcess === 4" class="text-dark">
             <i class="bx bx-loader-alt bx-spin font-size-20"></i>
           </div>
           <div v-else class="text-secondary">
@@ -140,9 +140,46 @@
             <p
               class="font-size-13 mt-n1 mb-0"
               :class="
-                currentProcess >= 4
+                helper.currentProcess >= 5
                   ? 'text-success'
-                  : currentProcess === 3
+                  : helper.currentProcess === 4
+                  ? 'text-dark'
+                  : 'text-secondary'
+              "
+            >
+              <span class="d-block font-weight-bold">
+                Membuat transaksi masuk
+              </span>
+              <span class="d-block font-size-9">
+                {{
+                  helper.currentProcess >= 5
+                    ? "Berhasil membuet transaksi masuk untuk kendaraan tamu di sistem"
+                    : helper.currentProcess === 4
+                    ? "Sistem sedang membuet transaksi masuk untuk kendaraan tamu di sistem"
+                    : "membuet transaksi masuk untuk kendaraan tamu di sistem"
+                }}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-top my-3">
+          <div v-if="helper.currentProcess >= 6" class="text-success">
+            <i class="bx bx-check-circle font-size-20"></i>
+          </div>
+          <div v-else-if="helper.currentProcess === 4" class="text-dark">
+            <i class="bx bx-loader-alt bx-spin font-size-20"></i>
+          </div>
+          <div v-else class="text-secondary">
+            <i class="bx bx-circle font-size-20"></i>
+          </div>
+          <div class="ml-2 mt-0">
+            <p
+              class="font-size-13 mt-n1 mb-0"
+              :class="
+                helper.currentProcess >= 6
+                  ? 'text-success'
+                  : helper.currentProcess === 4
                   ? 'text-dark'
                   : 'text-secondary'
               "
@@ -152,9 +189,9 @@
               </span>
               <span class="d-block font-size-9">
                 {{
-                  currentProcess >= 4
+                  helper.currentProcess >= 6
                     ? "Berhasil menyimpan data log aktivitas aktivasi ke server"
-                    : currentProcess === 3
+                    : helper.currentProcess === 4
                     ? "Sistem sedang menyimpan data log aktivitas aktivasi ke server"
                     : "Menyimpan data log aktivitas aktivasi ke server"
                 }}
@@ -170,7 +207,7 @@
 <script>
 import Lottie from "vue-lottie";
 import animationData from "~/static/animationData.json";
-import { guestMethods } from "@/store/helperActions";
+import { guestMethods, resolutionMethods } from "@/store/helperActions";
 
 export default {
   components: {
@@ -205,22 +242,58 @@ export default {
     // Berhasil menyimpan data log informasi transaksi yang digunakan oleh tamu sebelumnya ke server -> update member / create member
     // Berhasil menyimpan data log aktivitas aktivasi ke server -> update log
     return {
-      currentProcess: 0,
+      membership: {},
+      log: {},
+      helper: {
+        currentProcess: 1,
+        CORPORATE: {},
+      },
     };
   },
+  mounted() {
+    this.helper.CORPORATE = this.$utility.getCorporateData();
+    this.startProcess();
+  },
   methods: {
+    updateDataResolution: resolutionMethods.updateDataResolution,
     createMembership: guestMethods.createMembership,
     createEmployee: guestMethods.createEmployee,
+    createGuest: guestMethods.createGuest,
+    updateGuest: guestMethods.updateGuest,
 
     nextProcess() {
-      if (this.currentProcess < 5) {
-        this.currentProcess++;
+      if (this.helper.currentProcess < 5) {
+        this.helper.currentProcess++;
       }
+    },
+
+    setPayloadAuthTransaction() {
+      return {
+        spot_id: this.$utility.getSpotId(),
+        corporate_id: this.$utility.getCorporateId(),
+      };
+    },
+
+    setPayloadCreateTransaction(token) {
+      return {
+        token: token,
+        image: "",
+        user_id: payload["user_id"],
+        spot_id: this.$utility.getSpotId(),
+        transaction_id: this.$utility.generateUUID(),
+        handshake: payload["handshake"],
+        rf_id: payload["rf_id"],
+        pos_in: payload["gate_code"],
+        gate_code: payload["gate_code"],
+        created_at: payload["created_at"],
+        time_in: payload["time_in"],
+        source: "HOTEL_GUEST",
+      };
     },
 
     setPayloadTransaction() {
       return {
-        transaction_id: this.stepThree.transaction_id,
+        transaction_id: this.stepThree.data.selectedTransaction.id,
         method: "flag_problem",
         reason: `TAMU_HOTEL-${this.helper.CORPORATE.id}-${this.logger.id}`,
       };
@@ -228,57 +301,72 @@ export default {
 
     setPayloadCreationMembership() {
       return {
+        id: "",
         spot_id: this.$utility.getSpotId(),
-        name: `${this.helper.CORPORATE.name} - ${this.stepFour.data.rfId}`,
-        identification_number: this.identification_number.trim(),
+        name: `${this.helper.CORPORATE.name} - ${this.stepThree.data.rfId}`,
+        identification_number: "",
         email: "",
         phone_number: "",
         company_id: this.$utility.getCompanyId(),
         status: true,
         motorcycle: [],
         card: {
-          card_id: this.stepFour.data.cardId,
-          rf_id: this.stepFour.data.rfId,
-          product_id: this.stepTwo.data.productId.id,
-          employee_id: this.stepFour.data.employeeId,
-          license_plate: this.stepFour.data.licensePlate,
+          card_id: this.stepThree.data.rfId,
+          rf_id: this.stepThree.data.rfId,
+          product_id: this.stepTwo.data.productId.productId,
+          license_plate: this.stepTwo.data.licensePlate,
+          second_license_plate: "",
           start: this.$utility.formatDateMoment(
-            this.stepFour.data.start,
+            this.stepThree.data.selectedTransaction.time_in,
             "YYYY-MM-DD HH:mm:ss"
           ),
-          hour_start: this.stepFour.data.hourStart,
+          hour_start: this.$utility.formatDateMoment(
+            this.stepThree.data.selectedTransaction.time_in,
+            "HH:mm:ss"
+          ),
           reference: "HOTEL-GUEST-TRANSACTION",
           payment_method: "INVOICE",
-          payment_receipt: "",
-          paid_date: "",
+          payment_receipt: this.stepOne.ocrFile,
+          paid_date: this.$utility.formatDateMoment(
+            new Date(),
+            "YYYY-MM-DD HH:mm:ss"
+          ),
         },
       };
     },
 
     setPayloadExtendMembership() {
       return {
-        card_id: this.stepFour.data.cardId,
-        rf_id: this.stepFour.data.rfId,
-        product_id: this.stepTwo.data.productId.id,
-        employee_id: this.stepFour.data.employeeId,
-        license_plate: this.stepFour.data.licensePlate,
+        card_id: this.stepThree.data.rfId,
+        rf_id: this.stepThree.data.rfId,
+        product_id: this.stepTwo.data.productId.productId,
+        employee_id: this.stepThree.data.selectedMembership.employee_detail.id,
+        license_plate: this.stepThree.data.licensePlate,
+        second_license_plate: "",
         start: this.$utility.formatDateMoment(
-          this.stepFour.data.start,
+          this.stepThree.data.selectedTransaction.time_in,
           "YYYY-MM-DD HH:mm:ss"
         ),
-        hour_start: this.stepFour.data.hourStart,
+        hour_start: this.$utility.formatDateMoment(
+          this.stepThree.data.selectedTransaction.time_in,
+          "HH:mm:ss"
+        ),
         reference: "HOTEL-GUEST-TRANSACTION",
         payment_method: "INVOICE",
-        payment_receipt: "",
-        paid_date: "",
+        payment_receipt: this.stepOne.ocrFile,
+        paid_date: this.$utility.formatDateMoment(
+          new Date(),
+          "YYYY-MM-DD HH:mm:ss"
+        ),
       };
     },
 
     setPayloadLogsTransactionCreate() {
-      // this is the first step before saving or subitting all data (TRX START)
       return {
-        guestRoom: this.stepTwo.data.name,
+        id: this.$utility.generateUUID(),
         guestCheckin: this.stepTwo.data.start,
+        guestName: this.stepTwo.data.name,
+        corporateId: this.helper.CORPORATE.id,
         guestCheckout: this.stepTwo.data.end,
         type: "HOTEL_GUEST", // HOTEL_GUEST / HOTEL_BENEFIT
         ocrFile: this.stepOne.ocrFile,
@@ -289,7 +377,7 @@ export default {
           ? this.stepThree.data.selectedMembership.id
           : "",
         employeeId: !this.stepThree.data.isNewMembership
-          ? this.stepThree.data.selectedMembership.employee_id
+          ? this.stepThree.data.selectedMembership.employee_detail.id
           : "",
         rfId: this.stepThree.data.rfId,
         meta: JSON.stringify({
@@ -303,39 +391,110 @@ export default {
     setPayloadLogsTransactionUpdate() {
       return {
         id: this.logger.id,
-        membershipId: this.stepFour.data.id,
+        membershipId: this.membership.id,
       };
     },
 
     async processCancelTransaction() {
-      this.helper.isLoading = true;
-      const PAYLOAD = this.setPayloadTransaction();
       try {
-        await guestMethods.processTransactionFlag(PAYLOAD);
+        const PAYLOAD = this.setPayloadTransaction();
+        await this.updateDataResolution(PAYLOAD);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processCancelTransaction in FormGuest`
+          `${error.message} at processCancelTransaction in FormGuestProcess`
         );
-      } finally {
-        this.helper.isLoading = false;
+        throw error;
       }
     },
 
     async processExtendMembership() {
-      const PAYLOAD = this.setPayloadExtendMembership();
       try {
-        await guestMethods.processExtendMembership(PAYLOAD);
+        const PAYLOAD = this.setPayloadExtendMembership();
+        const { values } = await this.createMembership(PAYLOAD);
+        this.membership = values;
       } catch (error) {
+        console.log(
+          `${error.message} at processExtendMembership in FormGuestProcess`
+        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processExtendMembership in FormGuest`
+          `${error.message} at processExtendMembership in FormGuestProcess`
         );
+        throw error;
       }
     },
 
-    async processSubmitData() {
-      await this.processSaveMembership();
+    async processCreateMembership() {
+      try {
+        const PAYLOAD = this.setPayloadCreationMembership();
+        const { values } = await this.createEmployee(PAYLOAD);
+        this.membership = values;
+      } catch (error) {
+        console.log(
+          `${error.message} at processCreateMembership in FormGuestProcess`
+        );
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processCreateMembership in FormGuestProcess`
+        );
+        throw error;
+      }
+    },
+
+    async processCreateGuest() {
+      try {
+        const PAYLOAD = this.setPayloadLogsTransactionCreate();
+        const { values } = await this.createGuest(PAYLOAD);
+        this.logger = values[0];
+      } catch (error) {
+        console.log(
+          `${error.message} at processCreateGuest in FormGuestProcess`
+        );
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processCreateGuest in FormGuestProcess`
+        );
+        throw error;
+      }
+    },
+
+    async processUpdateGuest() {
+      try {
+        const PAYLOAD = this.setPayloadLogsTransactionUpdate();
+        console.log(PAYLOAD, "PAYLOAD UPDATE GUEST");
+        await this.updateGuest(PAYLOAD);
+      } catch (error) {
+        console.log(
+          `${error.message} at processUpdateGuest in FormGuestProcess`
+        );
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processUpdateGuest in FormGuestProcess`
+        );
+        throw error;
+      }
+    },
+
+    async startProcess() {
+      try {
+        await this.processCreateGuest();
+        this.nextProcess();
+        await this.processCancelTransaction();
+        this.nextProcess();
+        if (this.stepThree.data.isNewMembership) {
+          await this.processCreateMembership();
+        } else {
+          await this.processExtendMembership();
+        }
+        this.nextProcess();
+        this.processCreateTransaction();
+        this.nextProcess();
+        await this.processUpdateGuest();
+        this.$emit("finish");
+      } catch (error) {
+        // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated
+      }
     },
   },
 };

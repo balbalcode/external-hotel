@@ -15,12 +15,12 @@ async function get(filter) {
   return (
     axios
       // .get(`/api/temp/guest?${helper(filter)}`, { timeout: 25500 })
-      .get(`${process.env.TEMP_API}/api/temp/guest?${helper(filter)}`, {
+      .get(`${process.env.TEMP_API}/api/temp/logs?${helper(filter)}`, {
         timeout: 25500,
       })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
-        if (data.status === 200) return data.data;
+        if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
         return Promise.reject(error);
@@ -34,10 +34,10 @@ async function show(id) {
   return (
     axios
       // .get(`/api/temp/guest/${id}`, { timeout: 25500 })
-      .get(`/ap${process.env.TEMP_API}i/temp/guest/${id}`, { timeout: 25500 })
+      .get(`${process.env.TEMP_API}/api/temp/logs/${id}`, { timeout: 25500 })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
-        if (data.status === 200) return data.data;
+        if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
         return Promise.reject(error);
@@ -45,16 +45,18 @@ async function show(id) {
   );
 }
 
-async function create(data) {
+async function create(payload) {
   let axios = window.$nuxt.$axios;
   axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
-      // .post(`/api/temp/guest`, data, { timeout: 25500 })
-      .post(`/ap${process.env.TEMP_API}i/temp/guest`, data, { timeout: 25500 })
+      // .post(`/api/temp/guest`, payload, { timeout: 25500 })
+      .post(`${process.env.TEMP_API}/api/temp/logs`, payload, {
+        timeout: 25500,
+      })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
-        if (data.status === 200) return data.data;
+        if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
         return Promise.reject(error);
@@ -68,10 +70,10 @@ async function increase(data) {
   return (
     axios
       // .post(`/api/temp/guest`, data, { timeout: 25500 })
-      .post(`/ap${process.env.TEMP_API}i/temp/guest`, data, { timeout: 25500 })
+      .post(`${process.env.TEMP_API}/api/temp/logs`, data, { timeout: 25500 })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
-        if (data.status === 200) return data.data;
+        if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
         return Promise.reject(error);
@@ -85,11 +87,11 @@ async function update(id, data) {
   delete data.id;
   return (
     axios
-      // .put(`/ap${process.env.TEMP_API}i/temp/guest/${id}`, data, { timeout: 25500 })
-      .put(`/api/temp/guest/${id}`, data, { timeout: 25500 })
+      // .put(`${process.env.TEMP_API}/api/temp/logs/${id}`, data, { timeout: 25500 })
+      .patch(`/api/temp/guest/${id}`, data, { timeout: 25500 })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
-        if (data.status === 200) return data.data;
+        if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
         return Promise.reject(error);
@@ -103,12 +105,12 @@ async function remove(id) {
   return (
     axios
       // .delete(`/api/temp/guest/${id}`, { timeout: 25500 })
-      .delete(`${process.env.TEMP_API}/api/temp/guest/${id}`, {
+      .delete(`${process.env.TEMP_API}/api/temp/logs/${id}`, {
         timeout: 25500,
       })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
-        if (data.status === 200) return data.data;
+        if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
         return Promise.reject(error);
@@ -123,11 +125,9 @@ async function ocr(data) {
     .post(`${process.env.OCR_URL}/read`, data, { timeout: 25500 })
     .then((data) => {
       axios.defaults.baseURL = process.env.baseUrl;
-      if (data.status === 200) return data.data;
+      if ([200, 201].indexOf(data.status) >= 0) return data.data;
     })
     .catch((error) => {
       return Promise.reject(error);
     });
 }
-
-
