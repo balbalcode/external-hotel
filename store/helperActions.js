@@ -54,3 +54,8 @@ export const ocrMethods = mapActions("modules/ocr/storeOcr", [
   "getFormatOCR",
   "readOCR",
 ]);
+
+export const transactionMethods = mapActions(
+  "modules/transaction/storeTransaction",
+  ["authTransaction", "createTransaction"]
+);

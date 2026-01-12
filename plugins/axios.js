@@ -42,10 +42,11 @@ export default async function ({ app, store, route }) {
         refresh_token = new_token.values.refresh_token;
       }
     } catch (error) {
-      if (![undefined, "", null].includes(token)) {
-        apiAborter.abort("access token was expired");
-        window.location.href = "/logout?type=token";
-      }
+      console.log("error expired token", error);
+      // if (![undefined, "", null].includes(token)) {
+      //   apiAborter.abort("access token was expired");
+      //   window.location.href = "/logout?type=token";
+      // }
     }
   }
 
@@ -79,7 +80,7 @@ export default async function ({ app, store, route }) {
           },
         };
         apiAborter.abort("access token was expired");
-        window.location.href = "/logout?type=token";
+        // window.location.href = "/logout?type=token";
         throw error_response;
       } else {
         return Promise.reject(error);

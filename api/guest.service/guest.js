@@ -11,7 +11,6 @@ export const guestService = {
 
 async function get(filter) {
   let axios = window.$nuxt.$axios;
-  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .get(`/api/temp/guest?${helper(filter)}`, { timeout: 25500 })
@@ -19,7 +18,6 @@ async function get(filter) {
         timeout: 25500,
       })
       .then((data) => {
-        axios.defaults.baseURL = process.env.baseUrl;
         if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
@@ -30,13 +28,11 @@ async function get(filter) {
 
 async function show(id) {
   let axios = window.$nuxt.$axios;
-  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .get(`/api/temp/guest/${id}`, { timeout: 25500 })
       .get(`${process.env.TEMP_API}/api/temp/logs/${id}`, { timeout: 25500 })
       .then((data) => {
-        axios.defaults.baseURL = process.env.baseUrl;
         if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
@@ -47,7 +43,6 @@ async function show(id) {
 
 async function create(payload) {
   let axios = window.$nuxt.$axios;
-  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .post(`/api/temp/guest`, payload, { timeout: 25500 })
@@ -55,7 +50,6 @@ async function create(payload) {
         timeout: 25500,
       })
       .then((data) => {
-        axios.defaults.baseURL = process.env.baseUrl;
         if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
@@ -66,13 +60,11 @@ async function create(payload) {
 
 async function increase(data) {
   let axios = window.$nuxt.$axios;
-  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .post(`/api/temp/guest`, data, { timeout: 25500 })
       .post(`${process.env.TEMP_API}/api/temp/logs`, data, { timeout: 25500 })
       .then((data) => {
-        axios.defaults.baseURL = process.env.baseUrl;
         if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
@@ -83,14 +75,12 @@ async function increase(data) {
 
 async function update(id, data) {
   let axios = window.$nuxt.$axios;
-  axios.defaults.baseURL = process.env.TEMP_API;
   delete data.id;
   return (
     axios
       // .put(`${process.env.TEMP_API}/api/temp/logs/${id}`, data, { timeout: 25500 })
       .patch(`/api/temp/guest/${id}`, data, { timeout: 25500 })
       .then((data) => {
-        axios.defaults.baseURL = process.env.baseUrl;
         if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
@@ -101,7 +91,6 @@ async function update(id, data) {
 
 async function remove(id) {
   let axios = window.$nuxt.$axios;
-  axios.defaults.baseURL = process.env.TEMP_API;
   return (
     axios
       // .delete(`/api/temp/guest/${id}`, { timeout: 25500 })
@@ -109,7 +98,6 @@ async function remove(id) {
         timeout: 25500,
       })
       .then((data) => {
-        axios.defaults.baseURL = process.env.baseUrl;
         if ([200, 201].indexOf(data.status) >= 0) return data.data;
       })
       .catch((error) => {
@@ -124,7 +112,6 @@ async function ocr(data) {
   return axios
     .post(`${process.env.OCR_URL}/read`, data, { timeout: 25500 })
     .then((data) => {
-      axios.defaults.baseURL = process.env.baseUrl;
       if ([200, 201].indexOf(data.status) >= 0) return data.data;
     })
     .catch((error) => {

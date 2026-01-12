@@ -83,7 +83,7 @@ export default {
           membership: false,
         },
 
-        currentStep: 1,
+        currentStep: 4,
         isLoading: false,
         savingProcess: 0,
       },

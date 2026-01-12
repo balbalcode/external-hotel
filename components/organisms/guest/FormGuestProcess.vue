@@ -207,7 +207,13 @@
 <script>
 import Lottie from "vue-lottie";
 import animationData from "~/static/animationData.json";
-import { guestMethods, resolutionMethods } from "@/store/helperActions";
+import {
+  guestMethods,
+  resolutionMethods,
+  transactionMethods,
+} from "@/store/helperActions";
+
+import md5 from "md5";
 
 export default {
   components: {
@@ -247,6 +253,7 @@ export default {
       helper: {
         currentProcess: 1,
         CORPORATE: {},
+        authTransaction: {},
       },
     };
   },
@@ -260,6 +267,8 @@ export default {
     createEmployee: guestMethods.createEmployee,
     createGuest: guestMethods.createGuest,
     updateGuest: guestMethods.updateGuest,
+    createTransaction: transactionMethods.createTransaction,
+    authTransaction: transactionMethods.authTransaction,
 
     nextProcess() {
       if (this.helper.currentProcess < 5) {
@@ -271,27 +280,33 @@ export default {
       return {
         spot_id: this.$utility.getSpotId(),
         corporate_id: this.$utility.getCorporateId(),
+        secret_key: "f2e8d7ccf4454f77a164847587aa8310",
       };
     },
 
-    setPayloadCreateTransaction(token) {
+    setPayloadCreateTransaction() {
+      const transactionId = "375cb1be-d5d8-439e-ad73-3292ae44be2e" //this.$utility.generateUUID();
+      const handshake = md5(
+        `${transactionId}.${this.$utility.getSpotId()}.f2e8d7ccf4454f77a164847587aa8310`
+      );
+
       return {
-        token: token,
+        token: this.helper.authTransaction.access_token,
         image: "",
-        user_id: payload["user_id"],
+        user_id: "7166aa38-e193-4134-8a52-18f784baa43f",
         spot_id: this.$utility.getSpotId(),
-        transaction_id: this.$utility.generateUUID(),
-        handshake: payload["handshake"],
-        rf_id: payload["rf_id"],
-        pos_in: payload["gate_code"],
-        gate_code: payload["gate_code"],
-        created_at: payload["created_at"],
-        time_in: payload["time_in"],
+        transaction_id: transactionId,
+        handshake: handshake,
+        rf_id: "rfid",
+        pos_in: "",
+        gate_code: "",
+        created_at: new Date().getTime(),
+        time_in: new Date().getTime(), // this.stepThree.data.selectedTransaction.time_in,
         source: "HOTEL_GUEST",
       };
     },
 
-    setPayloadTransaction() {
+    setPayloadCancelTransaction() {
       return {
         transaction_id: this.stepThree.data.selectedTransaction.id,
         method: "flag_problem",
@@ -395,9 +410,44 @@ export default {
       };
     },
 
+    async processAuthTransaction() {
+      try {
+        const PAYLOAD_AUTH = this.setPayloadAuthTransaction();
+        const { values } = await this.authTransaction(PAYLOAD_AUTH);
+        this.helper.authTransaction = values;
+        await this.processCreateTransaction();
+      } catch (error) {
+        console.log(
+          `${error.message} at processAuthTransaction in FormGuestProcess`
+        );
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processAuthTransaction in FormGuestProcess`
+        );
+        throw error;
+      }
+    },
+
+    async processCreateTransaction() {
+      try {
+        const PAYLOAD = this.setPayloadCreateTransaction();
+        const data = await this.createTransaction(PAYLOAD);
+        console.log(data, "DATA TRANSACTION CREATED");
+      } catch (error) {
+        console.log(
+          `${error.message} at processAuthTransaction in FormGuestProcess`
+        );
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processAuthTransaction in FormGuestProcess`
+        );
+        throw error;
+      }
+    },
+
     async processCancelTransaction() {
       try {
-        const PAYLOAD = this.setPayloadTransaction();
+        const PAYLOAD = this.setPayloadCancelTransaction();
         await this.updateDataResolution(PAYLOAD);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
@@ -478,20 +528,20 @@ export default {
 
     async startProcess() {
       try {
-        await this.processCreateGuest();
-        this.nextProcess();
-        await this.processCancelTransaction();
-        this.nextProcess();
-        if (this.stepThree.data.isNewMembership) {
-          await this.processCreateMembership();
-        } else {
-          await this.processExtendMembership();
-        }
-        this.nextProcess();
-        this.processCreateTransaction();
-        this.nextProcess();
-        await this.processUpdateGuest();
-        this.$emit("finish");
+        // await this.processCreateGuest();
+        // this.nextProcess();
+        // await this.processCancelTransaction();
+        // this.nextProcess();
+        // if (this.stepThree.data.isNewMembership) {
+        //   await this.processCreateMembership();
+        // } else {
+        //   await this.processExtendMembership();
+        // }
+        // this.nextProcess();
+        this.processAuthTransaction();
+        // this.nextProcess();
+        // await this.processUpdateGuest();
+        // this.$emit("finish");
       } catch (error) {
         // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated
       }
