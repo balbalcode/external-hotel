@@ -5,6 +5,7 @@ export default {
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
     FormEvent: () => import("@/components/organisms/event/FormEvent"),
     TableEvent: () => import("@/components/organisms/event/TableEvent"),
+    Layout: () => import("@//layouts/main"),
   },
   data: () => {
     return {
@@ -40,7 +41,7 @@ export default {
 
 <style></style>
 <template>
-  <div class="p-5">
+  <Layout>
     <div class="d-flex justify-content-between mb-3">
       <div>
         <h5 class="font-weight-bold align-self-center font-size-16 mb-3">
@@ -84,5 +85,5 @@ export default {
         @cancel="modal.quota = false"
       />
     </plain-modal>
-  </div>
+  </Layout>
 </template>

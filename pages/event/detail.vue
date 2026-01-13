@@ -5,6 +5,7 @@ export default {
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
     DetailEvent: () => import("@/components/organisms/event/DetailEvent"),
     FormQuotaEvent: () => import("@/components/organisms/event/FormQuotaEvent"),
+    Layout: () => import("@//layouts/main"),
   },
   data: () => {
     return {
@@ -36,7 +37,7 @@ export default {
 
 <style></style>
 <template>
-  <div class="p-5">
+  <Layout>
     <div class="d-flex justify-content-between mb-3">
       <div>
         <h5 class="font-weight-bold align-self-center font-size-16 mb-0">
@@ -51,5 +52,5 @@ export default {
         @refresh-state="processRefreshState"
       />
     </plain-modal>
-  </div>
+  </Layout>
 </template>

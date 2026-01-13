@@ -17,6 +17,8 @@ async function auth(data) {
 
 async function create(data) {
   let axios = window.$nuxt.$axios;
+  const OLD_TOKEN = axios.defaults.headers.common["Authorization"];
+  axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
   return axios
     .post(`/v1/transaction-manless`, data, { timeout: 25500 })
     .then((data) => {
@@ -24,5 +26,8 @@ async function create(data) {
     })
     .catch((error) => {
       return Promise.reject(error);
+    })
+    .finally(() => {
+      axios.defaults.headers.common["Authorization"] = OLD_TOKEN;
     });
 }

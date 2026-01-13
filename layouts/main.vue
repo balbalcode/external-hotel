@@ -1,5 +1,8 @@
 <script>
 export default {
+  components: {
+    AlertNotification: () => import("@/components/core/AlertNotification"),
+  },
   props: {
     title: { default: "" },
   },
@@ -62,5 +65,6 @@ export default {
 <template>
   <div id="layout-wrapper" class="font-size-13">
     <slot />
+    <AlertNotification />
   </div>
 </template>

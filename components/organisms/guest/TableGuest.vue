@@ -220,6 +220,7 @@ export default {
         this.helper.loading = true;
         const payload = this.setPayloadGuest();
         const { values, total_values } = await this.getGuest(payload);
+        console.log(values);
         this.data = this.processFormatData(values);
         this.pagination.total = total_values;
       } catch (error) {

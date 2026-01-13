@@ -211,6 +211,7 @@ import {
   guestMethods,
   resolutionMethods,
   transactionMethods,
+  utilityMethods,
 } from "@/store/helperActions";
 
 import md5 from "md5";
@@ -250,6 +251,7 @@ export default {
     return {
       membership: {},
       log: {},
+      transactionId: "",
       helper: {
         currentProcess: 1,
         CORPORATE: {},
@@ -258,6 +260,7 @@ export default {
     };
   },
   mounted() {
+    this.transactionId = this.$utility.generateUUID();
     this.helper.CORPORATE = this.$utility.getCorporateData();
     this.startProcess();
   },
@@ -269,6 +272,7 @@ export default {
     updateGuest: guestMethods.updateGuest,
     createTransaction: transactionMethods.createTransaction,
     authTransaction: transactionMethods.authTransaction,
+    setDefaultSuccessAlert: utilityMethods.setDefaultSuccessAlert,
 
     nextProcess() {
       if (this.helper.currentProcess < 5) {
@@ -285,7 +289,7 @@ export default {
     },
 
     setPayloadCreateTransaction() {
-      const transactionId = "375cb1be-d5d8-439e-ad73-3292ae44be2e" //this.$utility.generateUUID();
+      const transactionId = this.transactionId;
       const handshake = md5(
         `${transactionId}.${this.$utility.getSpotId()}.f2e8d7ccf4454f77a164847587aa8310`
       );
@@ -297,11 +301,13 @@ export default {
         spot_id: this.$utility.getSpotId(),
         transaction_id: transactionId,
         handshake: handshake,
-        rf_id: "rfid",
+        rf_id: this.stepThree.data.rfId,
+        membership_id: this.membership.id,
         pos_in: "",
+        vehicle_code: this.processConvertVehicleType("MT1"),
         gate_code: "",
         created_at: new Date().getTime(),
-        time_in: new Date().getTime(), // this.stepThree.data.selectedTransaction.time_in,
+        time_in: this.stepThree.data.selectedTransaction.time_in,
         source: "HOTEL_GUEST",
       };
     },
@@ -378,22 +384,23 @@ export default {
 
     setPayloadLogsTransactionCreate() {
       return {
-        id: this.$utility.generateUUID(),
+        id: this.transactionId,
         guestCheckin: this.stepTwo.data.start,
         guestName: this.stepTwo.data.name,
         corporateId: this.helper.CORPORATE.id,
         guestCheckout: this.stepTwo.data.end,
-        type: "HOTEL_GUEST", // HOTEL_GUEST / HOTEL_BENEFIT
+        type: "HOTEL_GUEST",
         ocrFile: this.stepOne.ocrFile,
         ocrResult: this.stepOne.data,
         transactionId: this.stepThree.data.selectedTransaction.id,
-        membershipId: "", // WILL BE FILLED AFTER CREATING MEMBERSHIP
+        membershipId: "",
         oldMembershipId: !this.stepThree.data.isNewMembership
           ? this.stepThree.data.selectedMembership.id
           : "",
         employeeId: !this.stepThree.data.isNewMembership
           ? this.stepThree.data.selectedMembership.employee_detail.id
           : "",
+        checkinTransactionId: this.transactionId,
         rfId: this.stepThree.data.rfId,
         meta: JSON.stringify({
           stepOne: this.stepOne,
@@ -405,9 +412,36 @@ export default {
 
     setPayloadLogsTransactionUpdate() {
       return {
-        id: this.logger.id,
+        id: this.transactionId,
+        guestCheckin: this.stepTwo.data.start,
+        guestName: this.stepTwo.data.name,
+        corporateId: this.helper.CORPORATE.id,
+        guestCheckout: this.stepTwo.data.end,
+        type: "HOTEL_GUEST",
+        ocrFile: this.stepOne.ocrFile,
+        ocrResult: this.stepOne.data,
+        transactionId: this.stepThree.data.selectedTransaction.id,
         membershipId: this.membership.id,
+        oldMembershipId: !this.stepThree.data.isNewMembership
+          ? this.stepThree.data.selectedMembership.id
+          : "",
+        employeeId: !this.stepThree.data.isNewMembership
+          ? this.stepThree.data.selectedMembership.employee_detail.id
+          : "",
+        checkinTransactionId: this.transactionId,
+        rfId: this.stepThree.data.rfId,
+        meta: JSON.stringify({
+          stepOne: this.stepOne,
+          stepTwo: this.stepTwo,
+          stepThree: this.stepThree,
+        }),
       };
+    },
+
+    processConvertVehicleType(vehicle) {
+      vehicle = vehicle.toUpperCase();
+      let result = `${vehicle[0]}${vehicle[1]}2`; // DEVELOP SOON
+      return result.toUpperCase();
     },
 
     async processAuthTransaction() {
@@ -417,9 +451,6 @@ export default {
         this.helper.authTransaction = values;
         await this.processCreateTransaction();
       } catch (error) {
-        console.log(
-          `${error.message} at processAuthTransaction in FormGuestProcess`
-        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processAuthTransaction in FormGuestProcess`
@@ -431,12 +462,8 @@ export default {
     async processCreateTransaction() {
       try {
         const PAYLOAD = this.setPayloadCreateTransaction();
-        const data = await this.createTransaction(PAYLOAD);
-        console.log(data, "DATA TRANSACTION CREATED");
+        await this.createTransaction(PAYLOAD);
       } catch (error) {
-        console.log(
-          `${error.message} at processAuthTransaction in FormGuestProcess`
-        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processAuthTransaction in FormGuestProcess`
@@ -464,9 +491,6 @@ export default {
         const { values } = await this.createMembership(PAYLOAD);
         this.membership = values;
       } catch (error) {
-        console.log(
-          `${error.message} at processExtendMembership in FormGuestProcess`
-        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processExtendMembership in FormGuestProcess`
@@ -481,9 +505,6 @@ export default {
         const { values } = await this.createEmployee(PAYLOAD);
         this.membership = values;
       } catch (error) {
-        console.log(
-          `${error.message} at processCreateMembership in FormGuestProcess`
-        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processCreateMembership in FormGuestProcess`
@@ -498,9 +519,6 @@ export default {
         const { values } = await this.createGuest(PAYLOAD);
         this.logger = values[0];
       } catch (error) {
-        console.log(
-          `${error.message} at processCreateGuest in FormGuestProcess`
-        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processCreateGuest in FormGuestProcess`
@@ -512,12 +530,8 @@ export default {
     async processUpdateGuest() {
       try {
         const PAYLOAD = this.setPayloadLogsTransactionUpdate();
-        console.log(PAYLOAD, "PAYLOAD UPDATE GUEST");
         await this.updateGuest(PAYLOAD);
       } catch (error) {
-        console.log(
-          `${error.message} at processUpdateGuest in FormGuestProcess`
-        );
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
           `${error.message} at processUpdateGuest in FormGuestProcess`
@@ -528,20 +542,24 @@ export default {
 
     async startProcess() {
       try {
-        // await this.processCreateGuest();
-        // this.nextProcess();
-        // await this.processCancelTransaction();
-        // this.nextProcess();
-        // if (this.stepThree.data.isNewMembership) {
-        //   await this.processCreateMembership();
-        // } else {
-        //   await this.processExtendMembership();
-        // }
-        // this.nextProcess();
-        this.processAuthTransaction();
-        // this.nextProcess();
-        // await this.processUpdateGuest();
-        // this.$emit("finish");
+        await this.processCreateGuest();
+        this.nextProcess();
+        await this.processCancelTransaction();
+        this.nextProcess();
+        if (this.stepThree.data.isNewMembership) {
+          await this.processCreateMembership();
+        } else {
+          await this.processExtendMembership();
+          alert("extend!");
+        }
+        this.nextProcess();
+        await this.processAuthTransaction();
+        this.nextProcess();
+        await this.processUpdateGuest();
+        this.setDefaultSuccessAlert({
+          message: "Tamu berhasil ditambahkan",
+        });
+        this.$emit("finish");
       } catch (error) {
         // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated
       }

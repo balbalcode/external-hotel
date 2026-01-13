@@ -13,7 +13,7 @@ export default {
     ...utilityMethods,
     processRemoveAlert(index) {
       this.removeAlert(index);
-    }
+    },
   },
 };
 </script>
@@ -34,23 +34,35 @@ export default {
           <div class="bg-white rounded">
             <div class="d-flex h-100 p-3">
               <div class="mt-2">
-                <i v-if="alert.type === 'success'" class="bx bxs-check-circle font-size-22 text-success"></i>
-                <i v-else-if="alert.type === 'danger'" class="bx bxs-error-circle font-size-22 text-danger"></i>
-                <i v-else :class="`bx bxs-error-circle font-size-22 text-${alert.type}`"></i>
+                <i
+                  v-if="alert.type === 'success'"
+                  class="bx bxs-check-circle font-size-22 text-success"
+                ></i>
+                <i
+                  v-else-if="alert.type === 'danger'"
+                  class="bx bxs-error-circle font-size-22 text-danger"
+                ></i>
+                <i
+                  v-else
+                  :class="`bx bxs-error-circle font-size-22 text-${alert.type}`"
+                ></i>
               </div>
               <div class="flex-grow-1 px-2">
                 <p class="pt-2 pb-0 font-weight-semibold">
-                  {{ alert.content }} 
+                  {{ alert.content }}
                 </p>
               </div>
               <div class="mt-2">
-                <div class="p-1 bg-light rounded cursor-pointer" @click="processRemoveAlert(index)">
+                <div
+                  class="p-1 bg-light rounded cursor-pointer"
+                  @click="processRemoveAlert(index)"
+                >
                   <i class="bx bx-x text-muted"></i>
                 </div>
               </div>
             </div>
           </div>
-          <div :class="`bg-${alert.type}`" style="height: 5px;"></div>
+          <div :class="`bg-${alert.type}`" style="height: 5px"></div>
         </div>
       </b-toast>
     </template>

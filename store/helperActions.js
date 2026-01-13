@@ -9,6 +9,8 @@ export const utilityMethods = mapActions("modules/utility/storeUtility", [
   "setSingleDropdown",
   "clearSingleDropdown",
   "clearStackedDropdown",
+  "setDefaultErrorAlert",
+  "setDefaultSuccessAlert"
 ]);
 export const s3Methods = mapActions("modules/utility/storeS3", [
   "getPreSignedPostUrl",

@@ -312,7 +312,11 @@
       <div class="col-12 col-lg-6 text-right mt-2 px-2">
         <template v-if="data.selectedTransaction.id">
           <active-button
-            v-if="!helper.loading.membership && helper.wasCheckCard"
+            v-if="
+              !helper.loading.membership &&
+              helper.wasCheckCard &&
+              !helper.conflictMember
+            "
             text="Proses Benefit Parkir"
             test_id="btn_start_scan_rfid"
             id="btn_start_scan_rfid"
@@ -341,8 +345,8 @@
         </template>
         <active-button
           text="Batal"
-          data
           type="outline"
+          variant="secondary"
           @click="$emit('cancel')"
           additional_class="mr-1 px-3"
         />
@@ -405,7 +409,11 @@
 
 <script>
 import { minLength, maxLength, required } from "vuelidate/lib/validators";
-import { resolutionMethods, guestMethods } from "@/store/helperActions";
+import {
+  resolutionMethods,
+  guestMethods,
+  utilityMethods,
+} from "@/store/helperActions";
 export default {
   components: {
     InputTextGroup: () =>
@@ -464,6 +472,8 @@ export default {
           key: "",
           isSubmitted: false,
         };
+        this.helper.wasCheckCard = false;
+        this.helper.loading.membership = false;
         this.$v.filter.$reset();
       },
       immediate: false,
@@ -491,6 +501,7 @@ export default {
     getDataResolution: resolutionMethods.getDataResolution,
     updateDataResolution: resolutionMethods.updateDataResolution,
     getMembership: guestMethods.getMembership,
+    setDefaultErrorAlert: utilityMethods.setDefaultErrorAlert,
 
     setPayloadTransaction() {
       let payload = {
@@ -575,17 +586,29 @@ export default {
       }
     },
 
+    processCheckingMembership(membership) {
+      if (parseInt(membership.end) > parseInt(new Date().getTime())) {
+        this.setDefaultErrorAlert({
+          message:
+            "Kartu yang anda scan masih memiliki masa aktif, silahkan pindai kartu lain atau hentikan masa aktif pada halaman manajemen kartu.",
+        });
+        this.helper.conflictMember = true;
+      }
+      this.data.isNewMembership = false;
+      this.data.rfId = membership.rf_id;
+      this.data.cardId = membership.card_id;
+      this.data.selectedMembership = membership;
+    },
+
     async processSearchMembership() {
       try {
         this.helper.loading.membership = true;
         this.helper.wasCheckCard = true;
+        this.helper.conflictMember = false;
         const payload = this.setPayloadMembership();
         const { values, total_values } = await this.getMembership(payload);
         if (total_values > 0) {
-          this.data.isNewMembership = false;
-          this.data.rfId = values[0].employee_detail.rf_id;
-          this.data.cardId = values[0].employee_detail.card_id;
-          this.data.selectedMembership = values[0];
+          this.processCheckingMembership(values[0]);
         } else {
           this.data.isNewMembership = true;
           this.data.rfId = this.filter.membership.rfid;

@@ -2,6 +2,7 @@
 export default {
   components: {
     PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
+    Layout: () => import("@//layouts/main"),
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
     FormGuest: () => import("@/components/templates/guest/FormGuest"),
     TableGuest: () => import("@/components/organisms/guest/TableGuest"),
@@ -27,7 +28,7 @@ export default {
 
 <style></style>
 <template>
-  <div class="p-5">
+  <Layout>
     <div class="d-flex justify-content-between mb-3">
       <div>
         <h5 class="font-weight-bold align-self-center font-size-16 mb-3">
@@ -56,5 +57,5 @@ export default {
         @cancel="processCancelForm"
       />
     </plain-modal>
-  </div>
+  </Layout>
 </template>
