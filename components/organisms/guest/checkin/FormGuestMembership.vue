@@ -133,8 +133,10 @@
                     <p class="my-1 text-muted font-size-10">Waktu Masuk</p>
                     <p class="my-1 font-weight-bold">
                       {{
-                        $utility.formatDateMoment(
+                        $utility.momentAddDate(
                           data.selectedTransaction.time_in,
+                          "7",
+                          "hours",
                           "DD-MM-YYYY HH:mm:ss"
                         )
                       }}

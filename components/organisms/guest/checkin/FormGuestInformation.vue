@@ -368,16 +368,19 @@ export default {
     },
 
     processFillingOptionsProduct() {
-      this.options.product = this.options.productDictionary.map((opt) => {
+      const options = this.options.productDictionary.map((opt) => {
         const dictionary = this.options.productCompany.find(
           (item) => item.productId === opt.id
         );
-        return {
-          ...opt,
-          name: dictionary ? dictionary.name : "Unknown Product",
-          productId: opt.id,
-        };
+        if (dictionary?.name) {
+          return {
+            ...opt,
+            name: dictionary ? dictionary.name : "Unknown Product",
+            productId: opt.id,
+          };
+        }
       });
+      this.options.product = options.filter((opt) => opt !== undefined);
     },
 
     async processGetOptionsProduct() {

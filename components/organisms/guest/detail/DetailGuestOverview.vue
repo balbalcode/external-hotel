@@ -120,7 +120,7 @@
             size="sm"
             variant="dark"
             text_color="dark"
-            @click="$emit('new-card')"
+            @click="$emit('duplicateRequest')"
             additional_class="w-100 px-3"
           />
         </div>
@@ -132,7 +132,7 @@
             size="sm"
             variant="success"
             text_color="success"
-            @click="$emit('checkout-request')"
+            @click="$emit('checkoutRequest')"
             additional_class="w-100 px-3"
           />
         </div>

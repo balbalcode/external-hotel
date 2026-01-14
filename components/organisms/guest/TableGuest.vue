@@ -201,10 +201,11 @@ export default {
         ) {
           statusLabel = "Kedaluwarsa";
         } else {
-          statusLabel = "AKTIF";
-          cssClass = "primary";
+          statusLabel = "Aktif";
+          cssClass = "dark";
         }
       } else if (data.status === "CHECKEDOUT") {
+        statusLabel = "Sudah Checkout";
         cssClass = "success";
       }
 
