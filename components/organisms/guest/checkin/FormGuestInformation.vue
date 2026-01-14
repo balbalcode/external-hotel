@@ -368,14 +368,14 @@ export default {
     },
 
     processFillingOptionsProduct() {
-      this.options.product = this.options.productCompany.map((opt) => {
-        const dictionary = this.options.productDictionary.find(
-          (item) => item.id === opt.productId
+      this.options.product = this.options.productDictionary.map((opt) => {
+        const dictionary = this.options.productCompany.find(
+          (item) => item.productId === opt.id
         );
         return {
           ...opt,
-          values: dictionary ? dictionary.values : "Unknown Product",
-          period: dictionary ? dictionary.period : "day",
+          name: dictionary ? dictionary.name : "Unknown Product",
+          productId: opt.id,
         };
       });
     },

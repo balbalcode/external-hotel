@@ -63,7 +63,7 @@ export default {
 </script>
 
 <template>
-  <div id="layout-wrapper" class="font-size-13">
+  <div id="layout-wrapper" class="font-size-13" style="min-height: 540px !important">
     <slot />
     <AlertNotification />
   </div>

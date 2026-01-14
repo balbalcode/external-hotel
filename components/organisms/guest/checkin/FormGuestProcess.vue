@@ -284,14 +284,14 @@ export default {
       return {
         spot_id: this.$utility.getSpotId(),
         corporate_id: this.$utility.getCorporateId(),
-        secret_key: "f2e8d7ccf4454f77a164847587aa8310",
+        secret_key: "95c87ec61a7a4091bcbb04d36cc9110a",
       };
     },
 
     setPayloadCreateTransaction() {
       const transactionId = this.transactionId;
       const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.f2e8d7ccf4454f77a164847587aa8310`
+        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`
       );
 
       return {
@@ -393,6 +393,7 @@ export default {
         ocrFile: this.stepOne.ocrFile,
         ocrResult: this.stepOne.data,
         transactionId: this.stepThree.data.selectedTransaction.id,
+        status: "CREATION",
         membershipId: "",
         oldMembershipId: !this.stepThree.data.isNewMembership
           ? this.stepThree.data.selectedMembership.id
@@ -401,40 +402,21 @@ export default {
           ? this.stepThree.data.selectedMembership.employee_detail.id
           : "",
         checkinTransactionId: this.transactionId,
-        rfId: this.stepThree.data.rfId,
+        rfid: this.stepThree.data.rfId,
         meta: JSON.stringify({
           stepOne: this.stepOne,
           stepTwo: this.stepTwo,
           stepThree: this.stepThree,
         }),
+        create_by: this.$utility.getUserLoggedIn().email,
       };
     },
 
     setPayloadLogsTransactionUpdate() {
       return {
         id: this.transactionId,
-        guestCheckin: this.stepTwo.data.start,
-        guestName: this.stepTwo.data.name,
-        corporateId: this.helper.CORPORATE.id,
-        guestCheckout: this.stepTwo.data.end,
-        type: "HOTEL_GUEST",
-        ocrFile: this.stepOne.ocrFile,
-        ocrResult: this.stepOne.data,
-        transactionId: this.stepThree.data.selectedTransaction.id,
         membershipId: this.membership.id,
-        oldMembershipId: !this.stepThree.data.isNewMembership
-          ? this.stepThree.data.selectedMembership.id
-          : "",
-        employeeId: !this.stepThree.data.isNewMembership
-          ? this.stepThree.data.selectedMembership.employee_detail.id
-          : "",
-        checkinTransactionId: this.transactionId,
-        rfId: this.stepThree.data.rfId,
-        meta: JSON.stringify({
-          stepOne: this.stepOne,
-          stepTwo: this.stepTwo,
-          stepThree: this.stepThree,
-        }),
+        status: "ACTIVE",
       };
     },
 
@@ -550,7 +532,6 @@ export default {
           await this.processCreateMembership();
         } else {
           await this.processExtendMembership();
-          alert("extend!");
         }
         this.nextProcess();
         await this.processAuthTransaction();

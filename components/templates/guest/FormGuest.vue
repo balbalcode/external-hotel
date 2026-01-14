@@ -53,12 +53,12 @@
 export default {
   components: {
     FormGuestInformation: () =>
-      import("@/components/organisms/guest/FormGuestInformation"),
+      import("@/components/organisms/guest/checkin/FormGuestInformation"),
     FormGuestMembership: () =>
-      import("@/components/organisms/guest/FormGuestMembership"),
-    FormGuestRoom: () => import("@/components/organisms/guest/FormGuestRoom"),
+      import("@/components/organisms/guest/checkin/FormGuestMembership"),
+    FormGuestRoom: () => import("@/components/organisms/guest/checkin/FormGuestRoom"),
     FormGuestProcess: () =>
-      import("@/components/organisms/guest/FormGuestProcess"),
+      import("@/components/organisms/guest/checkin/FormGuestProcess"),
   },
   data: () => {
     return {
