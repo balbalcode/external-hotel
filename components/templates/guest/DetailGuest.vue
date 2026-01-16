@@ -28,6 +28,12 @@
       :is-open="modal.duplicate"
       @close="modal.duplicate = false"
     />
+
+    <form-checkout-confirmation
+      :is-open="modal.checkout"
+      :data="data"
+      @close="modal.checkout = false"
+    />
   </div>
 </template>
 <script>
@@ -44,6 +50,8 @@ export default {
       import("@/components/organisms/guest/detail/DetailGuestOverview"),
     FormDuplicateCard: () =>
       import("@/components/organisms/guest/duplicate/FormDuplicateCard"),
+    FormCheckoutConfirmation: () =>
+      import("@/components/organisms/guest/checkout/FormCheckoutConfirmation"),
   },
   data() {
     return {
@@ -77,6 +85,8 @@ export default {
     handleSelected(selected) {
       console.log(selected);
     },
+
+    
 
     async processGetGuestDetail() {
       try {

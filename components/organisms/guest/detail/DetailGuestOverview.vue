@@ -120,6 +120,7 @@
             size="sm"
             variant="dark"
             text_color="dark"
+            v-if="!data.isDuplicate"
             @click="$emit('duplicateRequest')"
             additional_class="w-100 px-3"
           />

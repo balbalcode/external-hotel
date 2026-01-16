@@ -10,7 +10,7 @@ export const utilityMethods = mapActions("modules/utility/storeUtility", [
   "clearSingleDropdown",
   "clearStackedDropdown",
   "setDefaultErrorAlert",
-  "setDefaultSuccessAlert"
+  "setDefaultSuccessAlert",
 ]);
 export const s3Methods = mapActions("modules/utility/storeS3", [
   "getPreSignedPostUrl",
@@ -50,6 +50,7 @@ export const guestMethods = mapActions("modules/guest/storeGuest", [
   "createMembership",
   "getMembership",
   "createEmployee",
+  "changePeriodMember",
 ]);
 
 export const ocrMethods = mapActions("modules/ocr/storeOcr", [

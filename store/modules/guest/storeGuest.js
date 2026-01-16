@@ -183,6 +183,20 @@ const actions = {
         };
       });
   },
+
+  async changePeriodMember({ dispatch }, payload) {
+    return await employeeService
+      .administrative(payload.spot_id, payload)
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        throw {
+          step: "changePeriodMember",
+          data: error,
+        };
+      });
+  },
 };
 
 const mutations = {};

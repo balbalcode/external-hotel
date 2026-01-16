@@ -179,7 +179,7 @@
               :class="
                 helper.currentProcess >= 6
                   ? 'text-success'
-                  : helper.currentProcess === 4
+                  : helper.currentProcess === 5
                   ? 'text-dark'
                   : 'text-secondary'
               "
@@ -191,8 +191,8 @@
                 {{
                   helper.currentProcess >= 6
                     ? "Berhasil menyimpan data log aktivitas aktivasi ke server"
-                    : helper.currentProcess === 4
-                    ? "Sistem sedang menyimpan data log aktivitas aktivasi ke server"
+                    : helper.currentProcess === 5
+                    ? "Berhasil menyimpan data log aktivitas aktivasi ke server"
                     : "Menyimpan data log aktivitas aktivasi ke server"
                 }}
               </span>
@@ -206,7 +206,7 @@
 
 <script>
 import Lottie from "vue-lottie";
-import animationData from "~/static/animationData.json";
+import animationData from "~/static/loadingCard.json";
 import {
   guestMethods,
   resolutionMethods,
@@ -255,13 +255,15 @@ export default {
       helper: {
         currentProcess: 1,
         CORPORATE: {},
+        SPOT: {},
         authTransaction: {},
       },
     };
   },
-  mounted() {
+  async mounted() {
     this.transactionId = this.$utility.generateUUID();
-    this.helper.CORPORATE = this.$utility.getCorporateData();
+    this.helper.CORPORATE = await this.$utility.getCorporateData();
+    this.helper.SPOT = await this.$utility.getSpotInfo();
     this.startProcess();
   },
   methods: {
@@ -303,9 +305,9 @@ export default {
         handshake: handshake,
         rf_id: this.stepThree.data.rfId,
         membership_id: this.membership.id,
-        pos_in: "",
+        pos_in: this.stepThree.data.selectedTransaction.pos_in,
         vehicle_code: this.processConvertVehicleType("MT1"),
-        gate_code: "",
+        gate_code: this.stepThree.data.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
         time_in: this.stepThree.data.selectedTransaction.time_in,
         source: "HOTEL_GUEST",
@@ -389,6 +391,9 @@ export default {
         guestName: this.stepTwo.data.name,
         corporateId: this.helper.CORPORATE.id,
         guestCheckout: this.stepTwo.data.end,
+        guestVechicleCode: this.processFindVehicleGuest(
+          this.stepThree.data.selectedTransaction.vehicle_Code
+        ),
         type: "HOTEL_GUEST",
         ocrFile: this.stepOne.ocrFile,
         ocrResult: this.stepOne.data,
@@ -422,8 +427,22 @@ export default {
 
     processConvertVehicleType(vehicle) {
       vehicle = vehicle.toUpperCase();
-      let result = `${vehicle[0]}${vehicle[1]}2`; // DEVELOP SOON
-      return result.toUpperCase();
+      if (`${vehicle[0]}${vehicle[1]}` === "MT") {
+        return "MT2"; // GET FROM ENV
+      } else {
+        return "MB2"; // GET FROM ENV
+      }
+    },
+
+    processFindVehicleGuest(vehicle) {
+      const values = Object.values(this.helper.SPOT.vehicle_codes)
+        .flat()
+        .find((item) => {
+          if (item.name === vehicle) {
+            return item;
+          }
+        });
+      return values.code;
     },
 
     async processAuthTransaction() {
