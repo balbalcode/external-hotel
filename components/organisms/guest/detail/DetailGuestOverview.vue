@@ -20,7 +20,7 @@
             {{
               $utility.formatDateMoment(
                 new Date(data.created_at),
-                "DD/MM/YYYY HH:mm:ss"
+                "DD/MM/YYYY HH:mm:ss",
               )
             }}
           </p>
@@ -59,7 +59,11 @@
 
         <div class="d-flex justify-content-between font-size-11 mb-1">
           <div class="text-muted">Kode Tiket Masuk</div>
-          <div>{{ transactionIn.search_key }}</div>
+          <div>
+            {{
+              String(data.checkinTransactionId).substring(0, 6).toUpperCase()
+            }}
+          </div>
         </div>
 
         <div class="d-flex justify-content-between font-size-11 mb-1">
@@ -68,7 +72,7 @@
             {{
               $utility.formatDateMoment(
                 new Date(data.guestCheckin),
-                "DD MMMM YYYY"
+                "DD MMMM YYYY",
               )
             }}
           </div>
@@ -92,8 +96,10 @@
         <div class="d-flex justify-content-between font-size-11 mb-1">
           <div class="text-muted">Kode Tiket Keluar</div>
           <div>
-            <span v-if="transactionOut.id">
-              {{ transactionOut.search_key }}
+            <span v-if="data.checkoutTransactionId !== ''">
+              {{
+                String(data.checkoutTransactionId).substring(0, 6).toUpperCase()
+              }}
             </span>
             <span v-else>-</span>
           </div>
@@ -106,14 +112,14 @@
               {{
                 $utility.formatDateMoment(
                   new Date(data.guestCheckout),
-                  "DD MMMM YYYY"
+                  "DD MMMM YYYY",
                 )
               }}
             </div>
           </div>
         </div>
 
-        <div class="mt-3">
+        <div class="mt-3" v-if="data.status !== 'CHECKEDOUT'">
           <active-button
             text="Buat Kartu Baru"
             type="outline"
@@ -126,7 +132,7 @@
           />
         </div>
 
-        <div class="mt-1">
+        <div class="mt-1" v-if="data.status !== 'CHECKEDOUT'">
           <active-button
             text="Proses Checkout"
             type="outline"
@@ -177,7 +183,7 @@ export default {
 
     processCheckVehicle() {
       const vehicle = String(
-        this.transactionIn.vehicle_code ?? "MT2"
+        this.transactionIn.vehicle_code ?? "MT2",
       ).toLowerCase();
 
       if (vehicle.includes("mb")) {

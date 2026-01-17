@@ -1,15 +1,8 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-3 mt-3">
-    <div class="d-flex justify-content-between mb-3">
-      <div>
-        <h5 class="font-weight-bold align-self-center font-size-16 mb-3">
-          Kendaraan Tamu Hari Ini
-        </h5>
-      </div>
-    </div>
+  <div class="">
     <content-table-view
       :length="data.length"
-      :is_loading="helper.isLoading"
+      :is_loading="helper.loading"
       :is_error="helper.isError"
     >
       <div class="table-responsive rounded-top table-freeze mb-0">
@@ -45,7 +38,7 @@
                 {{
                   $utility.formatDateMoment(
                     logs.guestCheckin,
-                    "DD-MM-YYYY HH:mm:ss"
+                    "DD-MM-YYYY HH:mm:ss",
                   )
                 }}
               </td>
@@ -58,7 +51,7 @@
                   {{
                     $utility.formatDateMoment(
                       logs.checkoutCreatedAt,
-                      "DD-MM-YYYY HH:mm:ss"
+                      "DD-MM-YYYY HH:mm:ss",
                     )
                   }}
                 </span>
@@ -100,16 +93,28 @@
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
                     align="rtl"
+                    @click="
+                      () => {
+                        selectedData = logs;
+                        modal.checkout = true;
+                      }
+                    "
                   />
-                  <!-- <active-button
+                  <active-button
                     icon="ic-dataflow-03"
                     icon_size="16"
-                    text="Cetak Kartu Baru"
+                    text="Duplikat Kartu"
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
                     align="rtl"
-                  /> -->
+                    @click="
+                      () => {
+                        selectedData = logs;
+                        modal.duplicate = true;
+                      }
+                    "
+                  />
                 </dropdown-button>
               </td>
             </tr>
@@ -128,6 +133,16 @@
         />
       </div>
     </content-table-view>
+    <form-duplicate-card
+      :is-open="modal.duplicate"
+      @close="modal.duplicate = false"
+    />
+
+    <form-checkout-confirmation
+      :is-open="modal.checkout"
+      :data="selectedData"
+      @close="modal.checkout = false"
+    />
   </div>
 </template>
 
@@ -135,21 +150,32 @@
 import { guestMethods, productMethods } from "@/store/helperActions";
 export default {
   components: {
+    PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
     DropdownButton: () => import("@utilities/atoms/button/DropdownButton"),
     ContentTableView: () =>
       import("@utilities/molecules/content-view/ContentTableView"),
     CardPaginationView: () =>
       import("@utilities/molecules/card-view/CardPaginationView"),
+    FormDuplicateCard: () =>
+      import("@/components/organisms/guest/duplicate/FormDuplicateCard"),
+    FormCheckoutConfirmation: () =>
+      import("@/components/organisms/guest/checkout/FormCheckoutConfirmation"),
   },
   data() {
     return {
+      id: "TableGuest",
       data: [],
+      selectedData: {},
       helper: {
         loading: false,
       },
       options: {
         product: [],
+      },
+      modal: {
+        duplicate: false,
+        checkout: false,
       },
       pagination: {
         page: 1,
@@ -158,26 +184,67 @@ export default {
       },
     };
   },
+  props: {
+    isSearching: {
+      type: Boolean,
+      default: false,
+    },
+    filter: {
+      type: Object,
+      default: () => ({
+        name: "",
+        range: [],
+      }),
+    },
+  },
+  watch: {
+    filter: {
+      handler() {
+        if (this.isSearching) {
+          this.processGetData();
+        }
+      },
+      deep: true,
+    },
+    isSearching(value) {
+      if (value) {
+        this.processGetData();
+      }
+    },
+  },
   async mounted() {
     await this.processGetOptionsProduct();
-    this.processGetData();
+    await this.processGetData();
   },
   methods: {
     getGuest: guestMethods.getGuest,
     getMembershipProduct: productMethods.getMembershipProduct,
 
     setPayloadGuest() {
-      return {
+      let payload = {
         filter: [{ key: "corporateId", value: this.$utility.getCorporateId() }],
         pagination: {
           page: this.pagination.page,
           per_page: this.pagination.per_page,
         },
       };
+
+      if (this.filter.name !== "") {
+        payload.filter.push({ key: "guestName", value: this.filter.name });
+      }
+
+      if (this.filter.range.length === 2) {
+        payload.filter.push({
+          key: "dateRange",
+          value: this.filter.range.join("_"),
+        });
+      }
+
+      return payload;
     },
 
     async passUpdatePagination(page) {
-      this.pagination.current_page = page;
+      this.pagination.page = page;
       await this.processGetData();
     },
 
@@ -228,7 +295,7 @@ export default {
           licensePlate: this.processFindData(
             item.meta,
             "stepTwo",
-            "licensePlate"
+            "licensePlate",
           ),
           rfId: this.processFindData(item.meta, "stepThree", "rfId"),
           product: this.processGetProduct(item.meta),
@@ -242,13 +309,13 @@ export default {
       try {
         this.helper.loading = true;
         const { values } = await this.getMembershipProduct(
-          this.setPayloadProduct()
+          this.setPayloadProduct(),
         );
         this.options.productCompany = values;
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processGetOptionsProduct in TableGuest`
+          `${error.message} at processGetOptionsProduct in TableGuest`,
         );
       } finally {
         this.helper.loading = false;
@@ -262,11 +329,11 @@ export default {
         const { values, total_values } = await this.getGuest(payload);
         this.data = this.processFormatData(values);
         this.pagination.total = total_values;
+        this.$emit("ready");
       } catch (error) {
-        console.log(error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processGetData in TableGuest`
+          `${error.message} at processGetData in TableGuest`,
         );
       } finally {
         this.helper.loading = false;

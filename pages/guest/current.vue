@@ -57,7 +57,7 @@ export default {
       </div>
     </div>
     <div class="bg-white rounded-lg shadow p-3 mt-3">
-      <filter-guest @update="passUpdateSearch" is-complex-filter />
+      <filter-guest @update="passUpdateSearch" />
       <table-guest
         ref="tableGuest"
         @ready="helper.isSearching = false"

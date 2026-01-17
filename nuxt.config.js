@@ -9,9 +9,19 @@ const NUXT_PUBLIC_BASE_PATH = HOST_BASE.endsWith("/")
   ? HOST_BASE
   : HOST_BASE + "/";
 
+const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+
 var modules = {
   target: "static",
   ssr: false,
+  dev: isDev,
+
+  vue: {
+    config: {
+      productionTip: false,
+      devtools: isDev
+    }
+  },
 
   server: {
     port: 8003,

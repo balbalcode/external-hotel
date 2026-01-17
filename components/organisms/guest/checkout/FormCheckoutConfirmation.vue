@@ -7,287 +7,330 @@
         modal.checkout = false;
         $emit('close');
       "
-      size="lg"
+      :size="helper.wasExpired ? 'sm' : 'lg'"
       test_id="modal-checkout"
     >
-      <div class="" v-if="helper.step === 0">
-        <div class="d-flex">
-          <div class="rounded border text-center">
-            <div v-if="!helper.loading.scanning" key="prepare">
-              <Lottie :options="helper.lottie[0]" :width="248" :height="194" />
-            </div>
-            <div v-else key="scanning">
-              <Lottie :options="helper.lottie[1]" :width="248" :height="194" />
-            </div>
-            <div style="width: 1px !important; height: 1px; overflow: hidden">
-              <input-text-group
-                v-model="form.rfid"
-                :is_error="$v.form.rfid.$error"
-                label_info=""
-                id="txt_rfid"
-                additional_class_group="my-1 mx-1"
-                additional_class_label="my-0 font-size-11 font-weight-bold d-none"
-                size="sm"
-                label="Kode Transaksi"
-                :is_submitted="form.isSubmitted"
-                @submit="processSubmitCard"
-              />
-            </div>
-          </div>
-          <div class="px-3">
-            <p class="mt-2 mb-1 font-size-14 font-weight-bold">
-              Siapkan Kartu Kamar
-            </p>
-            <p class="mt-0 mb-3 font-size-11 text-secondary">
-              Tempelkan kartu kamar pada mesin pembaca kartu untuk memproses
-              checkout, pastikan anda menempelkan kartu yang sesuai dengan data
-              tamu.
-            </p>
-            <p class="font-size-12">
-              Kamar:
-              <span class="font-weight-bold font-size-13">
-                {{ data.guestName }}
-              </span>
-              <br />
-              Kartu Terdaftar:
-              <span class="font-weight-bold font-size-13">
-                {{ data.rfid }}
-              </span>
-            </p>
-            <span
-              class="badge text-danger bg-danger-80 px-2 py-1 font-size-9 mt-2"
-              v-if="helper.isDuplicateCard && !helper.isNonMatchCard"
-            >
-              <i class="ic-alert-circle"></i> Kartu hasil duplikasi tidak dapat
-              digunakan untuk proses checkout!
-            </span>
-            <span
-              class="badge text-success bg-success-80 px-2 py-1 font-size-9 mt-2"
-              v-else-if="
-                !helper.isDuplicateCard &&
-                !helper.isNonMatchCard &&
-                helper.wasScanned
-              "
-            >
-              <i class="ic-check-circle"></i> Kartu asli terdeteksi, silahkan
-              melanjutkan proses checkout.
-            </span>
-            <span
-              class="badge text-danger bg-danger-80 px-2 py-1 font-size-9 mt-2"
-              v-else-if="!helper.isDuplicateCard && helper.isNonMatchCard"
-            >
-              <i class="ic-alert-circle"></i> Kartu Tidak Sesuai
-            </span>
-            <div class="d-flex mt-1">
-              <div v-if="helper.step === 0">
-                <div
-                  v-if="
-                    !(
-                      !helper.isDuplicateCard &&
-                      !helper.isNonMatchCard &&
-                      helper.wasScanned
-                    )
-                  "
-                >
-                  <disabled-button
-                    text="Membaca Kartu..."
-                    size="sm"
-                    v-if="helper.loading.scanning"
-                    variant="primary"
-                    text_color="primary"
-                  />
-                  <active-button
-                    :text="`${
-                      helper.wasScanned ? 'Scan Kartu Kembali' : 'Scan Kartu'
-                    }`"
-                    @click="processStartScanCard()"
-                    size="sm"
-                    v-else
-                    variant="primary"
-                    text_color="primary"
-                  />
-                </div>
-                <div v-else>
-                  <active-button
-                    text="Proses Checkout"
-                    @click="startProcess()"
-                    size="sm"
-                    variant="primary"
-                    text_color="primary"
-                  />
-                </div>
-              </div>
-              <div>
-                <active-button
-                  text="Batal"
-                  additional_class="ml-2"
-                  type="outline"
-                  size="sm"
-                  variant="primary"
-                  text_color="primary"
-                  @click="
-                    modal.checkout = false;
-                    $emit('close');
-                  "
+      <div v-if="helper.wasExpired">
+        <i
+          class="ic-alert-circle font-size-26 text-danger rounded-circle"
+          style="
+            background-color: #fc8d93;
+            border: 6px solid #fad4d6;
+            padding: 6px;
+          "
+        >
+        </i>
+
+        <p class="mt-3 mb-1 font-weight-bold">Kartu telah expired</p>
+        <p class="my-0 font-size-10 text-secondary">
+          Anda tidak dapat melakukan proses checkout karena kartu kamar telah
+          expired. Silahkan pergi ke halaman manajemen kartu untuk menonaktifkan
+          kartu tersebut.
+        </p>
+
+        <active-button
+          text="Tutup"
+          type="outline"
+          size="sm"
+          variant="info"
+          text_color="info"
+          @click="
+            modal.checkout = false;
+            $emit('close');
+          "
+          additional_class="w-100 px-3 mt-3"
+        />
+      </div>
+      <div v-else>
+        <div class="" v-if="helper.step === 0">
+          <div class="d-flex">
+            <div class="rounded border text-center">
+              <div v-if="!helper.loading.scanning" key="prepare">
+                <Lottie
+                  :options="helper.lottie[0]"
+                  :width="248"
+                  :height="194"
                 />
+              </div>
+              <div v-else key="scanning">
+                <Lottie
+                  :options="helper.lottie[1]"
+                  :width="248"
+                  :height="194"
+                />
+              </div>
+              <div style="width: 1px !important; height: 1px; overflow: hidden">
+                <input-text-group
+                  v-model="form.rfid"
+                  :is_error="$v.form.rfid.$error"
+                  label_info=""
+                  id="txt_rfid"
+                  additional_class_group="my-1 mx-1"
+                  additional_class_label="my-0 font-size-11 font-weight-bold d-none"
+                  size="sm"
+                  label="Kode Transaksi"
+                  :is_submitted="form.isSubmitted"
+                  @submit="processSubmitCard"
+                />
+              </div>
+            </div>
+            <div class="px-3">
+              <p class="mt-2 mb-1 font-size-14 font-weight-bold">
+                Siapkan Kartu Kamar
+              </p>
+              <p class="mt-0 mb-3 font-size-11 text-secondary">
+                Tempelkan kartu kamar pada mesin pembaca kartu untuk memproses
+                checkout, pastikan anda menempelkan kartu yang sesuai dengan
+                data tamu.
+              </p>
+              <p class="font-size-12">
+                Kamar:
+                <span class="font-weight-bold font-size-13">
+                  {{ data.guestName }}
+                </span>
+                <br />
+                Kartu Terdaftar:
+                <span class="font-weight-bold font-size-13">
+                  {{ data.rfid }}
+                </span>
+              </p>
+              <span
+                class="badge text-danger bg-danger-80 px-2 py-1 font-size-9 mt-2"
+                v-if="helper.isDuplicateCard && !helper.isNonMatchCard"
+              >
+                <i class="ic-alert-circle"></i> Kartu hasil duplikasi tidak
+                dapat digunakan untuk proses checkout!
+              </span>
+              <span
+                class="badge text-success bg-success-80 px-2 py-1 font-size-9 mt-2"
+                v-else-if="
+                  !helper.isDuplicateCard &&
+                  !helper.isNonMatchCard &&
+                  helper.wasScanned
+                "
+              >
+                <i class="ic-check-circle"></i> Kartu asli terdeteksi, silahkan
+                melanjutkan proses checkout.
+              </span>
+              <span
+                class="badge text-danger bg-danger-80 px-2 py-1 font-size-9 mt-2"
+                v-else-if="!helper.isDuplicateCard && helper.isNonMatchCard"
+              >
+                <i class="ic-alert-circle"></i> Kartu Tidak Sesuai
+              </span>
+              <div class="d-flex mt-1">
+                <div v-if="helper.step === 0">
+                  <div
+                    v-if="
+                      !(
+                        !helper.isDuplicateCard &&
+                        !helper.isNonMatchCard &&
+                        helper.wasScanned
+                      )
+                    "
+                  >
+                    <disabled-button
+                      text="Membaca Kartu..."
+                      size="sm"
+                      v-if="helper.loading.scanning"
+                      variant="primary"
+                      text_color="primary"
+                    />
+                    <active-button
+                      :text="`${
+                        helper.wasScanned ? 'Scan Kartu Kembali' : 'Scan Kartu'
+                      }`"
+                      @click="processStartScanCard()"
+                      size="sm"
+                      v-else
+                      variant="primary"
+                      text_color="primary"
+                    />
+                  </div>
+                  <div v-else>
+                    <active-button
+                      text="Proses Checkout"
+                      @click="startProcess()"
+                      size="sm"
+                      variant="primary"
+                      text_color="primary"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <active-button
+                    text="Batal"
+                    additional_class="ml-2"
+                    type="outline"
+                    size="sm"
+                    variant="primary"
+                    text_color="primary"
+                    @click="
+                      modal.checkout = false;
+                      $emit('close');
+                    "
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="" v-else>
-        <div class="d-flex">
-          <div class="rounded border text-center">
-            <Lottie :options="helper.lottie[2]" :width="248" :height="194" />
-          </div>
-          <div class="px-3">
-            <p class="mb-1 font-size-14 font-weight-bold">Memproses Checkout</p>
-            <div class="d-flex align-items-top my-2">
-              <div v-if="helper.currentProcess >= 2" class="text-success">
-                <i class="bx bx-check-circle font-size-20"></i>
-              </div>
-              <div v-else-if="helper.currentProcess === 1" class="text-dark">
-                <i class="bx bx-loader-alt bx-spin font-size-20"></i>
-              </div>
-              <div v-else class="text-secondary">
-                <i class="bx bx-circle font-size-20"></i>
-              </div>
-              <div class="ml-2 mt-0">
-                <p
-                  class="font-size-13 mt-n1 mb-0"
-                  :class="
-                    helper.currentProcess >= 2
-                      ? 'text-success'
-                      : helper.currentProcess === 1
-                      ? 'text-dark'
-                      : 'text-secondary'
-                  "
-                >
-                  <span class="d-block font-weight-bold">
-                    Validasi Informasi Tamu
-                  </span>
-                  <span class="d-block font-size-9">
-                    {{
+        <div class="" v-else>
+          <div class="d-flex">
+            <div class="rounded border text-center">
+              <Lottie :options="helper.lottie[2]" :width="248" :height="194" />
+            </div>
+            <div class="px-3">
+              <p class="mb-1 font-size-14 font-weight-bold">
+                Memproses Checkout
+              </p>
+              <div class="d-flex align-items-top my-2">
+                <div v-if="helper.currentProcess >= 2" class="text-success">
+                  <i class="bx bx-check-circle font-size-20"></i>
+                </div>
+                <div v-else-if="helper.currentProcess === 1" class="text-dark">
+                  <i class="bx bx-loader-alt bx-spin font-size-20"></i>
+                </div>
+                <div v-else class="text-secondary">
+                  <i class="bx bx-circle font-size-20"></i>
+                </div>
+                <div class="ml-2 mt-0">
+                  <p
+                    class="font-size-13 mt-n1 mb-0"
+                    :class="
                       helper.currentProcess >= 2
-                        ? "Berhasil memvalidasi data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                        ? 'text-success'
                         : helper.currentProcess === 1
-                        ? "Sistem sedang memvalidasi data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
-                        : "Memvalidasi data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
-                    }}
-                  </span>
-                </p>
+                        ? 'text-dark'
+                        : 'text-secondary'
+                    "
+                  >
+                    <span class="d-block font-weight-bold">
+                      Validasi Informasi Tamu
+                    </span>
+                    <span class="d-block font-size-9">
+                      {{
+                        helper.currentProcess >= 2
+                          ? "Berhasil memvalidasi data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                          : helper.currentProcess === 1
+                          ? "Sistem sedang memvalidasi data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                          : "Memvalidasi data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                      }}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div class="d-flex align-items-top my-2">
-              <div v-if="helper.currentProcess >= 3" class="text-success">
-                <i class="bx bx-check-circle font-size-20"></i>
-              </div>
-              <div v-else-if="helper.currentProcess === 2" class="text-dark">
-                <i class="bx bx-loader-alt bx-spin font-size-20"></i>
-              </div>
-              <div v-else class="text-secondary">
-                <i class="bx bx-circle font-size-20"></i>
-              </div>
-              <div class="ml-2 mt-0">
-                <p
-                  class="font-size-13 mt-n1 mb-0"
-                  :class="
-                    helper.currentProcess >= 3
-                      ? 'text-success'
-                      : helper.currentProcess === 2
-                      ? 'text-dark'
-                      : 'text-secondary'
-                  "
-                >
-                  <span class="d-block font-weight-bold">
-                    Merubah informasi kartu kamar
-                  </span>
-                  <span class="d-block font-size-9">
-                    {{
+              <div class="d-flex align-items-top my-2">
+                <div v-if="helper.currentProcess >= 3" class="text-success">
+                  <i class="bx bx-check-circle font-size-20"></i>
+                </div>
+                <div v-else-if="helper.currentProcess === 2" class="text-dark">
+                  <i class="bx bx-loader-alt bx-spin font-size-20"></i>
+                </div>
+                <div v-else class="text-secondary">
+                  <i class="bx bx-circle font-size-20"></i>
+                </div>
+                <div class="ml-2 mt-0">
+                  <p
+                    class="font-size-13 mt-n1 mb-0"
+                    :class="
                       helper.currentProcess >= 3
-                        ? "Berhasil menyimpan informasi kartu kamar pada server"
+                        ? 'text-success'
                         : helper.currentProcess === 2
-                        ? "Sistem sedang merubah informasi kartu kamar pada server"
-                        : "Menyimpan informasi kartu kamar pada server"
-                    }}
-                  </span>
-                </p>
+                        ? 'text-dark'
+                        : 'text-secondary'
+                    "
+                  >
+                    <span class="d-block font-weight-bold">
+                      Merubah informasi kartu kamar
+                    </span>
+                    <span class="d-block font-size-9">
+                      {{
+                        helper.currentProcess >= 3
+                          ? "Berhasil menyimpan informasi kartu kamar pada server"
+                          : helper.currentProcess === 2
+                          ? "Sistem sedang merubah informasi kartu kamar pada server"
+                          : "Menyimpan informasi kartu kamar pada server"
+                      }}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div class="d-flex align-items-top my-2">
-              <div v-if="helper.currentProcess >= 4" class="text-success">
-                <i class="bx bx-check-circle font-size-20"></i>
-              </div>
-              <div v-else-if="helper.currentProcess === 3" class="text-dark">
-                <i class="bx bx-loader-alt bx-spin font-size-20"></i>
-              </div>
-              <div v-else class="text-secondary">
-                <i class="bx bx-circle font-size-20"></i>
-              </div>
-              <div class="ml-2 mt-0">
-                <p
-                  class="font-size-13 mt-n1 mb-0"
-                  :class="
-                    helper.currentProcess >= 4
-                      ? 'text-success'
-                      : helper.currentProcess === 3
-                      ? 'text-dark'
-                      : 'text-secondary'
-                  "
-                >
-                  <span class="d-block font-weight-bold">
-                    Membuat transaksi keluar
-                  </span>
-                  <span class="d-block font-size-9">
-                    {{
+              <div class="d-flex align-items-top my-2">
+                <div v-if="helper.currentProcess >= 4" class="text-success">
+                  <i class="bx bx-check-circle font-size-20"></i>
+                </div>
+                <div v-else-if="helper.currentProcess === 3" class="text-dark">
+                  <i class="bx bx-loader-alt bx-spin font-size-20"></i>
+                </div>
+                <div v-else class="text-secondary">
+                  <i class="bx bx-circle font-size-20"></i>
+                </div>
+                <div class="ml-2 mt-0">
+                  <p
+                    class="font-size-13 mt-n1 mb-0"
+                    :class="
                       helper.currentProcess >= 4
-                        ? "Berhasil membatalkan transaksi sebelumnya dan membuat transaksi baru untuk transaksi keluar"
+                        ? 'text-success'
                         : helper.currentProcess === 3
-                        ? "Sistem sedang membatalkan transaksi sebelumnya dan membuat transaksi baru untuk transaksi keluar"
-                        : "Membatalkan transaksi sebelumnya dan membuat transaksi baru untuk transaksi keluar"
-                    }}
-                  </span>
-                </p>
+                        ? 'text-dark'
+                        : 'text-secondary'
+                    "
+                  >
+                    <span class="d-block font-weight-bold">
+                      Membuat transaksi keluar
+                    </span>
+                    <span class="d-block font-size-9">
+                      {{
+                        helper.currentProcess >= 4
+                          ? "Berhasil membatalkan transaksi sebelumnya dan membuat transaksi baru untuk transaksi keluar"
+                          : helper.currentProcess === 3
+                          ? "Sistem sedang membatalkan transaksi sebelumnya dan membuat transaksi baru untuk transaksi keluar"
+                          : "Membatalkan transaksi sebelumnya dan membuat transaksi baru untuk transaksi keluar"
+                      }}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div class="d-flex align-items-top my-2">
-              <div v-if="helper.currentProcess >= 5" class="text-success">
-                <i class="bx bx-check-circle font-size-20"></i>
-              </div>
-              <div v-else-if="helper.currentProcess === 4" class="text-dark">
-                <i class="bx bx-loader-alt bx-spin font-size-20"></i>
-              </div>
-              <div v-else class="text-secondary">
-                <i class="bx bx-circle font-size-20"></i>
-              </div>
-              <div class="ml-2 mt-0">
-                <p
-                  class="font-size-13 mt-n1 mb-0"
-                  :class="
-                    helper.currentProcess >= 5
-                      ? 'text-success'
-                      : helper.currentProcess === 4
-                      ? 'text-dark'
-                      : 'text-secondary'
-                  "
-                >
-                  <span class="d-block font-weight-bold">
-                    Menyimpan informasi tamu
-                  </span>
-                  <span class="d-block font-size-9">
-                    {{
-                      helper.currentProcess >= 4
-                        ? "Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+              <div class="d-flex align-items-top my-2">
+                <div v-if="helper.currentProcess >= 5" class="text-success">
+                  <i class="bx bx-check-circle font-size-20"></i>
+                </div>
+                <div v-else-if="helper.currentProcess === 4" class="text-dark">
+                  <i class="bx bx-loader-alt bx-spin font-size-20"></i>
+                </div>
+                <div v-else class="text-secondary">
+                  <i class="bx bx-circle font-size-20"></i>
+                </div>
+                <div class="ml-2 mt-0">
+                  <p
+                    class="font-size-13 mt-n1 mb-0"
+                    :class="
+                      helper.currentProcess >= 5
+                        ? 'text-success'
                         : helper.currentProcess === 4
-                        ? "Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
-                        : "Menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
-                    }}
-                  </span>
-                </p>
+                        ? 'text-dark'
+                        : 'text-secondary'
+                    "
+                  >
+                    <span class="d-block font-weight-bold">
+                      Menyimpan informasi tamu
+                    </span>
+                    <span class="d-block font-size-9">
+                      {{
+                        helper.currentProcess >= 4
+                          ? "Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                          : helper.currentProcess === 4
+                          ? "Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                          : "Menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-out ke server"
+                      }}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -333,6 +376,7 @@ export default {
     isOpen: {
       immediate: true,
       handler(newVal) {
+        this.processCheckExpiredCard();
         this.modal.checkout = newVal;
         this.helper.step = 0;
         this.helper.currentProcess = 1;
@@ -391,6 +435,7 @@ export default {
     };
   },
   mounted() {
+    this.processCheckExpiredCard();
     this.transactionId = this.$utility.generateUUID();
   },
   methods: {
@@ -402,6 +447,17 @@ export default {
     setDefaultSuccessAlert: utilityMethods.setDefaultSuccessAlert,
     getMembership: guestMethods.getMembership,
     changePeriodMember: guestMethods.changePeriodMember,
+
+    processCheckExpiredCard() {
+      const start = new Date(this.data.guestCheckout);
+      const end = new Date();
+      const differenceInTime = end.getTime() - start.getTime();
+      const differenceInMinutes = Math.ceil(differenceInTime / (1000 * 60));
+
+      differenceInMinutes >= -60
+        ? (this.helper.wasExpired = true)
+        : (this.helper.wasExpired = false);
+    },
 
     processSubmitCard() {
       this.form.isSubmitted = true;
@@ -474,7 +530,7 @@ export default {
     setPayloadCreateTransactionOut() {
       const transactionId = this.transactionId;
       const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`
+        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`,
       );
 
       return {
@@ -486,9 +542,9 @@ export default {
         handshake: handshake,
         rf_id: "",
         membership_id: "",
-        pos_in: "",
-        vehicle_code: this.processConvertVehicleType("MT1"),
-        gate_code: "",
+        pos_in: this.selectedTransaction.pos_in,
+        vehicle_code: this.data.guestVechicleCode,
+        gate_code: this.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
         time_in: this.selectedTransaction.time_in,
         source: "HOTEL_GUEST",
@@ -500,7 +556,7 @@ export default {
         new Date(),
         -5,
         "minutes",
-        "YYYY-MM-DD HH:mm:ss"
+        "YYYY-MM-DD HH:mm:ss",
       );
       return {
         id: this.membership.employee_detail.id,
@@ -513,7 +569,7 @@ export default {
             end_date: NEW_START_DATE,
             hour_start: this.$utility.formatDateMoment(
               NEW_START_DATE,
-              "HH:mm:ss"
+              "HH:mm:ss",
             ),
           },
         },
@@ -524,7 +580,7 @@ export default {
     setPayloadCreateTransaction() {
       const transactionId = this.transactionId;
       const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`
+        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`,
       );
 
       return {
@@ -537,7 +593,7 @@ export default {
         rf_id: this.data.rfid,
         membership_id: this.membership.id,
         pos_in: "",
-        vehicle_code: this.processConvertVehicleType("MT1"),
+        vehicle_code: this.data.guestVechicleCode,
         gate_code: "",
         created_at: new Date().getTime(),
         time_in: this.selectedTransaction.time_in,
@@ -547,7 +603,7 @@ export default {
 
     setPayloadLogsTransactionUpdate() {
       return {
-        id: this.transactionId,
+        id: this.data.id,
         checkoutCreateBy: this.$utility.getUserLoggedIn().email,
         checkoutCreatedAt: new Date().getTime(),
         checkoutTransactionId: this.transactionId,
@@ -581,7 +637,7 @@ export default {
         console.log("error at processSearchTransaction", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processSearchTransaction in FormCheckoutConfirmation`
+          `${error.message} at processSearchTransaction in FormCheckoutConfirmation`,
         );
       }
     },
@@ -595,7 +651,7 @@ export default {
         console.log("error at processCancelTransaction", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processCancelTransaction in FormCheckoutConfirmation`
+          `${error.message} at processCancelTransaction in FormCheckoutConfirmation`,
         );
         throw error;
       }
@@ -610,7 +666,7 @@ export default {
         console.log("error at processSearchMembership", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processSearchMembership in FormCheckoutConfirmation`
+          `${error.message} at processSearchMembership in FormCheckoutConfirmation`,
         );
       }
     },
@@ -623,7 +679,7 @@ export default {
         console.log("error at processChangePeriodMember", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processChangePeriodMember in FormCheckoutConfirmation`
+          `${error.message} at processChangePeriodMember in FormCheckoutConfirmation`,
         );
         throw error;
       }
@@ -639,7 +695,7 @@ export default {
         console.log("error at processAuthTransaction", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processAuthTransaction in FormCheckoutConfirmation`
+          `${error.message} at processAuthTransaction in FormCheckoutConfirmation`,
         );
         throw error;
       }
@@ -654,7 +710,7 @@ export default {
         console.log("error at processCreateTransaction", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processCreateTransaction in FormCheckoutConfirmation`
+          `${error.message} at processCreateTransaction in FormCheckoutConfirmation`,
         );
         throw error;
       }
@@ -668,19 +724,12 @@ export default {
         console.log("error at processUpdateGuest", error);
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processUpdateGuest in FormGuestProcess`
+          `${error.message} at processUpdateGuest in FormGuestProcess`,
         );
         throw error;
       }
     },
 
-    // get transaction in v
-    // cancel transaction in v
-    // get membership id v
-    // change period membership v
-    // auth transaction out v
-    // make transaction out v
-    // update logs v
     async startProcess() {
       try {
         this.helper.step = 1;
@@ -695,7 +744,6 @@ export default {
         this.helper.currentProcess++;
         this.$emit("finish");
       } catch (error) {
-        console.log("error at ");
         console.log("here", error);
         // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated
       }

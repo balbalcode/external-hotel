@@ -15,7 +15,7 @@ const actions = {
             message: data.message,
             opener: payload.opener,
           },
-          { root: true }
+          { root: true },
         );
         return data;
       })
@@ -26,7 +26,7 @@ const actions = {
             message: error.response.data.message,
             opener: payload.opener,
           },
-          { root: true }
+          { root: true },
         );
         this.$sentry.captureException(error, `terjadi kesalahan: ${payload}`);
         throw error;
@@ -43,7 +43,7 @@ const actions = {
             message: data.message,
             opener: payload.opener,
           },
-          { root: true }
+          { root: true },
         );
         return data;
       })
@@ -54,9 +54,28 @@ const actions = {
             message: error.response.data.message,
             opener: payload.opener,
           },
-          { root: true }
+          { root: true },
         );
         this.$sentry.captureException(error, `terjadi kesalahan: ${payload}`);
+        throw error;
+      });
+  },
+
+  async getTransactionLog({ commit, dispatch }, payload) {
+    return await transactionService
+      .logs(payload.id)
+      .then((data) => {
+        return data.values;
+      })
+      .catch((error) => {
+        dispatch(
+          "modules/utility/storeUtility/setDefaultErrorAlert",
+          {
+            message: error.response.data.message,
+            opener: payload.opener,
+          },
+          { root: true },
+        );
         throw error;
       });
   },

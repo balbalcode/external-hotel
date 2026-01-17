@@ -185,6 +185,7 @@ export default {
           cssClass = "primary";
         }
       } else if (data.status === "CHECKEDOUT") {
+        statusLabel = "Sudah Check Out";
         cssClass = "success";
       }
 

@@ -6,6 +6,7 @@
           :data="data"
           @duplicateRequest="modal.duplicate = true"
           @checkoutRequest="modal.checkout = true"
+          :transaction-out="data"
         />
       </div>
       <div class="col-12 col-lg-9">
@@ -24,6 +25,18 @@
         </div>
       </div>
     </div>
+
+    <plain-modal size="lg" v-model="modal.detail" @close="modal.detail = false">
+      <template v-if="selectedTransaction">
+        <table-detail-resolution :data="selectedTransaction" />
+        <table-log
+          :id="selectedTransaction.id"
+          :get_logs="getTransactionLog"
+          log_name="Transaksi"
+        />
+      </template>
+    </plain-modal>
+
     <form-duplicate-card
       :is-open="modal.duplicate"
       @close="modal.duplicate = false"
@@ -37,9 +50,10 @@
   </div>
 </template>
 <script>
-import { guestMethods } from "@/store/helperActions";
+import { guestMethods, transactionMethods } from "@/store/helperActions";
 export default {
   components: {
+    PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
     DetailGuestInformation: () =>
       import("@/components/organisms/guest/detail/DetailGuestInformation"),
     DetailLogsTransaction: () =>
@@ -52,10 +66,14 @@ export default {
       import("@/components/organisms/guest/duplicate/FormDuplicateCard"),
     FormCheckoutConfirmation: () =>
       import("@/components/organisms/guest/checkout/FormCheckoutConfirmation"),
+    TableDetailResolution: () =>
+      import("@/components/organisms/resolution-center/TableDetailResolution"),
+    TableLog: () => import("@/components/organisms/resolution-center/TableLog"),
   },
   data() {
     return {
       data: {},
+      selectedTransaction: null,
       helper: {
         loading: true,
       },
@@ -66,6 +84,7 @@ export default {
       modal: {
         duplicate: false,
         checkout: false,
+        detail: false,
       },
     };
   },
@@ -74,6 +93,7 @@ export default {
   },
   methods: {
     getGuestDetail: guestMethods.getGuestDetail,
+    getTransactionLog: transactionMethods.getTransactionLog,
 
     setPayloadGuestDetail() {
       const guestId = this.$route.query.id;
@@ -82,22 +102,24 @@ export default {
       };
     },
 
-    handleSelected(selected) {
-      console.log(selected);
+    handleSelected(selected = null) {
+      this.modal.detail = false;
+      if (selected !== null) {
+        this.selectedTransaction = selected;
+        this.modal.detail = true;
+      }
     },
-
-    
 
     async processGetGuestDetail() {
       try {
         const response = await this.getGuestDetail(
-          this.setPayloadGuestDetail()
+          this.setPayloadGuestDetail(),
         );
         this.data = response[0];
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processGetGuestDetail in DetailGuest`
+          `${error.message} at processGetGuestDetail in DetailGuest`,
         );
       } finally {
         this.helper.loading = false;

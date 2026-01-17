@@ -5,7 +5,7 @@
   "author": "ikbal maulana - balbalcode(github)",
   "private": true,
   "scripts": {
-    "dev": "rm .env && cp .env.dev .env && nuxt",
+    "dev": "rm .env && cp .env.dev .env && cross-env NODE_ENV=development nuxt",
     "release:dev": "rm .env && cp .env.dev .env && nuxt build && nuxt generate",
     "release:production": "rm .env && cp .env.production .env && node remove-data-testid.js && nuxt build && nuxt generate && git reset --hard",
     "start": "nuxt start",

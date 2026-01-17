@@ -18,7 +18,7 @@ export const s3Methods = mapActions("modules/utility/storeS3", [
 ]);
 export const subscriptionMethods = mapActions(
   "modules/corporate/storeCorporateSubscription",
-  ["getCorporateDetail"]
+  ["getCorporateDetail"],
 );
 
 export const productMethods = mapActions("modules/product/storeProduct", [
@@ -28,7 +28,7 @@ export const productMethods = mapActions("modules/product/storeProduct", [
 
 export const resolutionMethods = mapActions(
   "modules/resolution-center/storeResolutionCenter",
-  ["getDataResolution", "updateDataResolution"]
+  ["getDataResolution", "updateDataResolution"],
 );
 
 export const eventMethods = mapActions("modules/event/storeEvent", [
@@ -60,5 +60,5 @@ export const ocrMethods = mapActions("modules/ocr/storeOcr", [
 
 export const transactionMethods = mapActions(
   "modules/transaction/storeTransaction",
-  ["authTransaction", "createTransaction"]
+  ["authTransaction", "createTransaction", "getTransactionLog"],
 );
