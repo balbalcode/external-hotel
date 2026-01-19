@@ -62,3 +62,7 @@ export const transactionMethods = mapActions(
   "modules/transaction/storeTransaction",
   ["authTransaction", "createTransaction", "getTransactionLog"],
 );
+
+export const configMethods = mapActions("modules/config/storeConfig", [
+  "getConfig",
+]);

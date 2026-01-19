@@ -13,6 +13,7 @@ export default {
       filter: {
         name: "",
         range: [],
+        rfid: "",
       },
       helper: {
         isSearching: false,

@@ -212,6 +212,7 @@ import {
   resolutionMethods,
   transactionMethods,
   utilityMethods,
+  configMethods,
 } from "@/store/helperActions";
 
 import md5 from "md5";
@@ -256,6 +257,7 @@ export default {
         currentProcess: 1,
         CORPORATE: {},
         SPOT: {},
+        CONFIG: {},
         authTransaction: {},
       },
     };
@@ -264,9 +266,11 @@ export default {
     this.transactionId = this.$utility.generateUUID();
     this.helper.CORPORATE = await this.$utility.getCorporateData();
     this.helper.SPOT = await this.$utility.getSpotInfo();
+    this.helper.CONFIG = await this.processGetConfig();
     this.startProcess();
   },
   methods: {
+    getConfig: configMethods.getConfig,
     updateDataResolution: resolutionMethods.updateDataResolution,
     createMembership: guestMethods.createMembership,
     createEmployee: guestMethods.createEmployee,
@@ -286,27 +290,31 @@ export default {
       return {
         spot_id: this.$utility.getSpotId(),
         corporate_id: this.$utility.getCorporateId(),
-        secret_key: "95c87ec61a7a4091bcbb04d36cc9110a",
+        secret_key: this.helper.CONFIG.spotSecret,
       };
     },
 
     setPayloadCreateTransaction() {
       const transactionId = this.transactionId;
       const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`
+        `${transactionId}.${this.$utility.getSpotId()}.${
+          this.helper.CONFIG.spotSecret
+        }`,
       );
 
       return {
         token: this.helper.authTransaction.access_token,
         image: "",
-        user_id: "7166aa38-e193-4134-8a52-18f784baa43f",
+        user_id: this.helper.CONFIG.userId,
         spot_id: this.$utility.getSpotId(),
         transaction_id: transactionId,
         handshake: handshake,
         rf_id: this.stepThree.data.rfId,
         membership_id: this.membership.id,
         pos_in: this.stepThree.data.selectedTransaction.pos_in,
-        vehicle_code: this.processConvertVehicleType("MT1"),
+        vehicle_code: this.processConvertVehicleType(
+          this.stepThree.data.selectedTransaction.vehicle_Code,
+        ),
         gate_code: this.stepThree.data.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
         time_in: this.stepThree.data.selectedTransaction.time_in,
@@ -341,18 +349,18 @@ export default {
           second_license_plate: "",
           start: this.$utility.formatDateMoment(
             this.stepThree.data.selectedTransaction.time_in,
-            "YYYY-MM-DD HH:mm:ss"
+            "YYYY-MM-DD HH:mm:ss",
           ),
           hour_start: this.$utility.formatDateMoment(
             this.stepThree.data.selectedTransaction.time_in,
-            "HH:mm:ss"
+            "HH:mm:ss",
           ),
           reference: "HOTEL-GUEST-TRANSACTION",
           payment_method: "INVOICE",
           payment_receipt: this.stepOne.ocrFile,
           paid_date: this.$utility.formatDateMoment(
             new Date(),
-            "YYYY-MM-DD HH:mm:ss"
+            "YYYY-MM-DD HH:mm:ss",
           ),
         },
       };
@@ -368,18 +376,18 @@ export default {
         second_license_plate: "",
         start: this.$utility.formatDateMoment(
           this.stepThree.data.selectedTransaction.time_in,
-          "YYYY-MM-DD HH:mm:ss"
+          "YYYY-MM-DD HH:mm:ss",
         ),
         hour_start: this.$utility.formatDateMoment(
           this.stepThree.data.selectedTransaction.time_in,
-          "HH:mm:ss"
+          "HH:mm:ss",
         ),
         reference: "HOTEL-GUEST-TRANSACTION",
         payment_method: "INVOICE",
         payment_receipt: this.stepOne.ocrFile,
         paid_date: this.$utility.formatDateMoment(
           new Date(),
-          "YYYY-MM-DD HH:mm:ss"
+          "YYYY-MM-DD HH:mm:ss",
         ),
       };
     },
@@ -393,7 +401,7 @@ export default {
         productId: this.stepTwo.data.productId.productId,
         guestCheckout: this.stepTwo.data.end,
         guestVechicleCode: this.processFindVehicleGuest(
-          this.stepThree.data.selectedTransaction.vehicle_Code
+          this.stepThree.data.selectedTransaction.vehicle_Code,
         ),
         type: "HOTEL_GUEST",
         ocrFile: this.stepOne.ocrFile,
@@ -429,9 +437,9 @@ export default {
     processConvertVehicleType(vehicle) {
       vehicle = vehicle.toUpperCase();
       if (`${vehicle[0]}${vehicle[1]}` === "MT") {
-        return "MT2"; // GET FROM ENV
+        return this.helper.CONFIG.motorcycleKey;
       } else {
-        return "MB2"; // GET FROM ENV
+        return this.helper.CONFIG.carKey;
       }
     },
 
@@ -446,6 +454,28 @@ export default {
       return values.code;
     },
 
+    async processGetConfig() {
+      try {
+        const payload = {
+          filter: [{ key: "corporate_id", value: this.helper.CORPORATE.id }],
+        };
+        const { values } = await this.getConfig(payload);
+        if (values.length > 0) {
+          return values[0];
+        } else {
+          window.location.href = "/guest/current?status=not-configured";
+        }
+      } catch (error) {
+        this.helper.isError = true;
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetConfig in FormGuestProcess`,
+        );
+      } finally {
+        this.helper.isLoading = false;
+      }
+    },
+
     async processAuthTransaction() {
       try {
         const PAYLOAD_AUTH = this.setPayloadAuthTransaction();
@@ -455,7 +485,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processAuthTransaction in FormGuestProcess`
+          `${error.message} at processAuthTransaction in FormGuestProcess`,
         );
         throw error;
       }
@@ -468,7 +498,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processAuthTransaction in FormGuestProcess`
+          `${error.message} at processCreateTransaction in FormGuestProcess`,
         );
         throw error;
       }
@@ -481,7 +511,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processCancelTransaction in FormGuestProcess`
+          `${error.message} at processCancelTransaction in FormGuestProcess`,
         );
         throw error;
       }
@@ -495,7 +525,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processExtendMembership in FormGuestProcess`
+          `${error.message} at processExtendMembership in FormGuestProcess`,
         );
         throw error;
       }
@@ -509,7 +539,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processCreateMembership in FormGuestProcess`
+          `${error.message} at processCreateMembership in FormGuestProcess`,
         );
         throw error;
       }
@@ -523,7 +553,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processCreateGuest in FormGuestProcess`
+          `${error.message} at processCreateGuest in FormGuestProcess`,
         );
         throw error;
       }
@@ -536,7 +566,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processUpdateGuest in FormGuestProcess`
+          `${error.message} at processUpdateGuest in FormGuestProcess`,
         );
         throw error;
       }

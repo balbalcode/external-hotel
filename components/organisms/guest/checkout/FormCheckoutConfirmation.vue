@@ -176,7 +176,7 @@
           </div>
         </div>
 
-        <div class="" v-else>
+        <div class="" v-else-if="helper.step === 1">
           <div class="d-flex">
             <div class="rounded border text-center">
               <Lottie :options="helper.lottie[2]" :width="248" :height="194" />
@@ -335,6 +335,44 @@
             </div>
           </div>
         </div>
+
+        <div v-else>
+          <i
+            class="ic-check-circle font-size-26 text-success rounded-circle"
+            style="
+              background-color: #d1fadf;
+              border: 6px solid #ecfdf3;
+              padding: 6px;
+            "
+          >
+          </i>
+
+          <p class="mt-3 mb-1 font-weight-bold">Berhasil CheckOut</p>
+          <p class="my-0 font-size-10 text-secondary">
+            Tamu berhasil checkout dan transaksi keluar telah dibuat.
+          </p>
+
+          <a :href="`/guest/receipt?${createdTransaction.id}`" target="_blank">
+            <active-button
+              text="Print Struk"
+              type="outline"
+              size="sm"
+              variant="primary"
+              text_color="primary"
+              @click="$router.push('/guest/current')"
+              additional_class="w-100 px-3 mt-3"
+            />
+          </a>
+          <active-button
+            text="Lihat tamu Lainnya"
+            type="outline"
+            size="sm"
+            variant="info"
+            text_color="info"
+            @click="$router.push('/guest/current')"
+            additional_class="w-100 px-3 mt-1"
+          />
+        </div>
       </div>
     </plain-modal>
   </div>
@@ -345,6 +383,7 @@ import {
   resolutionMethods,
   guestMethods,
   transactionMethods,
+  configMethods,
   utilityMethods,
 } from "@/store/helperActions";
 import { required } from "vuelidate/lib/validators";
@@ -428,14 +467,16 @@ export default {
         loading: {
           scanning: false,
         },
+        CONFIG: {},
       },
       modal: {
         checkout: false,
       },
     };
   },
-  mounted() {
+  async mounted() {
     this.processCheckExpiredCard();
+    this.helper.CONFIG = await this.processGetConfig();
     this.transactionId = this.$utility.generateUUID();
   },
   methods: {
@@ -447,6 +488,29 @@ export default {
     setDefaultSuccessAlert: utilityMethods.setDefaultSuccessAlert,
     getMembership: guestMethods.getMembership,
     changePeriodMember: guestMethods.changePeriodMember,
+    getConfig: configMethods.getConfig,
+
+    async processGetConfig() {
+      try {
+        const payload = {
+          filter: [{ key: "corporate_id", value: this.data.corporateId }],
+        };
+        const { values } = await this.getConfig(payload);
+        if (values.length > 0) {
+          return values[0];
+        } else {
+          window.location.href = "/guest/current?status=not-configured";
+        }
+      } catch (error) {
+        this.helper.isError = true;
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetConfig in FormCheckoutConfirmation`,
+        );
+      } finally {
+        this.helper.isLoading = false;
+      }
+    },
 
     processCheckExpiredCard() {
       const start = new Date(this.data.guestCheckout);
@@ -523,20 +587,22 @@ export default {
       return {
         spot_id: this.$utility.getSpotId(),
         corporate_id: this.$utility.getCorporateId(),
-        secret_key: "95c87ec61a7a4091bcbb04d36cc9110a",
+        secret_key: this.helper.CONFIG.spotSecret,
       };
     },
 
     setPayloadCreateTransactionOut() {
       const transactionId = this.transactionId;
       const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`,
+        `${transactionId}.${this.$utility.getSpotId()}.${
+          this.helper.CONFIG.spotSecret
+        }`,
       );
 
       return {
         token: this.authTransactionData.access_token,
         image: "",
-        user_id: "7166aa38-e193-4134-8a52-18f784baa43f",
+        user_id: this.helper.CONFIG.userId,
         spot_id: this.$utility.getSpotId(),
         transaction_id: transactionId,
         handshake: handshake,
@@ -742,7 +808,7 @@ export default {
         this.helper.currentProcess++;
         await this.processUpdateGuest();
         this.helper.currentProcess++;
-        this.$emit("finish");
+        this.$router.push(`/guest/receipt?id=${this.transactionId}`);
       } catch (error) {
         console.log("here", error);
         // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated

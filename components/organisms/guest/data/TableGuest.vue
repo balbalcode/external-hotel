@@ -92,6 +92,7 @@
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
+                    v-if="isHavingAction"
                     align="rtl"
                     @click="
                       () => {
@@ -107,6 +108,7 @@
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
+                    v-if="isHavingAction"
                     align="rtl"
                     @click="
                       () => {
@@ -185,6 +187,10 @@ export default {
     };
   },
   props: {
+    isHavingAction: {
+      type: Boolean,
+      default: true,
+    },
     isSearching: {
       type: Boolean,
       default: false,
@@ -193,6 +199,7 @@ export default {
       type: Object,
       default: () => ({
         name: "",
+        rfid: "",
         range: [],
       }),
     },
@@ -231,6 +238,10 @@ export default {
 
       if (this.filter.name !== "") {
         payload.filter.push({ key: "guestName", value: this.filter.name });
+      }
+
+      if (this.filter.rfid?.trim()) {
+        payload.filter.push({ key: "rfid", value: this.filter.rfid.trim() });
       }
 
       if (this.filter.range.length === 2) {

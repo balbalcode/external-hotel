@@ -83,6 +83,7 @@ export default {
     id: "FilterGuest",
     filter: {
       name: "",
+      rfid: "",
       range: [],
       isSubmitted: false,
     },
