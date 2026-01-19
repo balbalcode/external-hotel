@@ -8,6 +8,7 @@ export default {
   },
   data() {
     return {
+      mode: process.env.MODE,
       height: 0,
     };
   },
@@ -37,7 +38,7 @@ export default {
           value: parseInt(this.height) + 30,
           title: this.title,
         },
-        "http://localhost:5173"
+        "http://localhost:5173",
       );
     },
 
@@ -63,8 +64,21 @@ export default {
 </script>
 
 <template>
-  <div id="layout-wrapper" class="font-size-13" style="min-height: 540px !important">
-    <slot />
+  <div
+    id="layout-wrapper"
+    class="font-size-13"
+    style="min-height: 540px !important"
+  >
+    <div :class="`${mode !== 'PRODUCTION' ? 'dev-layout' : ''}`">
+      <slot />
+    </div>
     <AlertNotification />
   </div>
 </template>
+<style scoped>
+.dev-layout {
+  margin-left: 15%;
+  margin-top: 90px;
+  margin-right: 15px;
+}
+</style>

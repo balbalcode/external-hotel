@@ -390,6 +390,7 @@ export default {
         guestCheckin: this.stepTwo.data.start,
         guestName: this.stepTwo.data.name,
         corporateId: this.helper.CORPORATE.id,
+        productId: this.stepTwo.data.productId.productId,
         guestCheckout: this.stepTwo.data.end,
         guestVechicleCode: this.processFindVehicleGuest(
           this.stepThree.data.selectedTransaction.vehicle_Code
