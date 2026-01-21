@@ -103,10 +103,8 @@ export default {
                   :id="`${log_name}__row__${index}__timestamp`"
                 >
                   {{
-                    $utility.momentAddDate(
+                    $utility.formatDateMoment(
                       log.timestamp,
-                      "7",
-                      "hours",
                       "DD/MM/YYYY HH:mm:ss",
                     )
                   }}

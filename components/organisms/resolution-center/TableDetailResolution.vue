@@ -134,10 +134,8 @@ export default {
                 <td class="text-center">
                   <plain-label
                     :value="
-                      $utility.momentAddDate(
+                      $utility.formatDateMoment(
                         data.time_in,
-                        '7',
-                        'hours',
                         'DD/MM/YYYY HH:mm:ss',
                       )
                     "
@@ -150,10 +148,8 @@ export default {
                   <plain-label
                     :value="
                       data.ref_detail.values.time_in
-                        ? $utility.momentAddDate(
+                        ? $utility.formatDateMoment(
                             data.ref_detail.values.time_in,
-                            '7',
-                            'hours',
                             'DD/MM/YYYY HH:mm:ss',
                           )
                         : '-'
@@ -164,10 +160,8 @@ export default {
                   <plain-label
                     :value="
                       data.time_out
-                        ? $utility.momentAddDate(
+                        ? $utility.formatDateMoment(
                             data.time_out,
-                            '7',
-                            'hours',
                             'DD/MM/YYYY HH:mm:ss',
                           )
                         : '-'
@@ -181,10 +175,8 @@ export default {
                   <plain-label
                     :value="
                       data.ref_detail.values.time_out
-                        ? $utility.momentAddDate(
+                        ? $utility.formatDateMoment(
                             data.ref_detail.values.time_out,
-                            '7',
-                            'hours',
                             'DD/MM/YYYY HH:mm:ss',
                           )
                         : '-'

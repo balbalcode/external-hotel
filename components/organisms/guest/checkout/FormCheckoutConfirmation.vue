@@ -7,10 +7,10 @@
         modal.checkout = false;
         $emit('close');
       "
-      :size="helper.wasExpired ? 'sm' : 'lg'"
+      :size="helper.wasExpired && !isExpiredForm ? 'sm' : 'lg'"
       test_id="modal-checkout"
     >
-      <div v-if="helper.wasExpired">
+      <div v-if="helper.wasExpired && !isExpiredForm">
         <i
           class="ic-alert-circle font-size-26 text-danger rounded-circle"
           style="
@@ -410,6 +410,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    isExpiredForm: {
+      type: Boolean,
+      default: false,
+    },
   },
   watch: {
     isOpen: {
@@ -493,7 +497,7 @@ export default {
     async processGetConfig() {
       try {
         const payload = {
-          filter: [{ key: "corporate_id", value: this.data.corporateId }],
+          filter: [{ key: "corporate_id", value: this.$utility.getCorporateId() }],
         };
         const { values } = await this.getConfig(payload);
         if (values.length > 0) {
@@ -599,6 +603,19 @@ export default {
         }`,
       );
 
+      const expiredTimeIn = new Date(this.data.guestCheckout);
+      expiredTimeIn.setHours(12, 0, 0, 0);
+      const expiredTimeInTimestamp = expiredTimeIn.getTime();
+
+      const timeIn = !this.isExpiredForm
+        ? this.selectedTransaction.time_in
+        : expiredTimeInTimestamp;
+
+      console.log("timeIn", timeIn);
+      console.log(expiredTimeInTimestamp);      
+      console.log(this.isExpiredForm);
+      alert("here")
+
       return {
         token: this.authTransactionData.access_token,
         image: "",
@@ -609,10 +626,10 @@ export default {
         rf_id: "",
         membership_id: "",
         pos_in: this.selectedTransaction.pos_in,
-        vehicle_code: this.data.guestVechicleCode,
+        vehicle_code: this.data.guestVehicleCode,
         gate_code: this.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
-        time_in: this.selectedTransaction.time_in,
+        time_in: timeIn,
         source: "HOTEL_GUEST",
       };
     },
@@ -659,7 +676,7 @@ export default {
         rf_id: this.data.rfid,
         membership_id: this.membership.id,
         pos_in: "",
-        vehicle_code: this.data.guestVechicleCode,
+        vehicle_code: this.data.guestVehicleCode,
         gate_code: "",
         created_at: new Date().getTime(),
         time_in: this.selectedTransaction.time_in,
@@ -769,7 +786,7 @@ export default {
 
     async processCreateTransaction() {
       try {
-        const PAYLOAD = this.setPayloadCreateTransaction();
+        const PAYLOAD = this.setPayloadCreateTransactionOut();
         const { values } = await this.createTransaction(PAYLOAD);
         this.createdTransaction = values;
       } catch (error) {

@@ -88,11 +88,11 @@
                   <active-button
                     icon="ic-clock-fast-forward"
                     icon_size="16"
-                    text="Eearly Check-Out"
+                    text="Check-Out"
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                    v-if="isHavingAction"
+                    v-if="isHavingAction && logs.statusLabel !== 'Sudah Checkout'"
                     align="rtl"
                     @click="
                       () => {
@@ -269,7 +269,7 @@ export default {
       return finder.name;
     },
 
-    processSetLabelStatus(data) {
+    processSetLabelStatus(data, index) {
       let statusLabel = "DATA BERMASALAH";
       let cssClass = "danger";
       if (data.status === "ACTIVE") {
@@ -287,7 +287,14 @@ export default {
         cssClass = "success";
       }
 
-      return `<span class="badge px-2 py-1 badge-${cssClass} font-size-11 font-weight-bold">${statusLabel}</span>`;
+      const status = {
+        label: statusLabel,
+        class: cssClass,
+        component: `<span class="badge px-2 py-1 badge-${cssClass} font-size-11 font-weight-bold">${statusLabel}</span>`,
+      };
+
+      return status[`${index}`]
+      
     },
 
     processsCountDateDifference(data) {
@@ -310,7 +317,8 @@ export default {
           ),
           rfId: this.processFindData(item.meta, "stepThree", "rfId"),
           product: this.processGetProduct(item.meta),
-          status: this.processSetLabelStatus(item),
+          status: this.processSetLabelStatus(item, "component"),
+          statusLabel: this.processSetLabelStatus(item, "label"),          
           durationStay: this.processsCountDateDifference(item),
         };
       });

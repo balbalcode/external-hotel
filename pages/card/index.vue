@@ -81,6 +81,7 @@ export default {
         @ready="helper.isSearching = false"
         :is-searching="helper.isSearching"
         :filter="filter"
+        :isHavingAction="false"
       />
     </div>
   </Layout>

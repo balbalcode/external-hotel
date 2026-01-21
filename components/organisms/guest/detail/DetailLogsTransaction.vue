@@ -36,11 +36,9 @@
               <p class="my-0 font-size-9">
                 Waktu Masuk:
                 {{
-                  $utility.momentAddDate(
+                  $utility.formatDateMoment(
                     transaction.transactionIn.time_in,
-                    "7",
-                    "hours",
-                    "DD-MM-YYYY hh:mm:ss"
+                    "DD-MM-YYYY HH:mm:ss"
                   )
                 }}
               </p>
@@ -99,11 +97,9 @@
               <p class="my-0 font-size-9">
                 Waktu Keluar:
                 {{
-                  $utility.momentAddDate(
+                  $utility.formatDateMoment(
                     transaction.transactionOut.time_out,
-                    "7",
-                    "hours",
-                    "DD-MM-YYYY hh:mm:ss"
+                    "DD-MM-YYYY HH:mm:ss"
                   )
                 }}
               </p>

@@ -256,7 +256,6 @@ export default {
       helper: {
         currentProcess: 1,
         CORPORATE: {},
-        SPOT: {},
         CONFIG: {},
         authTransaction: {},
       },
@@ -265,7 +264,6 @@ export default {
   async mounted() {
     this.transactionId = this.$utility.generateUUID();
     this.helper.CORPORATE = await this.$utility.getCorporateData();
-    this.helper.SPOT = await this.$utility.getSpotInfo();
     this.helper.CONFIG = await this.processGetConfig();
     this.startProcess();
   },
@@ -313,11 +311,11 @@ export default {
         membership_id: this.membership.id,
         pos_in: this.stepThree.data.selectedTransaction.pos_in,
         vehicle_code: this.processConvertVehicleType(
-          this.stepThree.data.selectedTransaction.vehicle_Code,
+          this.stepThree.data.selectedTransaction.vehicle_code,
         ),
         gate_code: this.stepThree.data.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
-        time_in: this.stepThree.data.selectedTransaction.time_in,
+        time_in: new Date().getTime(),
         source: "HOTEL_GUEST",
       };
     },
@@ -400,8 +398,8 @@ export default {
         corporateId: this.helper.CORPORATE.id,
         productId: this.stepTwo.data.productId.productId,
         guestCheckout: this.stepTwo.data.end,
-        guestVechicleCode: this.processFindVehicleGuest(
-          this.stepThree.data.selectedTransaction.vehicle_Code,
+        guestVehicleCode: this.processConvertVehicleType(
+          this.stepThree.data.selectedTransaction.vehicle_code,
         ),
         type: "HOTEL_GUEST",
         ocrFile: this.stepOne.ocrFile,
@@ -443,17 +441,6 @@ export default {
       }
     },
 
-    processFindVehicleGuest(vehicle) {
-      const values = Object.values(this.helper.SPOT.vehicle_codes)
-        .flat()
-        .find((item) => {
-          if (item.name === vehicle) {
-            return item;
-          }
-        });
-      return values.code;
-    },
-
     async processGetConfig() {
       try {
         const payload = {
@@ -471,6 +458,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processGetConfig in FormGuestProcess`,
         );
+        console.log(error, "processGetConfig in FormGuestProcess");
       } finally {
         this.helper.isLoading = false;
       }
@@ -487,6 +475,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processAuthTransaction in FormGuestProcess`,
         );
+        console.log(error, "processAuthTransaction in FormGuestProcess");
         throw error;
       }
     },
@@ -500,6 +489,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processCreateTransaction in FormGuestProcess`,
         );
+        console.log(error, "processCreateTransaction in FormGuestProcess");
         throw error;
       }
     },
@@ -513,6 +503,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processCancelTransaction in FormGuestProcess`,
         );
+        console.log(error, "processCancelTransaction in FormGuestProcess");
         throw error;
       }
     },
@@ -527,6 +518,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processExtendMembership in FormGuestProcess`,
         );
+        console.log(error, "processExtendMembership in FormGuestProcess");
         throw error;
       }
     },
@@ -541,6 +533,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processCreateMembership in FormGuestProcess`,
         );
+        console.log(error, "processCreateMembership in FormGuestProcess");
         throw error;
       }
     },
@@ -555,6 +548,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processCreateGuest in FormGuestProcess`,
         );
+        console.log(error, "processCreateGuest in FormGuestProcess");
         throw error;
       }
     },
@@ -568,6 +562,7 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processUpdateGuest in FormGuestProcess`,
         );
+        console.log(error, "processUpdateGuest in FormGuestProcess");
         throw error;
       }
     },

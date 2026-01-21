@@ -145,11 +145,9 @@ export default {
             class="font-size-16 my-0 text-uppercase"
           >
             {{
-              $utility.momentAddDate(
+              $utility.formatDateMoment(
                 data.time_in,
-                "7",
-                "hours",
-                "YYYY-MM-DD hh:mm:ss ",
+                "YYYY-MM-DD HH:mm:ss ",
               )
             }}
             WIB

@@ -89,11 +89,9 @@
               dikenakan denda parkir apabila kendaraan masih berada di area
               hotel. Batas benefit parkir:
               {{
-                $utility.momentAddDate(
-                  selectedData.checkOut,
-                  "1",
-                  "hours",
-                  "DD-MM-YYYY HH:mm",
+                $utility.formatDateMoment(
+                  selectedData.guestCheckout,
+                  "DD-MM-YYYY",
                 )
               }}
             </p>
@@ -119,14 +117,6 @@
               @click="$router.push('/guest/detail?id=' + selectedData.id)"
             />
             <active-button
-              v-if="helper.status === 'EXPIRED'"
-              text="Hapus Akses"
-              size="sm"
-              variant="danger"
-              type="outline"
-              text_color="danger"
-            />
-            <active-button
               text="Scan Kartu Baru"
               size="sm"
               variant="info"
@@ -134,10 +124,25 @@
               text_color="info"
               @click="$emit('requestScan')"
             />
+            <active-button
+              v-if="helper.status === 'EXPIRED'"
+              text="Checkout dg Denda Parkir"
+              @click="modal.checkout = true"
+              size="sm"
+              variant="danger"
+              type="outline"
+              text_color="danger"
+            />
           </div>
         </div>
       </div>
     </div>
+    <form-checkout-confirmation
+      :is-open="modal.checkout"
+      :data="selectedData"
+      @close="modal.checkout = false"
+      :isExpiredForm="true"
+    />
   </div>
 </template>
 
@@ -145,6 +150,8 @@
 export default {
   components: {
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
+    FormCheckoutConfirmation: () =>
+      import("@/components/organisms/guest/checkout/FormCheckoutConfirmation"),
   },
   name: "DetailCard",
   props: {
@@ -160,6 +167,9 @@ export default {
         page: 1,
         per_page: 10,
         total: 0,
+      },
+      modal: {
+        checkout: false,
       },
       helper: {
         CORPORATE: {},

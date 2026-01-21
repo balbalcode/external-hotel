@@ -45,12 +45,12 @@
             </div>
             <div class="col-12 col-lg-3 p-2">
               {{
-                $utility.formatDateMoment(item.time_in, "DD-MM-YYYY hh:mm:ss")
+                $utility.formatDateMoment(item.time_in, "DD-MM-YYYY HH:mm:ss")
               }}
             </div>
             <div class="col-12 col-lg-3 p-2">
               {{
-                $utility.formatDateMoment(item.time_out, "DD-MM-YYYY hh:mm:ss")
+                $utility.formatDateMoment(item.time_out, "DD-MM-YYYY HH:mm:ss")
               }}
             </div>
             <div class="col-12 col-lg-2 p-2">
