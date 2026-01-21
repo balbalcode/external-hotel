@@ -10,6 +10,7 @@ export default {
     return {
       mode: process.env.MODE,
       height: 0,
+      parentUrl: process.env.PARENT_URL,
     };
   },
   mounted() {
@@ -38,12 +39,12 @@ export default {
           value: parseInt(this.height) + 30,
           title: this.title,
         },
-        "http://localhost:5173",
+        this.parentUrl,
       );
     },
 
     handleMessage(event) {
-      if (event.origin !== "http://localhost:5173") return;
+      if (event.origin !== this.parentUrl) return;
 
       const { type, payload } = event.data;
 

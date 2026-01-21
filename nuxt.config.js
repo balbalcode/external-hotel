@@ -204,6 +204,7 @@ var modules = {
     FRAUD_WEBHOOK: process.env.FRAUD_WEBHOOK || "",
     TEMP_API: process.env.TEMP_API || "",
     OCR_URL: process.env.OCR_URL || "",
+    PARENT_URL: process.env.PARENT_URL || "",
     NUXT_PUBLIC_BASE_PATH: NUXT_PUBLIC_BASE_PATH,
   },
 };
