@@ -134,12 +134,22 @@ export default {
       return payload;
     },
 
+    processFilterData(data) {
+      const start = this.data.created_at;
+      const end = this.data.checkoutCreatedAt;
+
+      this.transaction = data.filter((item) => {
+        const timeIn = item.time_in;
+        return start <= timeIn && timeIn <= end;
+      });
+    },
+
     async processSearchTransaction() {
       try {
         this.helper.isLoading = true;
         const payload = this.setPayloadTransaction();
         const { values } = await this.getDataResolution(payload);
-        this.transaction = values;
+        this.processFilterData(values);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(

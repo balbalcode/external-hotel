@@ -66,8 +66,8 @@ export default async function ({ app, store, route }) {
       // 401 error (this is only run after user has a token or has logged in)
       if (error.response.status === 401) {
         // setting fallback url
-        jscookie.set("fallback_url", window.$nuxt.$route.path);
-        jscookie.remove("token");
+        // jscookie.set("fallback_url", window.$nuxt.$route.path);
+        // jscookie.remove("token");
 
         // this condition will prevent set same message for next request.
         error_response = {

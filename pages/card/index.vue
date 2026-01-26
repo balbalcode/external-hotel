@@ -29,7 +29,6 @@ export default {
         values: data.values,
         totalValues: data.totalValues,
       };
-      console.log(data, "here!");
       this.filter.range = [
         this.$utility.momentAddDate(new Date(), "-2", "months", "YYYY-MM-DD"),
         this.$utility.formatDateMoment(new Date(), "YYYY-MM-DD"),

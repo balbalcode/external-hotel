@@ -148,10 +148,6 @@ const actions = {
   },
 
   async getMembership({ commit, dispatch }, payload) {
-    if (!payload.filter) payload.filter = [];
-    if (!payload.pagination) payload.pagination = {};
-    if (!payload.order) payload.order = {};
-    console.log(payload);
     return await membershipService
       .get(payload.filter, payload.pagination, payload.order)
       .then((data) => {

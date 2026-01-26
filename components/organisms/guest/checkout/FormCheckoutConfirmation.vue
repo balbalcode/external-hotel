@@ -59,7 +59,9 @@
                   :height="194"
                 />
               </div>
-              <div style="width: 1px !important; height: 1px; overflow: hidden">
+              <div
+                style="width: 30px !important; height: 30px; overflow: hidden"
+              >
                 <input-text-group
                   v-model="form.rfid"
                   :is_error="$v.form.rfid.$error"
@@ -385,13 +387,13 @@ import {
   transactionMethods,
   configMethods,
   utilityMethods,
+  hashMethods,
 } from "@/store/helperActions";
 import { required } from "vuelidate/lib/validators";
 import Lottie from "vue-lottie";
 import prepareCard from "~/static/prepareCard.json";
 import loadingCard from "~/static/loadingCard.json";
 import tappingCard from "~/static/tapGuide.json";
-import md5 from "md5";
 export default {
   components: {
     PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
@@ -481,7 +483,7 @@ export default {
   async mounted() {
     this.processCheckExpiredCard();
     this.helper.CONFIG = await this.processGetConfig();
-    this.transactionId = this.$utility.generateUUID();
+    this.transactionId = "dc4c622b-d827-4c04-84c2-2e2877963989";
   },
   methods: {
     getDataResolution: resolutionMethods.getDataResolution,
@@ -493,11 +495,14 @@ export default {
     getMembership: guestMethods.getMembership,
     changePeriodMember: guestMethods.changePeriodMember,
     getConfig: configMethods.getConfig,
+    getCryptoHash: hashMethods.getCryptoHash,
 
     async processGetConfig() {
       try {
         const payload = {
-          filter: [{ key: "corporate_id", value: this.$utility.getCorporateId() }],
+          filter: [
+            { key: "corporateId", value: this.$utility.getCorporateId() },
+          ],
         };
         const { values } = await this.getConfig(payload);
         if (values.length > 0) {
@@ -522,9 +527,9 @@ export default {
       const differenceInTime = end.getTime() - start.getTime();
       const differenceInMinutes = Math.ceil(differenceInTime / (1000 * 60));
 
-      differenceInMinutes >= -60
-        ? (this.helper.wasExpired = true)
-        : (this.helper.wasExpired = false);
+      // differenceInMinutes >= -60
+      //   ? (this.helper.wasExpired = true)
+      //   : (this.helper.wasExpired = false);
     },
 
     processSubmitCard() {
@@ -570,6 +575,14 @@ export default {
       };
     },
 
+    setPayloadHash() {
+      return {
+        text: `${this.transactionId}.${this.$utility.getSpotId()}.${
+          this.helper.CONFIG.spotSecret
+        }`,
+      };
+    },
+
     setPayloadGetMembership() {
       return {
         filter: [
@@ -595,14 +608,9 @@ export default {
       };
     },
 
-    setPayloadCreateTransactionOut() {
+    async setPayloadCreateTransactionOut() {
       const transactionId = this.transactionId;
-      const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.${
-          this.helper.CONFIG.spotSecret
-        }`,
-      );
-
+      const handshake = await this.processGetHash();
       const expiredTimeIn = new Date(this.data.guestCheckout);
       expiredTimeIn.setHours(12, 0, 0, 0);
       const expiredTimeInTimestamp = expiredTimeIn.getTime();
@@ -610,11 +618,6 @@ export default {
       const timeIn = !this.isExpiredForm
         ? this.selectedTransaction.time_in
         : expiredTimeInTimestamp;
-
-      console.log("timeIn", timeIn);
-      console.log(expiredTimeInTimestamp);      
-      console.log(this.isExpiredForm);
-      alert("here")
 
       return {
         token: this.authTransactionData.access_token,
@@ -637,8 +640,8 @@ export default {
     setPayloadChangePeriodMember() {
       const NEW_START_DATE = this.$utility.momentAddDate(
         new Date(),
-        -5,
-        "minutes",
+        -1, // for a while we cannot change -5 mins. so we're change to -1 day
+        "days",
         "YYYY-MM-DD HH:mm:ss",
       );
       return {
@@ -660,11 +663,9 @@ export default {
       };
     },
 
-    setPayloadCreateTransaction() {
+    async setPayloadCreateTransaction() {
       const transactionId = this.transactionId;
-      const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.95c87ec61a7a4091bcbb04d36cc9110a`,
-      );
+      const handshake = await this.processGetHash();
 
       return {
         token: this.authTransactionData.access_token,
@@ -707,6 +708,22 @@ export default {
       }
     },
 
+    async processGetHash() {
+      try {
+        const PAYLOAD = this.setPayloadHash();
+        const { values } = await this.getCryptoHash(PAYLOAD);
+        console.log(PAYLOAD, values, "PAYLOAD HASH");
+        return values[0]?.data?.hash ?? "";
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetHash in FormGuestProcess`,
+        );
+        console.log(error, "processGetHash in FormGuestProcess");
+        throw error;
+      }
+    },
+
     async processSearchTransaction() {
       try {
         const payload = this.setPayloadGetTransaction();
@@ -729,7 +746,6 @@ export default {
       try {
         const PAYLOAD = this.setPayloadCancelTransaction();
         await this.updateDataResolution(PAYLOAD);
-        console.log(PAYLOAD, "canceled");
       } catch (error) {
         console.log("error at processCancelTransaction", error);
         this.$utility.setErrorContextSentry(error);
@@ -786,7 +802,7 @@ export default {
 
     async processCreateTransaction() {
       try {
-        const PAYLOAD = this.setPayloadCreateTransactionOut();
+        const PAYLOAD = await this.setPayloadCreateTransactionOut();
         const { values } = await this.createTransaction(PAYLOAD);
         this.createdTransaction = values;
       } catch (error) {
@@ -819,7 +835,7 @@ export default {
         await this.processSearchTransaction();
         this.helper.currentProcess++;
         await this.processSearchMembership();
-        // await this.processChangePeriodMember();
+        await this.processChangePeriodMember();
         this.helper.currentProcess++;
         await this.processAuthTransaction();
         this.helper.currentProcess++;
@@ -827,7 +843,7 @@ export default {
         this.helper.currentProcess++;
         this.$router.push(`/guest/receipt?id=${this.transactionId}`);
       } catch (error) {
-        console.log("here", error);
+        console.log("error startProcess", error);
         // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated
       }
     },

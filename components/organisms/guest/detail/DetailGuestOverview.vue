@@ -132,7 +132,7 @@
           />
         </div>
 
-        <div class="mt-1" v-if="data.status !== 'CHECKEDOUT'">
+        <div class="mt-1" >
           <active-button
             text="Proses Checkout"
             type="outline"

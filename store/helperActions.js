@@ -66,3 +66,7 @@ export const transactionMethods = mapActions(
 export const configMethods = mapActions("modules/config/storeConfig", [
   "getConfig",
 ]);
+
+export const hashMethods = mapActions("modules/hash/storeHash", [
+  "getCryptoHash",
+]);

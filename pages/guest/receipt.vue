@@ -54,7 +54,7 @@ export default {
       try {
         const payload = {
           filter: [
-            { key: "corporate_id", value: this.$utility.getCorporateId() },
+            { key: "corporateId", value: this.$utility.getCorporateId() },
           ],
         };
         const { values } = await this.getConfig(payload);
@@ -67,7 +67,7 @@ export default {
         this.helper.isError = true;
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processGetConfig in FormCheckoutConfirmation`,
+          `${error.message} at processGetConfig in receipt.vue`,
         );
       } finally {
         this.helper.loading = false;
@@ -145,10 +145,7 @@ export default {
             class="font-size-16 my-0 text-uppercase"
           >
             {{
-              $utility.formatDateMoment(
-                data.time_in,
-                "YYYY-MM-DD HH:mm:ss ",
-              )
+              $utility.formatDateMoment(data.time_in, "YYYY-MM-DD HH:mm:ss ")
             }}
             WIB
           </p>

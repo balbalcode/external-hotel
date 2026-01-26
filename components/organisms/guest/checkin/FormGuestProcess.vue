@@ -215,8 +215,6 @@ import {
   configMethods,
 } from "@/store/helperActions";
 
-import md5 from "md5";
-
 export default {
   components: {
     Lottie,
@@ -245,10 +243,6 @@ export default {
     },
   },
   data() {
-    // Berhasil menyimpan data informasi tamu mulai dari nomor kamar, nama, dan waktu check-in ke server -> create log
-    // Berhasil menyimpan data log informasi kendaraan tamu seperti nomor plat, jenis kendaraan, dan waktu masuk ke server -> change transaction
-    // Berhasil menyimpan data log informasi transaksi yang digunakan oleh tamu sebelumnya ke server -> update member / create member
-    // Berhasil menyimpan data log aktivitas aktivasi ke server -> update log
     return {
       membership: {},
       log: {},
@@ -277,6 +271,7 @@ export default {
     createTransaction: transactionMethods.createTransaction,
     authTransaction: transactionMethods.authTransaction,
     setDefaultSuccessAlert: utilityMethods.setDefaultSuccessAlert,
+    getCryptoHash: hashMethods.getCryptoHash,
 
     nextProcess() {
       if (this.helper.currentProcess < 5) {
@@ -292,13 +287,17 @@ export default {
       };
     },
 
-    setPayloadCreateTransaction() {
-      const transactionId = this.transactionId;
-      const handshake = md5(
-        `${transactionId}.${this.$utility.getSpotId()}.${
+    setPayloadHash() {
+      return {
+        text: `${this.transactionId}.${this.$utility.getSpotId()}.${
           this.helper.CONFIG.spotSecret
         }`,
-      );
+      };
+    },
+
+    async setPayloadCreateTransaction() {
+      const transactionId = this.transactionId;
+      const handshake = await this.processGetHash();
 
       return {
         token: this.helper.authTransaction.access_token,
@@ -394,6 +393,7 @@ export default {
       return {
         id: this.transactionId,
         guestCheckin: this.stepTwo.data.start,
+        guestData: this.stepOne.data,
         guestName: this.stepTwo.data.name,
         corporateId: this.helper.CORPORATE.id,
         productId: this.stepTwo.data.productId.productId,
@@ -410,9 +410,6 @@ export default {
         oldMembershipId: !this.stepThree.data.isNewMembership
           ? this.stepThree.data.selectedMembership.id
           : "",
-        employeeId: !this.stepThree.data.isNewMembership
-          ? this.stepThree.data.selectedMembership.employee_detail.id
-          : "",
         checkinTransactionId: this.transactionId,
         rfid: this.stepThree.data.rfId,
         meta: JSON.stringify({
@@ -428,6 +425,7 @@ export default {
       return {
         id: this.transactionId,
         membershipId: this.membership.id,
+        employeeId: this.membership.employee_detail.id,
         status: "ACTIVE",
       };
     },
@@ -441,10 +439,29 @@ export default {
       }
     },
 
+    async processGetHash() {
+      try {
+        const PAYLOAD = this.setPayloadHash();
+        const { values } = await this.getCryptoHash(PAYLOAD);
+        if (values[0].data.hash) {
+          return values[0].data.hash;
+        } else {
+          this.$router.push("hotel/logout");
+        }
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetHash in FormGuestProcess`,
+        );
+        console.log(error, "processGetHash in FormGuestProcess");
+        throw error;
+      }
+    },
+
     async processGetConfig() {
       try {
         const payload = {
-          filter: [{ key: "corporate_id", value: this.helper.CORPORATE.id }],
+          filter: [{ key: "corporateId", value: this.helper.CORPORATE.id }],
         };
         const { values } = await this.getConfig(payload);
         if (values.length > 0) {
@@ -482,7 +499,7 @@ export default {
 
     async processCreateTransaction() {
       try {
-        const PAYLOAD = this.setPayloadCreateTransaction();
+        const PAYLOAD = await this.setPayloadCreateTransaction();
         await this.createTransaction(PAYLOAD);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
