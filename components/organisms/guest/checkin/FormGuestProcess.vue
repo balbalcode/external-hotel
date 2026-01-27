@@ -212,6 +212,7 @@ import {
   resolutionMethods,
   transactionMethods,
   utilityMethods,
+  hashMethods,
   configMethods,
 } from "@/store/helperActions";
 
@@ -393,7 +394,7 @@ export default {
       return {
         id: this.transactionId,
         guestCheckin: this.stepTwo.data.start,
-        guestData: this.stepOne.data,
+        guestData: JSON.stringify(this.stepOne.data),
         guestName: this.stepTwo.data.name,
         corporateId: this.helper.CORPORATE.id,
         productId: this.stepTwo.data.productId.productId,
@@ -425,7 +426,9 @@ export default {
       return {
         id: this.transactionId,
         membershipId: this.membership.id,
-        employeeId: this.membership.employee_detail.id,
+        employeeId: this.stepThree.data.isNewMembership
+          ? this.membership.id
+          : this.stepThree.data.selectedMembership.employee_detail.id,
         status: "ACTIVE",
       };
     },
