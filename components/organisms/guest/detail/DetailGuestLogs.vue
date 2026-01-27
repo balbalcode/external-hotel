@@ -140,7 +140,8 @@ export default {
 
       this.transaction = data.filter((item) => {
         const timeIn = item.time_in;
-        return start <= timeIn && timeIn <= end;
+        if (end !== 0) return start <= timeIn && timeIn <= end;
+        else return start <= timeIn;
       });
     },
 
