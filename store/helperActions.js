@@ -70,3 +70,7 @@ export const configMethods = mapActions("modules/config/storeConfig", [
 export const hashMethods = mapActions("modules/hash/storeHash", [
   "getCryptoHash",
 ]);
+
+export const spotsMethods = mapActions("modules/spot/storeSpot", [
+  "getSpotDetail",
+]);

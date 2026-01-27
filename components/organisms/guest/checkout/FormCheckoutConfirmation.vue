@@ -483,7 +483,7 @@ export default {
   async mounted() {
     this.processCheckExpiredCard();
     this.helper.CONFIG = await this.processGetConfig();
-    this.transactionId = "dc4c622b-d827-4c04-84c2-2e2877963989";
+    this.transactionId = this.$utility.generateUUID();
   },
   methods: {
     getDataResolution: resolutionMethods.getDataResolution,
@@ -773,7 +773,8 @@ export default {
     async processChangePeriodMember() {
       try {
         const PAYLOAD = this.setPayloadChangePeriodMember();
-        await this.changePeriodMember(PAYLOAD);
+        console.log(PAYLOAD, "PAYLOAD CHANGE PERIOD - DISABLED FOR A WHILE");
+        // await this.changePeriodMember(PAYLOAD);
       } catch (error) {
         console.log("error at processChangePeriodMember", error);
         this.$utility.setErrorContextSentry(error);
@@ -841,7 +842,7 @@ export default {
         this.helper.currentProcess++;
         await this.processUpdateGuest();
         this.helper.currentProcess++;
-        this.$router.push(`/guest/receipt?id=${this.transactionId}`);
+        this.$router.push(`/guest/receipt?refid=${this.transactionId}&gid=${this.data.id}`);
       } catch (error) {
         console.log("error startProcess", error);
         // WHAT SHOULD I DO HERE? bcs its rollbacking 3-4 process is complicated

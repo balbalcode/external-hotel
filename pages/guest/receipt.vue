@@ -1,6 +1,12 @@
 <script>
 import QrcodeVue from "qrcode.vue";
-import { configMethods, resolutionMethods } from "@/store/helperActions";
+import {
+  configMethods,
+  hashMethods,
+  spotsMethods,
+  resolutionMethods,
+  guestMethods,
+} from "@/store/helperActions";
 export default {
   components: {
     Layout: () => import("@/layouts/main"),
@@ -11,24 +17,55 @@ export default {
     return {
       data: {},
       helper: {
+        hash: "",
+        GUEST: {},
         CONFIG: {},
+        SPOT: {},
         loading: false,
       },
     };
   },
   async mounted() {
+    this.helper.loading = true;
     this.helper.CONFIG = await this.processGetConfig();
-    this.processSearchTransaction();
+    await this.processSearchTransaction();
+    await this.processGetGuestDetail();
+    await this.processGetHash();
+    this.helper.loading = false;
   },
   methods: {
     getConfig: configMethods.getConfig,
     getDataResolution: resolutionMethods.getDataResolution,
+    getCryptoHash: hashMethods.getCryptoHash,
+    getSpotDetail: spotsMethods.getSpotDetail,
+    getGuestDetail: guestMethods.getGuestDetail,
+
+    setPayloadGuestDetail() {
+      const guestId = this.$route.query.gid;
+      return {
+        id: guestId,
+      };
+    },
+
+    async processGetGuestDetail() {
+      try {
+        const response = await this.getGuestDetail(
+          this.setPayloadGuestDetail(),
+        );
+        this.helper.GUEST = response[0];
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetGuestDetail in DetailGuest`,
+        );
+      }
+    },
 
     setPayloadTransaction() {
       return {
         filter: [
           { key: "spot_id", value: this.$utility.getSpotId() },
-          { key: "values", value: this.$route.query.id },
+          { key: "values", value: this.$route.query.refid },
           { key: "type", value: "id" },
           { key: "history", value: true },
         ],
@@ -37,6 +74,35 @@ export default {
           per_page: 10,
         },
       };
+    },
+
+    setPayloadSpot() {
+      return {
+        id: this.$utility.getSpotId(),
+      };
+    },
+
+    setPayloadHash() {
+      return {
+        text: `${this.$route.query.refid}.${this.$utility.getSpotId()}.${
+          this.helper.CONFIG.spotSecret
+        }`,
+      };
+    },
+
+    async processGetHash() {
+      try {
+        const PAYLOAD = this.setPayloadHash();
+        const { values } = await this.getCryptoHash(PAYLOAD);
+        this.helper.hash = values[0]?.data?.hash ?? "";
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetHash in FormGuestProcess`,
+        );
+        console.log(error, "processGetHash in FormGuestProcess");
+        throw error;
+      }
     },
 
     processPrintReceipt() {
@@ -69,8 +135,6 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processGetConfig in receipt.vue`,
         );
-      } finally {
-        this.helper.loading = false;
       }
     },
 
@@ -85,10 +149,23 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processSearchTransaction in FormGuestMembership`,
+          `${error.message} at processSearchTransaction in receipt.vue`,
         );
-      } finally {
-        this.helper.loading = false;
+      }
+    },
+
+    async processGetSpot() {
+      try {
+        this.helper.loading = true;
+        const payload = this.setPayloadSpot();
+        const values = await this.getSpotDetail(payload);
+        console.log(values.vehicle_codes, "data");
+        this.helper.SPOT = values.vehicle_codes;
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetSpot in receipt.vue`,
+        );
       }
     },
   },
@@ -157,13 +234,20 @@ export default {
           </p>
         </div>
 
-        <div style="text-align: center" class="text-center">
+        <div
+          v-if="!helper.loading"
+          style="text-align: center"
+          class="text-center"
+        >
           <qrcode-vue
-            :value="`${data.id}.${data.hs}.${data.time_in}.${data.vehicle_code}.${data.pos_in}.${helper.CONFIG.userId}`"
+            :value="`${data.id}.${helper.hash}.${data.time_in}.${helper.GUEST.guestVehicleCode}.${data.pos_in}.${data.time_in}.${helper.CONFIG.userId}`"
             :size="200"
             level="H"
             render-as="svg"
           />
+        </div>
+        <div v-else class="text-center my-5 py-3">
+          <b-spinner />
         </div>
         <div style="text-align: center" class="text-center pb-1 mb-1">
           <p
