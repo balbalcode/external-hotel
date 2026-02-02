@@ -12,14 +12,11 @@
         >
           <thead class="thead-freeze bg-gray-70">
             <tr class="border-bottom-table">
-              <th class="text-dark">Nomor Kamar</th>
-              <th class="text-dark">Plat Nomor 1</th>
-              <th class="text-dark">Nomor Kartu</th>
+              <th class="text-dark">Nama</th>
+              <th class="text-dark">Plat Nomor</th>
               <th class="text-dark">Produk</th>
-              <th class="text-dark">Tanggal Checkin</th>
-              <th class="text-dark">Durasi Stay</th>
-              <th class="text-dark">Tanggal Checkout</th>
               <th class="text-dark">Status</th>
+              <th class="text-dark">Tanggal Pemberian Benefit</th>
               <th class="text-dark">Pembuat</th>
               <th class="text-dark text-center">Action</th>
             </tr>
@@ -32,34 +29,14 @@
                   {{ logs.licensePlate }}
                 </span>
               </td>
-              <td>{{ logs.rfId }}</td>
               <td>{{ logs.product }}</td>
               <td>
                 {{
                   $utility.formatDateMoment(
-                    logs.guestCheckin,
+                    logs.created_at,
                     "DD-MM-YYYY HH:mm:ss",
                   )
                 }}
-              </td>
-              <td>
-                {{ logs.durationStay }} Hari
-                {{ parseInt(logs.durationStay) - 1 }} Malam
-              </td>
-              <td>
-                <span v-if="logs.checkoutCreatedAt">
-                  {{
-                    $utility.formatDateMoment(
-                      logs.checkoutCreatedAt,
-                      "DD-MM-YYYY HH:mm:ss",
-                    )
-                  }}
-                </span>
-                <span v-else>
-                  <span class="badge bg-primary-80 rounded px-2 py-1">
-                    Belum Checkout
-                  </span>
-                </span>
               </td>
               <td>
                 <p v-html="logs.status" class="my-0"></p>
@@ -92,9 +69,7 @@
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                    v-if="
-                      isHavingAction && logs.statusLabel !== 'Sudah Checkout'
-                    "
+                    v-if="isHavingAction && logs.statusLabel !== 'Sudah Keluar'"
                     align="rtl"
                     @click="
                       () => {
@@ -233,7 +208,7 @@ export default {
       let payload = {
         filter: [
           { key: "corporateId", value: this.$utility.getCorporateId() },
-          { key: "type", value: "HOTEL_GUEST" },
+          { key: "type", value: "USER_BENEFIT" },
         ],
         pagination: {
           page: this.pagination.page,
@@ -277,18 +252,11 @@ export default {
     processSetLabelStatus(data, index) {
       let statusLabel = "DATA BERMASALAH";
       let cssClass = "danger";
-      if (data.status === "ACTIVE") {
-        if (
-          new Date().setHours(11, 59, 59, 0) >
-          new Date(data.guestCheckout).setHours(11, 59, 59, 0)
-        ) {
-          statusLabel = "Kedaluwarsa";
-        } else {
-          statusLabel = "Aktif";
-          cssClass = "dark";
-        }
-      } else if (data.status === "CHECKEDOUT") {
-        statusLabel = "Sudah Checkout";
+      if (data.status === "CONNECTED") {
+        statusLabel = "Masih Parkir";
+        cssClass = "dark";
+      } else if (data.status === "CLAIMED") {
+        statusLabel = "Sudah Keluar";
         cssClass = "success";
       }
 
@@ -301,15 +269,6 @@ export default {
       return status[`${index}`];
     },
 
-    processsCountDateDifference(data) {
-      const start = new Date(data.guestCheckin);
-      const end = new Date(data.guestCheckout);
-      const differenceInTime = end.getTime() - start.getTime();
-      const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-
-      return differenceInDays ?? 0;
-    },
-
     processFormatData(data, step, key) {
       return data.map((item) => {
         return {
@@ -319,11 +278,9 @@ export default {
             "stepTwo",
             "licensePlate",
           ),
-          rfId: this.processFindData(item.meta, "stepThree", "rfId"),
           product: this.processGetProduct(item.meta),
           status: this.processSetLabelStatus(item, "component"),
           statusLabel: this.processSetLabelStatus(item, "label"),
-          durationStay: this.processsCountDateDifference(item),
         };
       });
     },
