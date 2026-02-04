@@ -4,11 +4,9 @@ export default {
     PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
     Layout: () => import("@//layouts/main"),
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
-    FormBenefitGuest: () =>
-      import("@/components/organisms/guest/benefit/FormBenefitGuest"),
-    TableBenefitGuest: () =>
-      import("@/components/organisms/guest/benefit/TableBenefitGuest"),
-    FilterGuest: () => import("@/components/organisms/guest/data/FilterGuest"),
+    FormBenefit: () => import("@/components/templates/benefit/FormBenefit"),
+    TableBenefit: () => import("@/components/organisms/benefit/TableBenefit"),
+    FilterBenefit: () => import("@/components/organisms/benefit/FilterBenefit"),
   },
   data: () => {
     return {
@@ -30,7 +28,7 @@ export default {
       this.modal.form = false;
     },
     processRefreshState() {
-      this.$refs.TableBenefitGuest.processGetData();
+      this.$refs.TableBenefit.processGetData();
       this.processCancelForm();
     },
 
@@ -60,23 +58,23 @@ export default {
       </div>
     </div>
     <div class="bg-white rounded-lg shadow p-3 mt-3">
-      <filter-guest @update="passUpdateSearch" is-complex-filter />
-      <table-benefit-guest
-        ref="TableBenefitGuest"
+      <filter-benefit @update="passUpdateSearch" is-complex-filter />
+      <table-benefit
+        ref="TableBenefit"
         @ready="helper.isSearching = false"
         :is-searching="helper.isSearching"
         :filter="filter"
       />
     </div>
     <plain-modal
-      id="FormBenefitGuest"
+      id="FormBenefit"
       @close="processCancelForm"
       v-model="modal.form"
       size="lg"
       test_id="modal-form-product"
     >
-      <form-benefit-guest
-        ref="FormBenefitGuest"
+      <form-benefit
+        ref="FormBenefit"
         @saved="processRefreshState"
         @cancel="processCancelForm"
       />

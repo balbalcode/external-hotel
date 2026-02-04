@@ -1,9 +1,5 @@
 <template>
   <div>
-    <div class="mt-2 d-flex mb-3">
-      <div class="badge badge-pill pt-1 badge-primary">1</div>
-      <div class="font-size-12 ml-2 font-weight-bold">Informasi Tamu</div>
-    </div>
     <div class="row">
       <div class="col-12 col-lg-12 mb-2">
         <p class="font-weight-bold my-0">Pencarian kendaraan pengguna</p>
@@ -113,7 +109,7 @@
       </div>
       <div class="col-12 col-lg-8 my-1">
         <div
-          style="height: 293px !important; overflow-y: scroll; z-index: 10"
+          style="height: 300px !important; overflow-y: scroll; z-index: 10"
           class="rounded border border-secondary-90"
         >
           <div class="h-100">
@@ -203,7 +199,7 @@
                           text="Pilih"
                           size="sm"
                           additional_class="px-4 mt-2 "
-                          @click="data.selectedTransaction = trx"
+                          @click="processSelectTransaction(trx)"
                         />
                       </template>
                     </div>
@@ -392,7 +388,7 @@
 
     <ModalScannerQrcode v-model="modal.scanner" @update="processGetScannedQR" />
     <!-- hidden input -->
-    <div style="width: 131px !important; height: 131px; overflow: hidden">
+    <div style="width: 1px !important; height: 1px; overflow: hidden">
       <input-text-group
         v-model="filter.transaction.key"
         :is_error="$v.filter.transaction.key.$error"
@@ -521,6 +517,11 @@ export default {
       }
 
       return payload;
+    },
+
+    processSelectTransaction(trx) {
+      this.data.selectedTransaction = trx;
+      this.processSubmitForm();
     },
 
     processStartScanEmoney() {

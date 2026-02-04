@@ -11,18 +11,20 @@
           </div>
           <div>
             <p class="mb-0 text-success font-weight-bold">
-              Berhasil memproses informasi tamu
+              Berhasil menemukan transaksi pengeunjung
             </p>
             <p class="mb-0 text-success font-size-12">
-              Silakan perbaiki informasi tamu berikut jika diperlukan, dan
-              masukkan informasi tamu lainnya.
+              Silakan lengkapi informasi pengunjung untuk melanjutkan proses
+              pemberian benefit.
             </p>
           </div>
         </div>
       </div>
       <div class="mt-3 d-flex mb-3">
         <div class="badge badge-pill pt-1 badge-primary">2</div>
-        <div class="font-size-12 ml-2 font-weight-bold">Informasi Tamu</div>
+        <div class="font-size-12 ml-2 font-weight-bold">
+          Informasi Pengunjung
+        </div>
       </div>
       <div class="row">
         <div class="col-12 my-0 col-lg-6">
@@ -93,7 +95,7 @@
             :is_error="$v.form.productId.$error"
             id="txt_productId"
             label="Paket Produk"
-            label_info="Paket produk sudah disesuaikan dengan lama menginap tamu. Silakan pilih paket produk yang sesuai jika diperlukan."
+            label_info="Paket ini akan menentukan tagihan yang akan didapatkan setiap bulan."
             :is_submitted="form.isSubmitted"
             placeholder="Pilih Paket Produk"
             :error_message="[
@@ -114,7 +116,7 @@
             id="txt_note"
             label="Catatan/Alasan Pemberian"
             :is_submitted="form.isSubmitted"
-            placeholder="Contoh: Tamu merupakan pelanggan setia."
+            placeholder="Contoh: Pengunjung benefit total spent diatas Rp2.000.000,-."
             :error_message="[
               {
                 state: $v.form.note.required,
@@ -170,7 +172,7 @@ export default {
   },
   data: () => {
     return {
-      id: "form_guest_information",
+      id: "FormBenefitInformation",
       form: {
         name: "",
         vehicleType: "MB",
