@@ -11,7 +11,7 @@
           </div>
           <div>
             <p class="mb-0 text-success font-weight-bold">
-              Berhasil menemukan transaksi pengeunjung
+              Berhasil menemukan transaksi pengunjung
             </p>
             <p class="mb-0 text-success font-size-12">
               Silakan lengkapi informasi pengunjung untuk melanjutkan proses
@@ -33,61 +33,18 @@
             :is_error="$v.form.name.$error"
             label_info=""
             id="txt_name"
-            label="Nomor Kamar"
+            label="Nama Pengunjung"
             :is_submitted="form.isSubmitted"
             placeholder="Contoh: Mrs Sultoni Daswand"
             :error_message="[
               {
                 state: $v.form.name.required,
-                message: 'Nomor Kamar tidak boleh kosong',
+                message: 'Nama Pengunjung tidak boleh kosong',
               },
             ]"
             :test_id="`${id}__name`"
             :ref="`${id}__name`"
           />
-        </div>
-        <div class="col-12 my-0 col-lg-3">
-          <input-radio-group
-            v-model="form.vehicleType"
-            :is_error="$v.form.vehicleType.$error"
-            label_info=""
-            :options="options.vehicleType"
-            id="txt_vehicleType"
-            label="Jenis Kendaraan"
-            :is_submitted="form.isSubmitted"
-            placeholder="Contoh: B31234CD"
-            :error_message="[
-              {
-                state: $v.form.vehicleType.required,
-                message: 'Jenis Kendaraan tidak boleh kosong',
-              },
-            ]"
-            :test_id="`${id}__vehicleType`"
-            :ref="`${id}__vehicleType`"
-          />
-        </div>
-        <div class="col-12 my-0 col-lg-3">
-          <input-text-group
-            v-model="form.licensePlate"
-            format="license_plate"
-            :is_error="$v.form.licensePlate.$error"
-            label_info=""
-            id="txt_licensePlate"
-            label="Plat Nomor"
-            :is_submitted="form.isSubmitted"
-            placeholder="Contoh: B31234CD"
-            :error_message="[
-              {
-                state: $v.form.licensePlate.required,
-                message: 'Plat Nomor tidak boleh kosong',
-              },
-            ]"
-            :test_id="`${id}__licensePlate`"
-            :ref="`${id}__licensePlate`"
-          />
-        </div>
-
-        <div class="col-12 col-lg-7 my-1">
           <input-select-group
             v-model="form.productId"
             :options="options.product"
@@ -108,21 +65,16 @@
             :ref="`${id}__productId`"
           />
         </div>
-        <div class="col-12 col-lg-5 my-1">
+        <div class="col-12 col-lg-6 my-1">
           <input-textarea-group
             v-model="form.note"
-            :is_error="$v.form.note.$error"
+            :is_error="false"
             label_info=""
             id="txt_note"
             label="Catatan/Alasan Pemberian"
             :is_submitted="form.isSubmitted"
-            placeholder="Contoh: Pengunjung benefit total spent diatas Rp2.000.000,-."
-            :error_message="[
-              {
-                state: $v.form.note.required,
-                message: 'Catatan/Alasan Pemberian tidak boleh kosong',
-              },
-            ]"
+            placeholder="Contoh: Pengunjung benefit total spent diatas Rp2.000.000,- dengan kode transaksi #1234567890"
+            :error_message="[]"
             :test_id="`${id}__note`"
             :ref="`${id}__note`"
           />
@@ -203,8 +155,6 @@ export default {
     form: {
       vehicleType: { required },
       name: { required },
-      start: { required },
-      end: { required },
       licensePlate: { required },
       productId: { required },
     },
@@ -212,6 +162,7 @@ export default {
   async mounted() {
     await this.processGetOptionsDictionary();
     await this.processGetOptionsProduct();
+    this.processFillingOptionsProduct();
   },
   methods: {
     getMembershipProduct: productMethods.getMembershipProduct,
@@ -237,8 +188,6 @@ export default {
         data: this.form,
       });
     },
-
-    processMakeMappedData() {},
 
     processFillingOptionsProduct() {
       const options = this.options.productDictionary.map((opt) => {

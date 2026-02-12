@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <div class="col-12 col-lg-12 mb-2">
+      <div class="col-12 col-lg-12 my-2">
         <p class="font-weight-bold my-0">Pencarian kendaraan pengguna</p>
         <p class="text-muted my-0 font-size-10">
           Anda harus memasukkan informasi kendaraan tamu untuk dapat memberikan
@@ -533,7 +533,7 @@ export default {
       this.$emit("submit", {
         data: {
           selectedTransaction: this.data.selectedTransaction,
-          transactionId: this.data.this.data.selectedTransaction.id,
+          transactionId: this.data.selectedTransaction.id,
           isNewMembership: false,
           rfId: "",
           cardId: "",

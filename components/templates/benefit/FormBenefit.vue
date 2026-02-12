@@ -21,15 +21,13 @@
     </div>
     <form-benefit-transaction
       :data="form.stepOne"
-      @submit="processStepTwo"
-      v-if="helper.currentStep > 0 && helper.currentStep < 4"
-      :is-passed="helper.currentStep > 1"
+      @submit="processStepOne"
+      v-if="helper.currentStep === 1"
     />
     <form-benefit-information
       :data="form.stepTwo"
-      @submit="processStepThree"
-      v-if="helper.currentStep > 1 && helper.currentStep < 4"
-      :is-passed="helper.currentStep > 2"
+      @submit="processStepTwo"
+      v-if="helper.currentStep === 2"
     />
     <form-benefit-process
       v-if="helper.currentStep === 3"
