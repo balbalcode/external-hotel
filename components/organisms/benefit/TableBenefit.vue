@@ -2,7 +2,7 @@
   <div class="">
     <content-table-view
       :length="data.length"
-      :is_loading="helper.loading"
+      :is_loading="helper.loading.data"
       :is_error="helper.isError"
     >
       <div class="table-responsive rounded-top table-freeze mb-0">
@@ -59,7 +59,12 @@
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0"
-                    @click="$router.push(`/guest/detail?id=${logs.id}`)"
+                    @click="
+                      () => {
+                        modal.detail = true;
+                        processGetTransactionLog(logs.transactionId);
+                      }
+                    "
                     align="rtl"
                   />
                 </dropdown-button>
@@ -80,21 +85,32 @@
         />
       </div>
     </content-table-view>
-    <form-duplicate-card
-      :is-open="modal.duplicate"
-      @close="modal.duplicate = false"
-    />
 
-    <form-checkout-confirmation
-      :is-open="modal.checkout"
-      :data="selectedData"
-      @close="modal.checkout = false"
-    />
+    <plain-modal size="lg" v-model="modal.detail" @close="modal.detail = false">
+      <template v-if="helper.loading.detail">
+        <div class="my-5 py-5 mx-auto text-center">
+          <b-spinner size="lg" primary />
+        </div>
+      </template>
+      <template v-else>
+        <table-detail-resolution :data="selectedTransaction" />
+        <table-log
+          :id="selectedTransaction.id"
+          :get_logs="getTransactionLog"
+          log_name="Transaksi"
+        />
+      </template>
+    </plain-modal>
   </div>
 </template>
 
 <script>
-import { guestMethods, productMethods } from "@/store/helperActions";
+import {
+  guestMethods,
+  productMethods,
+  transactionMethods,
+  resolutionMethods,
+} from "@/store/helperActions";
 export default {
   components: {
     PlainModal: () => import("@utilities/atoms/modal/PlainModal"),
@@ -104,25 +120,26 @@ export default {
       import("@utilities/molecules/content-view/ContentTableView"),
     CardPaginationView: () =>
       import("@utilities/molecules/card-view/CardPaginationView"),
-    FormDuplicateCard: () =>
-      import("@/components/organisms/guest/duplicate/FormDuplicateCard"),
-    FormCheckoutConfirmation: () =>
-      import("@/components/organisms/guest/checkout/FormCheckoutConfirmation"),
+    TableDetailResolution: () =>
+      import("@/components/organisms/resolution-center/TableDetailResolution"),
+    TableLog: () => import("@/components/organisms/resolution-center/TableLog"),
   },
   data() {
     return {
       id: "TableGuest",
       data: [],
-      selectedData: {},
+      selectedTransaction: {},
       helper: {
-        loading: false,
+        loading: {
+          data: false,
+          detail: false,
+        },
       },
       options: {
         product: [],
       },
       modal: {
-        duplicate: false,
-        checkout: false,
+        detail: false,
       },
       pagination: {
         page: 1,
@@ -170,7 +187,21 @@ export default {
   },
   methods: {
     getGuest: guestMethods.getGuest,
+    getTransactionLog: transactionMethods.getTransactionLog,
+    getDataResolution: resolutionMethods.getDataResolution,
     getMembershipProduct: productMethods.getMembershipProduct,
+
+    setPayloadTransaction(transactionId) {
+      let payload = {
+        filter: [
+          { key: "spot_id", value: this.$utility.getSpotId() },
+          { key: "values", value: transactionId },
+          { key: "type", value: "id" },
+        ],
+      };
+
+      return payload;
+    },
 
     setPayloadGuest() {
       let payload = {
@@ -220,11 +251,11 @@ export default {
     processSetLabelStatus(data, index) {
       let statusLabel = "DATA BERMASALAH";
       let cssClass = "danger";
-      if (data.status === "CONNECTED") {
-        statusLabel = "Masih Parkir";
+      if (data.status === "GIFTED") {
+        statusLabel = "Berhasil Diberikan";
         cssClass = "dark";
       } else if (data.status === "CLAIMED") {
-        statusLabel = "Sudah Keluar";
+        statusLabel = "Sudah Diklaim";
         cssClass = "success";
       }
 
@@ -255,7 +286,7 @@ export default {
 
     async processGetOptionsProduct() {
       try {
-        this.helper.loading = true;
+        this.helper.loading.data = true;
         const { values } = await this.getMembershipProduct(
           this.setPayloadProduct(),
         );
@@ -266,13 +297,13 @@ export default {
           `${error.message} at processGetOptionsProduct in TableGuest`,
         );
       } finally {
-        this.helper.loading = false;
+        this.helper.loading.data = false;
       }
     },
 
     async processGetData() {
       try {
-        this.helper.loading = true;
+        this.helper.loading.data = true;
         const payload = this.setPayloadGuest();
         const { values, total_values } = await this.getGuest(payload);
         this.data = this.processFormatData(values);
@@ -284,7 +315,23 @@ export default {
           `${error.message} at processGetData in TableGuest`,
         );
       } finally {
-        this.helper.loading = false;
+        this.helper.loading.data = false;
+      }
+    },
+
+    async processGetTransactionLog(id) {
+      try {
+        this.helper.loading.detail = true;
+        const payload = this.setPayloadTransaction(id);
+        const { values } = await this.getDataResolution(payload);
+        this.selectedTransaction = values[0];
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processGetTransactionLog in TableBenefit`,
+        );
+      } finally {
+        this.helper.loading.detail = false;
       }
     },
   },

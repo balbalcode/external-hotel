@@ -534,12 +534,22 @@ export default {
         data: {
           selectedTransaction: this.data.selectedTransaction,
           transactionId: this.data.selectedTransaction.id,
+          licensePlate: this.processFillingLicensePlate(),
           isNewMembership: false,
           rfId: "",
           cardId: "",
           selectedMembership: {},
         },
       });
+    },
+
+    processFillingLicensePlate() {
+      let licensePlate = this.filter.transaction.key.toUpperCase();
+      if (this.helper.selectedFinder !== "license") {
+        licensePlate = this.data.selectedTransaction.predictions?.lpr_in?.license_plate.toUpperCase() || "";
+      }
+
+      return licensePlate;
     },
 
     processSubmitTransaction() {

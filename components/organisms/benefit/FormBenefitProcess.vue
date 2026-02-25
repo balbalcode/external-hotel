@@ -276,7 +276,8 @@ export default {
     async processChangeTransaction() {
       try {
         const PAYLOAD = this.setPayloadChangeTransaction();
-        await this.updateDataResolution(PAYLOAD);
+        // await this.updateDataResolution(PAYLOAD);
+        console.log(PAYLOAD, "payload change transaction");
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
