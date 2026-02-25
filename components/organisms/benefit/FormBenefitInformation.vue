@@ -64,6 +64,17 @@
             :test_id="`${id}__productId`"
             :ref="`${id}__productId`"
           />
+          <template v-if="helper.havingCardOption">
+            <input-switch-group
+              v-model="helper.isUsingCard"
+              search_by="name"
+              id="txt_isUsingCard"
+              label="Embed Benefit dengan kartu member?"
+              placeholder="Pilih Embed Benefit dengan kartu member?"
+              :test_id="`${id}__isUsingCard`"
+              :ref="`${id}__isUsingCard`"
+            />
+          </template>
         </div>
         <div class="col-12 col-lg-6 my-1">
           <input-textarea-group
@@ -80,8 +91,93 @@
           />
         </div>
 
-        <div class="col-12 col-lg-12 text-right mt-2 px-2" v-if="!isPassed">
-          <active-button text="Berikutnya" @click="processSubmitForm()" />
+        <div
+          class="col-12 col-lg-6 mt-2 h-100 d-flex flex-column justify-content-center"
+        >
+          <div v-if="helper.isUsingCard">
+            <p
+              class="my-0 font-size-10 text-muted"
+              v-if="!helper.loading.membership && !helper.wasCheckCard"
+            >
+              <i class="bx bx-error-circle"></i>
+              Anda belum memindai kartu kamar atau kartu khusus untuk memberikan
+              parkir gratis pada kendaraan penjunjung.
+            </p>
+
+            <p
+              class="my-0 font-size-10 text-muted"
+              v-else-if="!helper.loading.membership && helper.wasCheckCard"
+            >
+              <i class="bx bx-check-circle"></i>
+              Kartu kamar berhasil dipindai. Kode Kartu: {{ data.rfId }}
+            </p>
+
+            <p
+              class="my-0 font-size-10 text-muted"
+              v-else-if="helper.loading.membership"
+            >
+              <i class="bx bx-spinner bx-spin"></i>
+              Memproses kartu, mohon tunggu...
+            </p>
+          </div>
+
+          <div style="width: 1px !important; height: 1px; overflow: hidden">
+            <input-text-group
+              v-model="filter.membership.rfid"
+              :is_error="$v.filter.membership.rfid.$error"
+              label_info=""
+              id="txt_rfid"
+              additional_class_group="my-1 mx-1"
+              additional_class_label="my-0 font-size-11 font-weight-bold d-none"
+              size="sm"
+              label="Kode Kartu"
+              :is_submitted="filter.membership.isSubmitted"
+              @submit="processSubmitMembership"
+              placeholder="Contoh: AB2356"
+              :error_message="[
+                {
+                  state: $v.filter.membership.rfid.required,
+                  message: 'Kode Kartu tidak boleh kosong',
+                },
+              ]"
+              :test_id="`${id}__rfid`"
+              :ref="`${id}__rfid`"
+            />
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 text-right mt-2 px-2">
+          <active-button
+            v-if="!helper.isUsingCard"
+            text="Berikutnya"
+            @click="processSubmitForm"
+          />
+          <template v-else>
+            <active-button
+              v-if="
+                !helper.loading.membership &&
+                helper.wasCheckCard &&
+                !helper.conflictMember
+              "
+              text="Proses Benefit Parkir"
+              test_id="btn_start_scan_rfid"
+              id="btn_start_scan_rfid"
+              ref="btn_start_scan_rfid"
+              @click="processSubmitForm"
+            />
+            <active-button
+              v-if="!helper.loading.membership"
+              :text="`${
+                helper.wasCheckCard
+                  ? 'Pindai Ulang Kartu'
+                  : 'Scan Kartu Sekarang'
+              }`"
+              :type="helper.wasCheckCard ? 'outline' : ''"
+              test_id="btn_start_scan_rfid"
+              id="btn_start_scan_rfid"
+              ref="btn_start_scan_rfid"
+              @click="processStartScanRFID"
+            />
+          </template>
           <active-button
             text="Batal"
             type="outline"
@@ -95,8 +191,8 @@
 </template>
 
 <script>
-import { productMethods } from "@/store/helperActions";
-import { required } from "vuelidate/lib/validators";
+import { productMethods, guestMethods } from "@/store/helperActions";
+import { required, requiredIf } from "vuelidate/lib/validators";
 
 export default {
   components: {
@@ -110,6 +206,8 @@ export default {
       import("@utilities/molecules/input-group/InputSelectGroup"),
     InputRadioGroup: () =>
       import("@utilities/molecules/input-group/InputRadioGroup"),
+    InputSwitchGroup: () =>
+      import("@utilities/molecules/input-group/InputSwitchGroup"),
     ActiveButton: () => import("@utilities/atoms/button/ActiveButton"),
   },
   props: {
@@ -142,21 +240,41 @@ export default {
         productCompany: [],
         productDictionary: [],
       },
+      filter: {
+        membership: {
+          rfid: "",
+          isSubmitted: false,
+        },
+      },
       helper: {
+        wasCheckCard: false,
+        havingCardOption: true,
+        isUsingCard: false,
+        conflictMember: false,
         differentDays: 0,
         loading: {
           product: false,
           form: false,
+          membership: false,
         },
       },
     };
   },
+  watch: {
+    "form.productId"(newVal) {
+      this.helper.havingCardOption = newVal.values > 1;
+    },
+  },
   validations: {
     form: {
-      vehicleType: { required },
       name: { required },
-      licensePlate: { required },
       productId: { required },
+    },
+
+    filter: {
+      membership: {
+        rfid: { required },
+      },
     },
   },
   async mounted() {
@@ -166,6 +284,7 @@ export default {
   },
   methods: {
     getMembershipProduct: productMethods.getMembershipProduct,
+    getMembership: guestMethods.getMembership,
     getMembershipDictionary: productMethods.getMembershipDictionary,
 
     setPayloadProduct() {
@@ -178,15 +297,43 @@ export default {
       };
     },
 
+    setPayloadMembership() {
+      return {
+        filter: [
+          { key: "spot_id", value: this.$utility.getSpotId() },
+          { key: "rf_id", value: this.filter.membership.rfid },
+          { key: "history", value: true },
+        ],
+        pagination: {
+          page: 1,
+          per_page: 10,
+        },
+      };
+    },
+
     processSubmitForm() {
       this.form.isSubmitted = true;
-      this.$v.$touch();
-      if (this.$v.$invalid) {
+      this.$v.form.$touch();
+      console.log(this.$v.form);
+      if (this.$v.form.$invalid) {
         return false;
       }
       this.$emit("submit", {
         data: this.form,
       });
+    },
+
+    processStartScanRFID() {
+      this.helper.loading.membership = true;
+      this.helper.wasCheckCard = false;
+      this.helper.conflictMember = false;
+      this.filter.membership.isSubmitted = false;
+      this.$v.filter.membership.$reset();
+      this.filter.membership.rfid = "";
+      this.data.isNewMembership = false;
+      this.data.rfId = "";
+      this.data.cardId = "";
+      document.getElementById("input-txt_rfid").focus();
     },
 
     processFillingOptionsProduct() {
@@ -203,6 +350,41 @@ export default {
         }
       });
       this.options.product = options.filter((opt) => opt !== undefined);
+    },
+
+    processSubmitMembership() {
+      this.filter.membership.isSubmitted = true;
+      this.$v.filter.membership.$touch();
+      if (!this.$v.filter.membership.$invalid) {
+        this.processSearchMembership();
+      }
+    },
+
+    async processSearchMembership() {
+      try {
+        this.helper.loading.membership = true;
+        this.helper.wasCheckCard = true;
+        this.helper.conflictMember = false;
+        const payload = this.setPayloadMembership();
+        const { values, total_values } = await this.getMembership(payload);
+        if (total_values > 0) {
+          this.processCheckingMembership(values[0]);
+        } else {
+          this.data.isNewMembership = true;
+          this.data.rfId = this.filter.membership.rfid;
+          this.data.cardId = "";
+        }
+      } catch (error) {
+        this.data.isNewMembership = true;
+        this.data.rfId = this.filter.membership.rfid;
+        this.data.cardId = "";
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processSearchMembership in FormGuestMembership`,
+        );
+      } finally {
+        this.helper.loading.membership = false;
+      }
     },
 
     async processGetOptionsProduct() {

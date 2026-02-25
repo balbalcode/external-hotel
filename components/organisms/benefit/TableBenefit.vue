@@ -15,8 +15,8 @@
               <th class="text-dark">Nama</th>
               <th class="text-dark">Plat Nomor</th>
               <th class="text-dark">Produk</th>
-              <th class="text-dark">Status</th>
               <th class="text-dark">Tanggal Pemberian Benefit</th>
+              <th class="text-dark">Status</th>
               <th class="text-dark">Pembuat</th>
               <th class="text-dark text-center">Action</th>
             </tr>
@@ -55,44 +55,12 @@
                   <active-button
                     icon="ic-user-01"
                     icon_size="16"
-                    text="Detail Tamu"
+                    text="Detail Pengunjung"
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0"
                     @click="$router.push(`/guest/detail?id=${logs.id}`)"
                     align="rtl"
-                  />
-                  <active-button
-                    icon="ic-clock-fast-forward"
-                    icon_size="16"
-                    text="Check-Out"
-                    variant="light"
-                    type="outline"
-                    additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                    v-if="isHavingAction && logs.statusLabel !== 'Sudah Keluar'"
-                    align="rtl"
-                    @click="
-                      () => {
-                        selectedData = logs;
-                        modal.checkout = true;
-                      }
-                    "
-                  />
-                  <active-button
-                    icon="ic-dataflow-03"
-                    icon_size="16"
-                    text="Duplikat Kartu"
-                    variant="light"
-                    type="outline"
-                    additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                    v-if="isHavingAction"
-                    align="rtl"
-                    @click="
-                      () => {
-                        selectedData = logs;
-                        modal.duplicate = true;
-                      }
-                    "
                   />
                 </dropdown-button>
               </td>
@@ -208,7 +176,7 @@ export default {
       let payload = {
         filter: [
           { key: "corporateId", value: this.$utility.getCorporateId() },
-          { key: "type", value: "USER_BENEFIT" },
+          { key: "type", value: "HOTEL_BENEFIT" },
         ],
         pagination: {
           page: this.pagination.page,
@@ -226,7 +194,7 @@ export default {
 
       if (this.filter.range.length === 2) {
         payload.filter.push({
-          key: "dateRange",
+          key: "created_at",
           value: this.filter.range.join("_"),
         });
       }
@@ -275,7 +243,7 @@ export default {
           ...item,
           licensePlate: this.processFindData(
             item.meta,
-            "stepTwo",
+            "stepOne",
             "licensePlate",
           ),
           product: this.processGetProduct(item.meta),
