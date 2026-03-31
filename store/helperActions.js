@@ -74,3 +74,11 @@ export const hashMethods = mapActions("modules/hash/storeHash", [
 export const spotsMethods = mapActions("modules/spot/storeSpot", [
   "getSpotDetail",
 ]);
+
+export const invoiceMethods = mapActions("modules/invoice/storeInvoice", [
+  "getInvoice",
+  "getInvoiceDetail",
+  "createInvoice",
+  "updateInvoice",
+  "deleteInvoice",
+]);
