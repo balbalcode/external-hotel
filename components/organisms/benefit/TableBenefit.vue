@@ -207,7 +207,7 @@ export default {
       let payload = {
         filter: [
           { key: "corporateId", value: this.$utility.getCorporateId() },
-          { key: "type", value: "HOTEL_BENEFIT" },
+          { key: "type", value: "FREE_PARKING" },
         ],
         pagination: {
           page: this.pagination.page,

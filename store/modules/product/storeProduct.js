@@ -33,7 +33,7 @@ const actions = {
 
   async getMembershipProduct({ commit, dispatch }, payload) {
     return await productService
-      .get(payload)
+      .get(payload.filter, payload.pagination, payload.order)
       .then((data) => {
         return data;
       })

@@ -34,7 +34,7 @@ async function show(id) {
   return (
     axios
       // .get(`/api/temp/event/${id}`, { timeout: 25500 })
-      .get(`/ap${process.env.TEMP_API}i/temp/event/${id}`, { timeout: 25500 })
+      .get(`${process.env.TEMP_API}/api/temp/event/${id}`, { timeout: 25500 })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
@@ -51,7 +51,7 @@ async function create(data) {
   return (
     axios
       // .post(`/api/temp/event`, data, { timeout: 25500 })
-      .post(`/ap${process.env.TEMP_API}i/temp/event`, data, { timeout: 25500 })
+      .post(`${process.env.TEMP_API}/api/temp/event`, data, { timeout: 25500 })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;
@@ -68,7 +68,7 @@ async function increase(data) {
   return (
     axios
       // .post(`/api/temp/event`, data, { timeout: 25500 })
-      .post(`/ap${process.env.TEMP_API}i/temp/event`, data, { timeout: 25500 })
+      .post(`${process.env.TEMP_API}/api/temp/event`, data, { timeout: 25500 })
       .then((data) => {
         axios.defaults.baseURL = process.env.baseUrl;
         if (data.status === 200) return data.data;

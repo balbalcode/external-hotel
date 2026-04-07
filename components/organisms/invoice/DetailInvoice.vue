@@ -71,7 +71,9 @@
                 >
                   <div v-if="helper.corporate.hasOwnProperty('id')">
                     <p class="section-label mb-1">Billed To</p>
-                    <h6 class="mb-1 font-weight-bold">{{ helper.corporate.name }}</h6>
+                    <h6 class="mb-1 font-weight-bold">
+                      {{ helper.corporate.name }}
+                    </h6>
                     <p class="mb-0 text-muted small">
                       {{ helper.corporate.pic_email }} ({{
                         helper.corporate.pic_phone_number
@@ -127,7 +129,7 @@
                 <div class="col-lg-5 p-2">
                   {{ product.label }}
                 </div>
-                <div class="col-lg-2 p-2 text-center">
+                <div class="col-lg-2 p-2">
                   {{ product.total }}
                 </div>
                 <div class="col-lg-2 p-2">
@@ -138,6 +140,45 @@
                 </div>
               </template>
             </div>
+
+            <div
+              v-for="(event, index) in events"
+              :key="index"
+              class="col-12 row pr-lg-0"
+            >
+              <div class="col-lg-1 p-2">
+                {{
+                  Object.values(options.product).filter((p) => p.total > 0)
+                    .length +
+                  index +
+                  1
+                }}
+              </div>
+              <div class="col-lg-5 p-2">
+                {{ event.name }}
+              </div>
+              <div class="col-lg-2 p-2">1</div>
+              <div class="col-lg-2 p-2">
+                Rp
+                {{
+                  $utility.convertToRupiah(
+                    parseInt(event.product_motorcycle) +
+                      parseInt(event.product_car) +
+                      parseInt(event.product_vip),
+                  )
+                }}
+              </div>
+              <div class="col-lg-2 p-2 text-left">
+                Rp
+                {{
+                  $utility.convertToRupiah(
+                    parseInt(event.product_motorcycle) +
+                      parseInt(event.product_car) +
+                      parseInt(event.product_vip),
+                  )
+                }}
+              </div>
+            </div>
           </div>
 
           <!-- Total -->
@@ -147,7 +188,7 @@
                 <div class="d-flex justify-content-between pt-1 my-1">
                   <div class="font-weight-bold text-muted">Sub Total</div>
                   <div class="text-right">
-                    Rp {{ $utility.convertToRupiah(data.subtotal) }}
+                    Rp {{ $utility.convertToRupiah(data.subTotal) }}
                   </div>
                 </div>
 
@@ -192,6 +233,27 @@
               </div>
             </div>
           </div>
+
+          <div class="note-box-success mt-1 p-3" v-if="data.paymentFile !== ''">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bx bx-info-circle fs-5"></i>
+              <div class="ml-1">
+                <p class="mb-1 small font-weight-bold">
+                  Pembayaran Terkonfirmasi
+                </p>
+                <p class="mb-0 small">
+                  Anda telah mengkonfirmasi pembayaran untuk tagihan ini pada
+                  tanggal
+                  {{
+                    $utility.formatDateMoment(
+                      data.paymentDate,
+                      "DD-MM-YYYY HH:mm",
+                    )
+                  }}.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Footer -->
@@ -219,6 +281,7 @@
     </div>
 
     <plain-modal v-model="modal.transaction" size="lg">
+      <div class="font-weight-bold my-1">Daftar Layanan</div>
       <div
         style="
           max-height: 600px !important;
@@ -284,12 +347,68 @@
           </div>
         </div>
       </div>
+
+      <div class="font-weight-bold my-1">Daftar Event</div>
+      <div
+        style="
+          max-height: 600px !important;
+          overflow-y: scroll;
+          overflow-x: hidden;
+        "
+        class="border rounded"
+      >
+        <div class="row col-12 no-gutters p-0">
+          <div
+            class="col-lg-1 bg-secondary text-dark p-2 font-weight-bold"
+            style="border-top-left-radius: 0.275rem; overflow: hidden"
+          >
+            No
+          </div>
+          <div class="col-lg-5 bg-secondary text-dark p-2 font-weight-bold">
+            Event
+          </div>
+          <div class="col-lg-2 bg-secondary text-dark p-2 font-weight-bold">
+            Tanggal
+          </div>
+          <div class="col-lg-2 bg-secondary text-dark p-2 font-weight-bold">
+            Harga
+          </div>
+          <div
+            class="col-lg-2 bg-secondary text-dark p-2 font-weight-bold"
+            style="border-top-right-radius: 0.275rem; overflow: hidden"
+          >
+            Dibuat Oleh
+          </div>
+        </div>
+        <div
+          class="col-12 row pr-lg-0"
+          v-for="(event, index) in events"
+          :key="event.id"
+        >
+          <div class="col-lg-1 p-2">
+            {{ logs.length + index + 1 }}
+          </div>
+          <div class="col-lg-5 p-2">{{ event.name }}</div>
+          <div class="col-lg-2 p-2">
+            {{ $utility.formatDateMoment(event.start, "DD-MM-YYYY HH:mm") }}
+            -
+            {{ $utility.formatDateMoment(event.end, "DD-MM-YYYY HH:mm") }}
+          </div>
+          <div class="col-lg-2 p-2">
+            <span v-html="formatEventData(event).__html"></span>
+          </div>
+          <div class="col-lg-2 p-2">
+            {{ event.created_by }}
+          </div>
+        </div>
+      </div>
     </plain-modal>
   </div>
 </template>
 
 <script>
 import {
+  eventMethods,
   guestMethods,
   productMethods,
   subscriptionMethods,
@@ -309,6 +428,7 @@ export default {
   data() {
     return {
       logs: [],
+      events: [],
       options: {
         baseProduct: [],
         product: {},
@@ -353,6 +473,7 @@ export default {
     getMembershipProduct: productMethods.getMembershipProduct,
     getCorporateDetail: subscriptionMethods.getCorporateDetail,
     getGuestDetail: guestMethods.getGuestDetail,
+    getEventDetail: eventMethods.getEventDetail,
 
     handlePrint() {
       this.helper.isPrintTarget = true;
@@ -384,25 +505,6 @@ export default {
           )?.id
         ] = {
           ...product,
-          cost:
-            this.options.baseProduct.find(
-              (base) => base.id === product.productId,
-            )?.price || 0,
-        };
-        return acc;
-      }, {});
-
-      this.options.product = productOptions;
-    },
-
-    formatProductData(values) {
-      const productOptions = values.reduce((acc, product) => {
-        acc[
-          this.options.baseProduct.find(
-            (base) => base.id === product.productId,
-          )?.id
-        ] = {
-          ...product,
           total: 0,
           subTotal: 0,
           cost:
@@ -416,10 +518,57 @@ export default {
       this.options.product = productOptions;
     },
 
+    formatEventData(event) {
+      if (!event) {
+        this.helper.error.product = true;
+        return {
+          __html:
+            "<span class='text-danger font-size-9'><i class='bx bx-error-circle'></i> Data bermasalah</span>",
+          state: false,
+        };
+      }
+      return {
+        __html: `
+        <span class="font-size-10 text-muted">
+          Motor: Rp ${this.$utility.convertToRupiah(
+            event.product_motorcycle,
+          )} <br>
+          Mobil: Rp ${this.$utility.convertToRupiah(event.product_car)} <br>
+          VIP: Rp ${this.$utility.convertToRupiah(event.product_vip)}
+        </span>`,
+        state: true,
+        total:
+          parseInt(event.product_motorcycle || 0) +
+          parseInt(event.product_car || 0) +
+          parseInt(event.product_vip || 0),
+      };
+    },
+
     async processPopulateInvoice() {
       const logsId = this.data.logsId.split(",");
       for (const log of logsId) {
         await this.processGetLogsDetail(log);
+      }
+
+      const eventId = this.data.eventsId.split(",");
+      for (const event of eventId) {
+        await this.processGetEventDetail(event);
+      }
+    },
+
+    async processGetEventDetail(eventId) {
+      try {
+        this.helper.isLoading = true;
+        const payload = { id: eventId };
+        const data = await this.getEventDetail(payload);
+        this.events.push(data[0]);
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at getEventDetail in FormCorporateInvoice`,
+        );
+      } finally {
+        this.helper.isLoading = false;
       }
     },
 
@@ -625,6 +774,13 @@ export default {
   color: #92400e;
 }
 
+.note-box-success {
+  border-radius: 12px;
+  border: 1px solid #a7fd8a;
+  background: #f4ffeb;
+  color: #50920e;
+}
+
 .footer-bar {
   border-top: 1px solid #e8edf5 !important;
 }
@@ -793,6 +949,13 @@ export default {
   .note-box {
     border: 1px solid #e8edf5 !important;
     break-inside: avoid !important;
+  }
+
+  .note-box-success {
+    border-radius: 12px !important;
+    border: 1px solid #a7fd8a !important;
+    background: #fffbeb !important;
+    color: #50920e !important;
   }
 
   .footer-bar {

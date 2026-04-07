@@ -216,7 +216,7 @@ export default {
         productId: this.stepTwo.data.productId.productId,
         guestCheckout: "",
         guestVehicleCode: this.processFindVehicleType(),
-        type: "HOTEL_BENEFIT",
+        type: "FREE_PARKING",
         ocrFile: "",
         ocrResult: "",
         transactionId: this.stepOne.data.selectedTransaction.id,
