@@ -88,7 +88,7 @@
                       text="Daftar Tamu"
                       variant="light"
                       type="outline"
-                      @click="$router.push(`/hotel/event/detail?id=${item.id}`)"
+                      @click="$router.push(`/event/detail?id=${item.id}`)"
                       additional_class="border-0 w-100 text-left p-2 rounded-0"
                     />
                     <active-button
@@ -232,7 +232,6 @@ export default {
         this.$sentry.captureMessage(
           `${error.message} at processGetDataEvent in TableEvent`
         );
-        console.log(error);
       } finally {
         this.helper.isLoading = false;
       }

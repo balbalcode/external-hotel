@@ -316,7 +316,7 @@ export default {
         gate_code: this.stepThree.data.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
         time_in: new Date().getTime(),
-        source: "HOTEL_GUEST",
+        source: "FREE_STAY",
       };
     },
 
@@ -402,7 +402,7 @@ export default {
         guestVehicleCode: this.processConvertVehicleType(
           this.stepThree.data.selectedTransaction.vehicle_code,
         ),
-        type: "HOTEL_GUEST",
+        type: "FREE_STAY",
         ocrFile: this.stepOne.ocrFile,
         ocrResult: this.stepOne.data,
         transactionId: this.stepThree.data.selectedTransaction.id,

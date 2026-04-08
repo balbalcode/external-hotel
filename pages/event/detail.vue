@@ -38,13 +38,6 @@ export default {
 <style></style>
 <template>
   <Layout>
-    <div class="d-flex justify-content-between mb-3">
-      <div>
-        <h5 class="font-weight-bold align-self-center font-size-16 mb-0">
-          Detail Event
-        </h5>
-      </div>
-    </div>
     <detail-event @addQuota="toggleModalQuota" />
     <plain-modal v-model="modal.quota" :size="'md'" @close="processCancelForm">
       <form-quota-event

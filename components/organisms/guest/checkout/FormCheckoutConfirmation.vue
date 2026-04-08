@@ -633,7 +633,7 @@ export default {
         gate_code: this.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
         time_in: timeIn,
-        source: "HOTEL_GUEST",
+        source: "FREE_STAY",
       };
     },
 
@@ -681,7 +681,7 @@ export default {
         gate_code: "",
         created_at: new Date().getTime(),
         time_in: this.selectedTransaction.time_in,
-        source: "HOTEL_GUEST",
+        source: "FREE_STAY",
       };
     },
 
