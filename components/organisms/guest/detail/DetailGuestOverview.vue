@@ -2,22 +2,21 @@
   <div class="bg-white border rounded p-3">
     <div v-if="data.id">
       <div class="d-flex">
-        <div class="mr-1">
+        <div class="mr-1 mt-1">
           <i
-            class="ic-users-check font-size-20 text-info rounded-circle"
+            class="ic-users-check font-size-24 text-info rounded-circle"
             style="
               background-color: #a6cdfe;
               border: 3px solid #cfe4ff;
-              padding: 3px;
+              padding: 8px;
             "
           >
           </i>
         </div>
         <div class="mt-n1 pt-1 ml-1">
-          <p class="font-weight-bold my-0">Ringkasan Informasi</p>
-          <p class="text-muted font-size-8 my-0 mt-n1">
-            Tanggal Input:
-            {{
+          <p class="font-weight-bold font-size-16 my-0">Ringkasan Informasi</p>
+          <p class="text-muted font-size-10 font-size-8 my-0">
+            Tanggal Input: {{
               $utility.formatDateMoment(
                 new Date(data.created_at),
                 "DD/MM/YYYY HH:mm:ss",
@@ -27,8 +26,12 @@
         </div>
       </div>
 
-      <div class="my-3">
-        <div class="d-flex justify-content-between font-size-11 mb-1">
+      <div class="col-12 col-lg-12 my-2 py-2 px-0">
+        <hr class="my-1 mx-0 px-0" />
+      </div>
+
+      <div class="mb-3 mt-2">
+        <div class="d-flex justify-content-between font-size-12 my-2">
           <div class="text-muted">Plat Nomor</div>
           <div>
             <span
@@ -39,26 +42,29 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11">
+        <div class="d-flex justify-content-between font-size-12 my-2">
           <div class="text-muted">Kendaraan</div>
           <div>
-            <i
-              v-if="processCheckVehicle()"
-              class="ic-motorcycle font-size-14 mt-1"
-            ></i>
-            <i v-else class="ic-car-01 font-size-14 mt-1"></i>
+            <span class="font-weight-bold" v-if="processCheckVehicle()">
+              <i
+              class="ic-motorcycle font-size-14 "
+            ></i> Motor
+            </span>
+            <span class="font-weight-bold" v-else>
+              <i class="ic-car-01 font-size-14 "></i> Mobil
+            </span>
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
-          <div class="text-muted">Jenis Tiket Masuk</div>
+        <div class="d-flex justify-content-between font-size-12 mb-2 mt-n1">
+          <div class="text-muted">Metode Check In</div>
           <div>
             {{ transactionIn.e_card_id ? "Kartu/E-Money" : "Karcis" }}
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
-          <div class="text-muted">Kode Tiket Masuk</div>
+        <div class="d-flex justify-content-between font-size-12 my-2">
+          <div class="text-muted">Kode Tiket Check In</div>
           <div>
             {{
               String(data.checkinTransactionId).substring(0, 6).toUpperCase()
@@ -66,7 +72,7 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
+        <div class="d-flex justify-content-between font-size-12 my-2">
           <div class="text-muted">Waktu Checkin</div>
           <div>
             {{
@@ -78,13 +84,13 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
+        <div class="d-flex justify-content-between font-size-12 my-2">
           <div class="text-muted">Total Menginap</div>
           <div>{{ processsCountDateDifference() }} Malam</div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
-          <div class="text-muted">Jenis Tiket Keluar</div>
+        <div class="d-flex justify-content-between font-size-12 my-2">
+          <div class="text-muted">Metode Check Out</div>
           <div>
             <span v-if="transactionOut.id">
               {{ transactionOut.e_card_id ? "Kartu/E-Money" : "Karcis" }}
@@ -93,8 +99,8 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
-          <div class="text-muted">Kode Tiket Keluar</div>
+        <div class="d-flex justify-content-between font-size-12 my-2">
+          <div class="text-muted">Kode Tiket Check Out</div>
           <div>
             <span v-if="data.checkoutTransactionId !== ''">
               {{
@@ -105,7 +111,7 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between font-size-11 mb-1">
+        <div class="d-flex justify-content-between font-size-12 my-2">
           <div class="text-muted">Waktu Checkout</div>
           <div>
             <div>
@@ -119,30 +125,31 @@
           </div>
         </div>
 
-        <div class="mt-3" v-if="data.status !== 'CHECKEDOUT'">
-          <active-button
-            text="Buat Kartu Baru"
-            type="outline"
-            size="sm"
-            variant="dark"
-            text_color="dark"
-            v-if="!data.isDuplicate"
-            @click="$emit('duplicateRequest')"
-            additional_class="w-100 px-3"
-          />
-        </div>
+        <template v-if="data.status !== 'CHECKEDOUT'">
+          <div class="mt-3">
+            <active-button
+              text="Buat Kartu Baru"
+              type="outline"
+              size="sm"
+              variant="dark"
+              text_color="dark"
+              v-if="!data.isDuplicate"
+              @click="$emit('duplicateRequest')"
+              additional_class="w-100 px-3"
+            />
+          </div>
 
-        <div class="mt-1" >
-          <active-button
-            text="Proses Checkout"
-            type="outline"
-            size="sm"
-            variant="success"
-            text_color="success"
-            @click="$emit('checkoutRequest')"
-            additional_class="w-100 px-3"
-          />
-        </div>
+          <div class="mt-3">
+            <active-button
+              text="Proses Checkout"
+              type="outline"
+              variant="success"
+              text_color="success"
+              @click="$emit('checkoutRequest')"
+              additional_class="w-100 px-3"
+            />
+          </div>
+        </template>
       </div>
     </div>
     <div v-else class="py-5 my-5">

@@ -10,8 +10,8 @@
         />
       </div>
       <div class="col-12 col-lg-9">
-        <div class="bg-white pt-2 pb-3 px-3 rounded border">
-          <detail-guest-information :data="data" />
+        <detail-guest-information :data="data" />
+        <div class="bg-white py-3 pb-3 px-3 mt-3 rounded border">
           <detail-logs-transaction
             :data="data"
             @update="

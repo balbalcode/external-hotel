@@ -1,68 +1,120 @@
 <template>
-  <div>
+  <div class="bg-white py-3 pb-3 px-3 rounded border">
     <div class="row" v-if="data.id">
-      <div class="col-12 col-lg-12 mb-3">
-        <p class="font-weight-bold font-size-14 mb-0">Informasi Tamu</p>
-        <p class="font-size-11 text-secondary mb-0">
+      <div class="col-12 col-lg-9 mb-3">
+        <p class="font-weight-bold font-size-16 mb-0">Informasi Tamu</p>
+        <p class="font-size-13 text-secondary mb-0">
           Informasi detail tamu yang menginap di hotel selama periode tertentu.
         </p>
       </div>
+      <div class="col-12 col-lg-3 text-right mb-3">
+        <div
+          class="d-flex flex-column align-items-end h-100 justify-content-center"
+        >
+          <active-button
+            @click="modal.ocr = true"
+            text="Lihat Form Tamu"
+            type="outline"
+            size="sm"
+            icon="ic-file-02"
+          />
+        </div>
+      </div>
+      <div class="col-12 col-lg-12 my-0 py-0">
+        <hr class="my-0" />
+      </div>
 
-      <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">
-          Nama/Nomor Kamar
-        </p>
-        <p class="my-0 font-size-13">{{ data.guestName }}</p>
+      <div class="col-12 col-lg-3 my-3">
+        <div class="d-flex">
+          <div
+            class="bg-primary-90 rounded-lg d-flex align-items-center justify-content-center px-2 my-1 mr-2"
+          >
+            <i class="ic-user-01 text-primary font-size-20 py-1"></i>
+          </div>
+          <div>
+            <p class="font-weight-bold text-muted my-0 font-size-12">
+              Nama / Nomor Kamar
+            </p>
+            <p class="my-0 font-size-14 font-weight-bold">
+              {{ data.guestName }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-3 my-3">
+        <div class="d-flex">
+          <div
+            class="bg-primary-90 rounded-lg d-flex align-items-center justify-content-center px-2 my-1 mr-2"
+          >
+            <i class="ic-credit-card-buyer text-primary font-size-20 py-1"></i>
+          </div>
+          <div>
+            <p class="font-weight-bold text-muted my-0 font-size-12">
+              Nomor Kartu
+            </p>
+            <p class="my-0 font-size-14 font-weight-bold">
+              {{ processFindData(data.meta, "stepThree", "rfId") }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-3 my-3">
+        <div class="d-flex">
+          <div
+            class="bg-primary-90 rounded-lg d-flex align-items-center justify-content-center px-2 my-1 mr-2"
+          >
+            <i
+              :class="`ic-${
+                processCheckVehicle() ? 'car-01' : 'motorcycle'
+              } text-primary font-size-20 py-1`"
+            ></i>
+          </div>
+          <div>
+            <p class="font-weight-bold text-muted my-0 font-size-12">
+              Jenis Kendaraan
+            </p>
+            <p class="my-0 font-size-14 font-weight-bold">
+              <span v-if="processCheckVehicle()">Mobil</span>
+              <span v-else>Motor</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-3 my-3">
+        <div class="d-flex">
+          <div
+            class="bg-primary-90 rounded-lg d-flex align-items-center justify-content-center px-2 my-1 mr-2"
+          >
+            <i class="ic-keyboard-01 text-primary font-size-20 py-1"></i>
+          </div>
+          <div>
+            <p class="font-weight-bold text-muted my-0 font-size-12">
+              Plat Nomor
+            </p>
+            <p class="my-0 font-size-14 font-weight-bold">
+              {{ processFindData(data.meta, "stepTwo", "licensePlate") }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">Nomor Kartu</p>
-        <p class="my-0 font-size-13">
-          {{ processFindData(data.meta, "stepThree", "rfId") }}
-        </p>
+        <p class="font-weight-bold text-muted my-0 font-size-12">Status</p>
+        <p class="my-1" v-html="processSetLabelStatus(data)"></p>
       </div>
 
       <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">
-          Jenis Kendaraan
-        </p>
-        <p class="my-0 font-size-13">
-          <span v-if="processCheckVehicle()">Mobil</span>
-          <span v-else>Motor</span>
-        </p>
-      </div>
-
-      <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">Plat Nomor</p>
-        <p class="my-0 font-size-13">
-          {{ processFindData(data.meta, "stepTwo", "licensePlate") }}
-        </p>
-      </div>
-
-      <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">Status</p>
-        <p class="my-0 font-size-13" v-html="processSetLabelStatus(data)"></p>
-      </div>
-
-      <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">
+        <p class="font-weight-bold text-muted my-0 font-size-12">
           Duplikasi Kartu
         </p>
-        <p class="my-0 font-size-13">
+        <p class="my-1 font-size-14">
           <span v-if="data.isDuplicate">
             <i class="ic-check-circle"></i> Ya
           </span>
           <span v-else><i class="ic-alert-circle"></i> Tidak</span>
-        </p>
-      </div>
-
-      <div class="col-12 col-lg-3 my-2">
-        <p class="font-weight-bold text-muted my-0 font-size-11">Form Tamu</p>
-        <p
-          class="my-0 font-size-13 text-primary cursor-pointer"
-          @click="modal.ocr = true"
-        >
-          Lihat Form <i class="ic-external-link-01"></i>
         </p>
       </div>
 
@@ -74,7 +126,7 @@
               :src="`${$utility.getBaseAssetUrl()}/${processFindData(
                 data.meta,
                 'stepOne',
-                'ocrFile'
+                'ocrFile',
               )}`"
               alt="form-guest"
               class="img-fluid rounded border"
@@ -83,7 +135,7 @@
               :href="`${$utility.getBaseAssetUrl()}/${processFindData(
                 data.meta,
                 'stepOne',
-                'ocrFile'
+                'ocrFile',
               )}`"
               target="_blank"
             >
@@ -152,7 +204,7 @@ export default {
 
     processCheckVehicle() {
       const vehicle = String(
-        this.transactionIn.vehicle_code ?? "MT2"
+        this.transactionIn.vehicle_code ?? "MT2",
       ).toLowerCase();
 
       if (vehicle.includes("mb")) {
@@ -174,22 +226,29 @@ export default {
     processSetLabelStatus(data) {
       let statusLabel = "DATA BERMASALAH";
       let cssClass = "danger";
+      let iconLabel = "ic-alert-circle";
       if (data.status === "ACTIVE") {
         if (
           new Date().setHours(11, 59, 59, 0) >
           new Date(data.guestCheckout).setHours(11, 59, 59, 0)
         ) {
+          iconLabel = "ic-error-circle";
           statusLabel = "Kedaluwarsa";
         } else {
           statusLabel = "AKTIF";
+          iconLabel = "ic-parking-circle";
           cssClass = "primary";
         }
       } else if (data.status === "CHECKEDOUT") {
         statusLabel = "Sudah Check Out";
+        iconLabel = "ic-check-circle";
         cssClass = "success";
       }
 
-      return `<span class="badge badge-${cssClass} font-size-10">${statusLabel}</span>`;
+      return `<span class="badge font-size-12 p-2 text-${cssClass} bg-${cssClass}-90">
+        <i class="${iconLabel} mr-1"></i>
+        ${statusLabel}
+        </span>`;
     },
   },
 };

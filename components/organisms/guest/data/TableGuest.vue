@@ -37,7 +37,7 @@
               <td>
                 {{
                   $utility.formatDateMoment(
-                    logs.guestCheckin,
+                    logs.created_at,
                     "DD-MM-YYYY HH:mm:ss",
                   )
                 }}
@@ -285,7 +285,7 @@ export default {
           statusLabel = "Kedaluwarsa";
         } else {
           statusLabel = "Aktif";
-          cssClass = "dark";
+          cssClass = "primary";
         }
       } else if (data.status === "CHECKEDOUT") {
         statusLabel = "Sudah Checkout";

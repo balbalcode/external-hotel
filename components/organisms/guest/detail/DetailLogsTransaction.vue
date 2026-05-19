@@ -1,11 +1,99 @@
 <template>
-  <div>
-    <div class="row mt-3" v-if="data.id">
-      <div class="col-12 col-lg-12">
-        <p class="font-weight-bold font-size-14 mb-0">Transaksi Tamu</p>
-        <p class="font-size-11 text-secondary mb-2">
+  <div class="">
+    <div class="row" v-if="data.id">
+      <div class="col-12 col-lg-9 mb-3">
+        <p class="font-weight-bold font-size-16 mb-0">Transaksi Tamu</p>
+        <p class="font-size-13 text-secondary mb-0">
           Informasi kartu checkin dan checkout tamu selama menginap
         </p>
+      </div>
+      <div class="col-12 col-lg-3 text-right mb-3">
+        <div
+          class="d-flex flex-column align-items-end h-100 justify-content-center"
+        >
+          <active-button
+            @click="modal.ocr = true"
+            text="Refresh"
+            type="outline"
+            variant="secondary"
+            size="sm"
+            icon="ic-refresh-ccw-05"
+          />
+        </div>
+      </div>
+
+      <div class="bg-white rounded border p-3">
+        <div class="d-flex">
+          <div class="bg-info border-right rounded-lg"></div>
+          <div
+            class="d-flex align-items-center justify-content-center px-2 my-1 mr-2"
+          >
+            <i
+              class="ic-log-in-03 font-size-24 text-info rounded-circle"
+              style="
+                background-color: #a6cdfe;
+                border: 3px solid #cfe4ff;
+                padding: 8px;
+              "
+            >
+            </i>
+          </div>
+          <div class="ml-2">
+            <div
+              class="rounded bg-info-90 text-info font-size-10 px-3 py-1 d-inline"
+            >
+              CHECK-IN
+            </div>
+            <div class="mt-2">
+              <p class="my-0 font-size-11">Tanggal Masuk:</p>
+              <p class="font-weight-bold font-size-14 mt-n1 mb-2">
+                {{
+                  $utility.formatDateMoment(
+                    transaction.transactionIn.time_in,
+                    "DD-MM-YYYY HH:mm:ss",
+                  )
+                }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="mr-2">
+                <p class="my-1 font-size-10">Kode Tiket</p>
+                <p class="my-1">
+                  <span
+                    class="rounded bg-info-90 text-dark font-weight-bold text-uppercase font-size-10 p-1 d-inline"
+                  >
+                    {{
+                      transaction.transactionIn.id
+                        ? transaction.transactionIn.id.substring(0, 6)
+                        : "N/A"
+                    }}
+                  </span>
+                </p>
+              </div>
+
+              <div class="mr-2">
+                <p class="my-1 font-size-10">Kendaraan</p>
+                <p class="my-1">
+                  {{
+                    processCheckVehicle(transaction.transactionIn)
+                      ? "Mobil"
+                      : "Motor"
+                  }}
+                </p>
+              </div>
+              <div class="mr-2">
+                <p class="my-1 font-size-10">Plat Nomor</p>
+                <p class="my-1">
+                  {{
+                    transaction.transactionIn.license_plate
+                      ? transaction.transactionIn.license_plate
+                      : "N/A"
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -31,14 +119,18 @@
                     : "Motor"
                 }}
                 -
-                {{ (transaction.transactionIn.license_plate) ? transaction.transactionIn.license_plate : 'N/A' }}
+                {{
+                  transaction.transactionIn.license_plate
+                    ? transaction.transactionIn.license_plate
+                    : "N/A"
+                }}
               </p>
               <p class="my-0 font-size-9">
                 Waktu Masuk:
                 {{
                   $utility.formatDateMoment(
                     transaction.transactionIn.time_in,
-                    "DD-MM-YYYY HH:mm:ss"
+                    "DD-MM-YYYY HH:mm:ss",
                   )
                 }}
               </p>
@@ -99,7 +191,7 @@
                 {{
                   $utility.formatDateMoment(
                     transaction.transactionOut.time_out,
-                    "DD-MM-YYYY HH:mm:ss"
+                    "DD-MM-YYYY HH:mm:ss",
                   )
                 }}
               </p>
@@ -160,6 +252,9 @@ export default {
       },
     };
   },
+  components: {
+    ActiveButton: () => import("@/components/atoms/button/ActiveButton"),
+  },
   watch: {
     data: {
       immediate: true,
@@ -167,12 +262,12 @@ export default {
         if (newVal.id) {
           this.processSearchTransaction(
             this.setPayloadTransaction("transactionId"),
-            "transactionIn"
+            "transactionIn",
           );
           if (this.data.status === "CHECKEDOUT") {
             this.processSearchTransaction(
               this.setPayloadTransaction("checkoutTransactionId"),
-              "transactionOut"
+              "transactionOut",
             );
           }
         }
@@ -183,12 +278,12 @@ export default {
     if (this.data.id) {
       this.processSearchTransaction(
         this.setPayloadTransaction("transactionId"),
-        "transactionIn"
+        "transactionIn",
       );
       if (this.data.status === "CHECKEDOUT") {
         this.processSearchTransaction(
           this.setPayloadTransaction("checkoutTransactionId"),
-          "transactionOut"
+          "transactionOut",
         );
       }
     }
@@ -231,7 +326,7 @@ export default {
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processSearchTransaction-${loaderTarget} in DetailLogsTransaction`
+          `${error.message} at processSearchTransaction-${loaderTarget} in DetailLogsTransaction`,
         );
       } finally {
         this.helper.loading[`${loaderTarget}`] = false;
