@@ -329,10 +329,10 @@ export default {
       };
     },
 
-    setPayloadSyncMembership() {
+    setPayloadSyncMembership(membershipId) {
       return {
         spot_id: this.$utility.getSpotId(),
-        membership_id: this.membership.id,
+        membership_id: membershipId,
       };
     },
 
@@ -595,9 +595,9 @@ export default {
       }
     },
 
-    async processSyncMembership() {
+    async processSyncMembership(membershipId) {
       try {
-        const PAYLOAD = this.setPayloadSyncMembership();
+        const PAYLOAD = this.setPayloadSyncMembership(membershipId);
         await this.syncMembership(PAYLOAD);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
@@ -617,10 +617,12 @@ export default {
         this.nextProcess();
         if (this.stepThree.data.isNewMembership) {
           await this.processCreateMembership();
+          await this.processSyncMembership(this.membership.card.membership_id);
         } else {
           await this.processExtendMembership();
+          await this.processSyncMembership(this.membership.id)
         }
-        await this.processSyncMembership();
+        
         this.nextProcess();
         await this.processAuthTransaction();
         this.nextProcess();
