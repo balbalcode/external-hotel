@@ -130,7 +130,6 @@
             <active-button
               text="Buat Kartu Baru"
               type="outline"
-              size="sm"
               variant="dark"
               text_color="dark"
               v-if="!data.isDuplicate"
@@ -139,7 +138,7 @@
             />
           </div>
 
-          <div class="mt-3">
+          <div class="mt-1">
             <active-button
               text="Proses Checkout"
               type="outline"

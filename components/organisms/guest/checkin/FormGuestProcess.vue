@@ -267,6 +267,7 @@ export default {
     updateDataResolution: resolutionMethods.updateDataResolution,
     createMembership: guestMethods.createMembership,
     createEmployee: guestMethods.createEmployee,
+    syncMembership: guestMethods.syncMembership,
     createGuest: guestMethods.createGuest,
     updateGuest: guestMethods.updateGuest,
     createTransaction: transactionMethods.createTransaction,
@@ -325,6 +326,13 @@ export default {
         transaction_id: this.stepThree.data.selectedTransaction.id,
         method: "flag_problem",
         reason: `TAMU_HOTEL-${this.helper.CORPORATE.id}-${this.logger.id}`,
+      };
+    },
+
+    setPayloadSyncMembership() {
+      return {
+        spot_id: this.$utility.getSpotId(),
+        membership_id: this.membership.id,
       };
     },
 
@@ -587,6 +595,20 @@ export default {
       }
     },
 
+    async processSyncMembership() {
+      try {
+        const PAYLOAD = this.setPayloadSyncMembership();
+        await this.syncMembership(PAYLOAD);
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processSyncMembership in FormGuestProcess`,
+        );
+        console.log(error, "processSyncMembership in FormGuestProcess");
+        throw error;
+      }
+    },
+
     async startProcess() {
       try {
         await this.processCreateGuest();
@@ -598,6 +620,7 @@ export default {
         } else {
           await this.processExtendMembership();
         }
+        await this.processSyncMembership();
         this.nextProcess();
         await this.processAuthTransaction();
         this.nextProcess();

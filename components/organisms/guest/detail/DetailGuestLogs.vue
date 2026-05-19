@@ -19,7 +19,7 @@
       >
         <div class="rounded border p-0 overflow-hidden w-100">
           <div class="row m-0">
-            <div class="col-12 col-lg-3 bg-light p-2 font-weight-bold">
+            <div class="col-12 col-lg-5 bg-light p-2 font-weight-bold">
               Kode Transaksi
             </div>
             <div class="col-12 col-lg-3 bg-light p-2 font-weight-bold">
@@ -27,9 +27,6 @@
             </div>
             <div class="col-12 col-lg-3 bg-light p-2 font-weight-bold">
               Waktu Keluar
-            </div>
-            <div class="col-12 col-lg-2 bg-light p-2 font-weight-bold">
-              Status
             </div>
             <div class="col-12 col-lg-1 bg-light p-2 font-weight-bold">
               Detail
@@ -40,7 +37,7 @@
             v-for="(item, index) in transaction"
             :key="index"
           >
-            <div class="col-12 col-lg-3 p-2">
+            <div class="col-12 col-lg-5 p-2">
               {{ item.id }}
             </div>
             <div class="col-12 col-lg-3 p-2">
@@ -52,15 +49,6 @@
               {{
                 $utility.formatDateMoment(item.time_out, "DD-MM-YYYY HH:mm:ss")
               }}
-            </div>
-            <div class="col-12 col-lg-2 p-2">
-              <span>
-                {{
-                  options
-                    .TRANSACTION_STATUS()
-                    .filter((opt) => item.status === opt.value)[0].text
-                }}</span
-              >
             </div>
             <div class="col-12 col-lg-1 p-2">
               <button
@@ -142,7 +130,7 @@ export default {
         const timeIn = item.time_in;
         if (end !== 0) return start <= timeIn && timeIn <= end;
         else return start <= timeIn;
-      });
+      }); 
     },
 
     async processSearchTransaction() {

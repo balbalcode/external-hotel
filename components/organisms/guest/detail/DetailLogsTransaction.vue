@@ -22,206 +22,186 @@
         </div>
       </div>
 
-      <div class="bg-white rounded border p-3">
-        <div class="d-flex">
-          <div class="bg-info border-right rounded-lg"></div>
+      <div class="d-flex px-3">
+        <div class="bg-white mr-2">
           <div
-            class="d-flex align-items-center justify-content-center px-2 my-1 mr-2"
+            class="d-flex rounded border overflow-hidden"
+            @click="$emit('selected', transaction.transactionIn)"
+            v-if="transaction.transactionIn.id"
           >
-            <i
-              class="ic-log-in-03 font-size-24 text-info rounded-circle"
-              style="
-                background-color: #a6cdfe;
-                border: 3px solid #cfe4ff;
-                padding: 8px;
-              "
-            >
-            </i>
-          </div>
-          <div class="ml-2">
             <div
-              class="rounded bg-info-90 text-info font-size-10 px-3 py-1 d-inline"
+              class="bg-info border-right border-info rounded-lg"
+              style="border-right: 3px solid var(--info) #333"
+            ></div>
+            <div
+              class="d-flex align-items-center justify-content-center px-2 my-1"
             >
-              CHECK-IN
+              <i
+                class="ic-log-in-03 font-size-24 text-info rounded-circle"
+                style="
+                  background-color: #a6cdfe;
+                  border: 3px solid #cfe4ff;
+                  padding: 8px 12px;
+                "
+              >
+              </i>
             </div>
-            <div class="mt-2">
-              <p class="my-0 font-size-11">Tanggal Masuk:</p>
-              <p class="font-weight-bold font-size-14 mt-n1 mb-2">
-                {{
-                  $utility.formatDateMoment(
-                    transaction.transactionIn.time_in,
-                    "DD-MM-YYYY HH:mm:ss",
-                  )
-                }}
-              </p>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="mr-2">
-                <p class="my-1 font-size-10">Kode Tiket</p>
-                <p class="my-1">
-                  <span
-                    class="rounded bg-info-90 text-dark font-weight-bold text-uppercase font-size-10 p-1 d-inline"
-                  >
+            <div class="px-2 py-2">
+              <div
+                class="rounded bg-info-90 text-info font-size-10 px-3 py-1 d-inline"
+              >
+                CHECK-IN
+              </div>
+              <div class="mt-2">
+                <p class="my-0 font-size-11">Tanggal Masuk:</p>
+                <p class="font-weight-bold font-size-14 mt-n1 mb-2">
+                  {{
+                    $utility.formatDateMoment(
+                      transaction.transactionIn.time_in,
+                      "DD-MM-YYYY HH:mm:ss",
+                    )
+                  }}
+                </p>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="mr-4">
+                  <p class="my-1 font-size-10">Kode Tiket</p>
+                  <p class="my-1">
+                    <span
+                      class="rounded bg-info-90 text-dark font-weight-bold text-uppercase font-size-10 p-1 d-inline"
+                    >
+                      {{
+                        transaction.transactionIn.id
+                          ? transaction.transactionIn.id.substring(0, 6)
+                          : "N/A"
+                      }}
+                    </span>
+                  </p>
+                </div>
+
+                <div class="mr-4">
+                  <p class="my-1 font-size-10">Kendaraan</p>
+                  <p class="my-1">
                     {{
-                      transaction.transactionIn.id
-                        ? transaction.transactionIn.id.substring(0, 6)
+                      processCheckVehicle(transaction.transactionIn)
+                        ? "Mobil"
+                        : "Motor"
+                    }}
+                  </p>
+                </div>
+                <div class="mr-4">
+                  <p class="my-1 font-size-10">Plat Nomor</p>
+                  <p class="my-1">
+                    {{
+                      transaction.transactionIn.license_plate
+                        ? transaction.transactionIn.license_plate
                         : "N/A"
                     }}
-                  </span>
-                </p>
+                  </p>
+                </div>
               </div>
+            </div>
+          </div>
 
-              <div class="mr-2">
-                <p class="my-1 font-size-10">Kendaraan</p>
-                <p class="my-1">
+          <div v-else>
+            <div class="rounded bg-light p-2 border">
+              <div
+                class="d-flex justify-content-center flex-column align-items-center"
+              >
+                <div class="my-3 py-2">
+                  <b-spinner size="sm" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="">
+          <div
+            class="d-flex align-items-center justify-content-center h-100 px-3"
+          >
+            <i class="ic-arrow-right font-size-26 text-secondary"></i>
+          </div>        
+        </div>
+
+        <div class="bg-white">
+          <div
+            class="d-flex rounded border overflow-hidden"
+            @click="$emit('selected', transaction.transactionOut)"
+            v-if="transaction.transactionOut.id"
+          >
+            <div
+              class="bg-danger border-right border-danger rounded-lg"
+              style="border-right: 3px solid var(--danger) #333"
+            ></div>
+            <div
+              class="d-flex align-items-center justify-content-center px-2 my-1"
+            >
+              <i
+                class="ic-log-out-02 font-size-24 text-danger rounded-circle"
+                style="
+                  background-color: #fc8d93;
+                  border: 3px solid #fad4d6;
+                  padding: 8px 12px;
+                "
+              >
+              </i>
+            </div>
+            <div class="px-2 py-2">
+              <div
+                class="rounded bg-danger-90 text-danger font-size-10 px-3 py-1 d-inline"
+              >
+                CHECK-OUT
+              </div>
+              <div class="mt-2">
+                <p class="my-0 font-size-11">Tanggal Keluar:</p>
+                <p class="font-weight-bold font-size-14 mt-n1 mb-2">
                   {{
-                    processCheckVehicle(transaction.transactionIn)
-                      ? "Mobil"
-                      : "Motor"
+                    $utility.formatDateMoment(
+                      transaction.transactionOut.time_out,
+                      "DD-MM-YYYY HH:mm:ss",
+                    )
                   }}
                 </p>
               </div>
-              <div class="mr-2">
-                <p class="my-1 font-size-10">Plat Nomor</p>
-                <p class="my-1">
-                  {{
-                    transaction.transactionIn.license_plate
-                      ? transaction.transactionIn.license_plate
-                      : "N/A"
-                  }}
-                </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="mr-4">
+                  <p class="my-1 font-size-10">Kode Tiket</p>
+                  <p class="my-1">
+                    <span
+                      class="rounded bg-danger-90 text-dark font-weight-bold text-uppercase font-size-10 p-1 d-inline"
+                    >
+                      {{
+                        transaction.transactionOut.id
+                          ? transaction.transactionOut.id.substring(0, 6)
+                          : "N/A"
+                      }}
+                    </span>
+                  </p>
+                </div>
+
+                <div class="mr-4">
+                  <p class="my-1 font-size-10">Kendaraan</p>
+                  <p class="my-1">
+                    {{
+                      processCheckVehicle(transaction.transactionOut)
+                        ? "Mobil"
+                        : "Motor"
+                    }}
+                  </p>
+                </div>
+                <div class="mr-4">
+                  <p class="my-1 font-size-10">Plat Nomor</p>
+                  <p class="my-1">
+                    {{
+                      transaction.transactionOut.license_plate
+                        ? transaction.transactionOut.license_plate
+                        : "N/A"
+                    }}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="col-12 col-lg-4 cursor-pointer"
-        @click="$emit('selected', transaction.transactionIn)"
-        v-if="transaction.transactionIn.id"
-      >
-        <div class="rounded bg-light p-2 border">
-          <div>
-            <p class="my-0 font-weight-bold text-muted font-size-10">
-              Tiket Masuk
-              {{
-                transaction.transactionIn.e_card_id ? "E-Money/Kartu" : "Karcis"
-              }}
-            </p>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="mt-1 mb-2">
-              <p class="my-0 font-weight-bold text-muted font-size-14">
-                {{
-                  processCheckVehicle(transaction.transactionIn)
-                    ? "Mobil"
-                    : "Motor"
-                }}
-                -
-                {{
-                  transaction.transactionIn.license_plate
-                    ? transaction.transactionIn.license_plate
-                    : "N/A"
-                }}
-              </p>
-              <p class="my-0 font-size-9">
-                Waktu Masuk:
-                {{
-                  $utility.formatDateMoment(
-                    transaction.transactionIn.time_in,
-                    "DD-MM-YYYY HH:mm:ss",
-                  )
-                }}
-              </p>
-            </div>
-            <div>
-              <i class="ic-log-in-03 font-size-20 text-success"></i>
-            </div>
-          </div>
-          <div>
-            <p class="my-0 font-size-9 text-muted">
-              <i class="ic-alert-circle"></i> Klik untuk melihat lebih lengkap
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-lg-4 cursor-pointer h-100" v-else>
-        <div class="rounded bg-light p-2 border">
-          <div
-            class="d-flex justify-content-center flex-column align-items-center"
-          >
-            <div class="my-3 py-2">
-              <b-spinner size="sm" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="col-12 col-lg-4 cursor-pointer"
-        v-if="transaction.transactionOut.id"
-        @click="$emit('selected', transaction.transactionOut)"
-      >
-        <div class="rounded bg-light p-2 border">
-          <div>
-            <p class="my-0 font-weight-bold text-muted font-size-10">
-              Tiket Keluar
-              {{
-                transaction.transactionOut.e_card_id
-                  ? "E-Money/Kartu"
-                  : "Karcis"
-              }}
-            </p>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="mt-1 mb-2">
-              <p class="my-0 font-weight-bold text-muted font-size-14">
-                {{
-                  processCheckVehicle(transaction.transactionOut)
-                    ? "Mobil"
-                    : "Motor"
-                }}
-                -
-                {{ transaction.transactionOut.license_plate }}
-              </p>
-              <p class="my-0 font-size-9">
-                Waktu Keluar:
-                {{
-                  $utility.formatDateMoment(
-                    transaction.transactionOut.time_out,
-                    "DD-MM-YYYY HH:mm:ss",
-                  )
-                }}
-              </p>
-            </div>
-            <div>
-              <i class="ic-log-out-03 font-size-20 text-danger"></i>
-            </div>
-          </div>
-          <div>
-            <p class="my-0 font-size-9 text-muted">
-              <i class="ic-alert-circle"></i> Klik untuk melihat lebih lengkap
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-lg-4 cursor-pointer h-100" v-else>
-        <div class="rounded bg-light p-2 border">
-          <div>
-            <p class="my-0 font-weight-bold text-muted font-size-10">
-              Tiket Keluar (Karcis)
-            </p>
-          </div>
-          <div
-            class="d-flex justify-content-center flex-column align-items-center"
-          >
-            <div class="mt-2">
-              <i class="ic-alert-circle font-size-20"></i>
-            </div>
-            <div class="font-size-11 mb-2 text-muted">Tiket belum dibuat</div>
           </div>
         </div>
       </div>

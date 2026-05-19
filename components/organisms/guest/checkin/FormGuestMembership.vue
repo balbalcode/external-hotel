@@ -65,6 +65,29 @@
 
           <div
             :class="`col-12 rounded cursor-pointer  p-2 mt-1 ${
+              helper.selectedFinder === 'license_plate'
+                ? 'bg-white border border-primary'
+                : 'bg-white border border-secondary-90 text-muted'
+            }`"
+            @click="helper.selectedFinder = 'license_plate'"
+          >
+            <div class="d-flex cursor-pointer">
+              <div class="mr-2">
+                <i class="ic-keyboard-01"></i>
+              </div>
+              <div class="">
+                <p class="my-0 font-size-12 font-weight-bold">
+                  Pencarian Plat Nomor
+                </p>
+                <p class="my-0 font-size-10">
+                  Pencarian tamu menggunakan plat nomor kendaraan.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            :class="`col-12 rounded cursor-pointer  p-2 mt-1 ${
               helper.selectedFinder === 'key'
                 ? 'bg-white border border-primary'
                 : 'bg-white border border-secondary-90 text-muted'
@@ -90,32 +113,51 @@
       </div>
       <div class="col-12 col-lg-8 my-1">
         <div class="rounded border border-secondary-90 h-100">
-          <div class="p-1" v-if="data.selectedTransaction.id">
+          <div
+            class="p-1"
+            v-if="data.selectedTransaction.id || helper.transaction.length > 0"
+          >
             <div class="col-12 font-size-12 font-weight-bold mt-2">
               Kendaraan Tamu Ditemukan
             </div>
-            <div class="row rounded mb-1 p-1 m-0">
+            <div
+              v-for="(trx, index) in helper.transaction"
+              @mouseenter="helper.hoverSuggestion = index"
+              @mouseleave="helper.hoverSuggestion = null"
+              :class="`row rounded mb-1 p-1 m-0 custom-hover ${
+                trx.id === data.selectedTransaction.id ? 'bg-primary-90' : ''
+              }`"
+              :key="index"
+            >
               <div class="col-lg-2 p-2">
                 <div class="position-relative">
                   <img
-                    :src="data.selectedTransaction.image_url"
+                    :src="trx.image_url"
                     class="img-fluid cursor-pointer"
-                    @mouseenter="helper.showTooltip = true"
-                    @mouseleave="helper.showTooltip = false"
+                    @mouseenter="
+                      (e) => {
+                        helper.showTooltip = index;
+                        helper.tooltipPosition =
+                          e.target.getBoundingClientRect();
+                      }
+                    "
+                    @mouseleave="helper.showTooltip = null"
                   />
                   <div
-                    v-if="helper.showTooltip"
-                    class="position-absolute bg-white border shadow-sm p-1"
-                    style="
-                      bottom: 100%;
-                      left: 50%;
-                      transform: translateX(-50%);
-                      z-index: 1000;
-                      margin-bottom: 5px;
-                    "
+                    v-if="helper.showTooltip === index"
+                    class="position-fixed bg-white border shadow-sm p-1"
+                    :style="`
+                        top: ${helper.tooltipPosition.top - 190}px;
+                        left: ${
+                          helper.tooltipPosition.left +
+                          helper.tooltipPosition.width / 2
+                        }px;
+                        transform: translateX(-50%);
+                        z-index: 1000;
+                      `"
                   >
                     <img
-                      :src="data.selectedTransaction.image_url"
+                      :src="trx.image_url"
                       style="width: 180px; height: 180px; object-fit: cover"
                     />
                   </div>
@@ -126,7 +168,7 @@
                   <div>
                     <p class="my-1 text-muted font-size-10">Kode Tiket</p>
                     <p class="my-1 font-weight-bold">
-                      {{ data.selectedTransaction.search_key }}
+                      {{ trx.search_key }}
                     </p>
                   </div>
                   <div class="ml-3">
@@ -134,10 +176,10 @@
                     <p class="my-1 font-weight-bold">
                       {{
                         $utility.momentAddDate(
-                          data.selectedTransaction.time_in,
+                          trx.time_in,
                           "7",
                           "hours",
-                          "DD-MM-YYYY HH:mm:ss"
+                          "DD-MM-YYYY HH:mm:ss",
                         )
                       }}
                     </p>
@@ -145,22 +187,43 @@
                   <div class="ml-3">
                     <p class="my-1 text-muted font-size-10">Jenis Kendaraan</p>
                     <p class="my-1 font-weight-bold">
-                      {{ data.selectedTransaction.vehicle_code }}
+                      {{ trx.vehicle_code }}
                     </p>
                   </div>
                   <div class="ml-3">
-                    <p class="my-1 text-muted font-size-10">Akses Masuk</p>
-                    <p class="my-1 font-weight-bold">
-                      {{
-                        data.selectedTransaction.emoney_card_id
-                          ? "E-Money"
-                          : "Tiket"
-                      }}
-                    </p>
+                    <template v-if="trx.id === data.selectedTransaction.id">
+                      <p
+                        class="my-1 font-weight-bold font-size-12 text-primary text-center mx-auto border rounded-pill px-2 border-primary"
+                      >
+                        <i class="ic-check-circle"></i> Dipilih
+                      </p>
+                    </template>
+                    <template v-else>
+                      <template v-if="helper.hoverSuggestion !== index">
+                        <p class="my-1 text-muted font-size-10">Akses Masuk</p>
+                        <p class="my-1 font-weight-bold">
+                          {{ trx.emoney_card_id ? "E-Money" : "Tiket" }}
+                        </p>
+                      </template>
+                      <template v-else>
+                        <active-button
+                          text="Pilih"
+                          size="sm"
+                          additional_class="px-4 mt-2 "
+                          @click="processSelectTransaction(trx)"
+                        />
+                      </template>
+                    </template>
                   </div>
                 </div>
               </div>
             </div>
+
+            <div
+              v-if="
+                data.selectedTransaction.id && helper.transaction.length > 1
+              "
+            ></div>
 
             <div class="row p-2 mx-0 mt-n2">
               <div class="col-lg-12 bg-light p-2 rounded mx-1">
@@ -424,6 +487,12 @@ export default {
     ModalScannerQrcode: () =>
       import("@utilities/molecules/modal-view/ModalScannerQrcode"),
   },
+  props: {
+    licensePlate: {
+      type: Object,
+      default: {},
+    },
+  },
   data: () => {
     return {
       id: "FormGuestVehicleFinder",
@@ -454,9 +523,13 @@ export default {
           transaction: false,
           membership: false,
         },
+        transaction: [],
+        hoverSuggestion: null,
         wasCheckCard: false,
         showTooltip: false,
-        selectedFinder: "rfid",
+        tooltipPosition: { top: 0, left: 0, width: 0 },
+        selectedFinder: "license_plate",
+        licensePlate: "",
       },
     };
   },
@@ -464,6 +537,7 @@ export default {
     "helper.selectedFinder": {
       deep: true,
       handler() {
+        this.helper.transaction = [];
         this.data = {
           isNewMembership: false,
           rfId: "",
@@ -476,6 +550,9 @@ export default {
         };
         this.helper.wasCheckCard = false;
         this.helper.loading.membership = false;
+        if (this.helper.selectedFinder === "license_plate") {
+          this.processGetLicensePlate();
+        }
         this.$v.filter.$reset();
       },
       immediate: false,
@@ -499,6 +576,9 @@ export default {
       },
     };
   },
+  mounted() {
+    this.processGetLicensePlate();
+  },
   methods: {
     getDataResolution: resolutionMethods.getDataResolution,
     updateDataResolution: resolutionMethods.updateDataResolution,
@@ -511,12 +591,18 @@ export default {
           { key: "spot_id", value: this.$utility.getSpotId() },
           { key: "values", value: this.filter.transaction.key },
         ],
+        pagination: {
+          page: 1,
+          per_page: 5,
+        },
       };
 
       if (this.helper.selectedFinder === "id") {
         payload.filter.push({ key: "type", value: "id" });
       } else if (this.helper.selectedFinder === "key") {
         payload.filter.push({ key: "type", value: "key" });
+      } else if (this.helper.selectedFinder === "license_plate") {
+        payload.filter.push({ key: "type", value: "license_plate" });
       }
 
       return payload;
@@ -564,6 +650,10 @@ export default {
           selectedMembership: this.data.selectedMembership,
         },
       });
+    },
+
+    processSelectTransaction(trx) {
+      this.data.selectedTransaction = trx;
     },
 
     processSubmitTransaction() {
@@ -622,10 +712,36 @@ export default {
         this.data.cardId = "";
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processSearchMembership in FormGuestMembership`
+          `${error.message} at processSearchMembership in FormGuestMembership`,
         );
       } finally {
         this.helper.loading.membership = false;
+      }
+    },
+
+    async processGetLicensePlate() {
+      try {
+        this.helper.loading.transaction = true;
+        let payload = {
+          filter: [
+            { key: "spot_id", value: this.$utility.getSpotId() },
+            { key: "values", value: this.licensePlate.data.licensePlate },
+            { key: "type", value: "license" },
+          ],
+          pagination: {
+            page: 1,
+            per_page: 3,
+          },
+        };
+        const { values, total_values } = await this.getDataResolution(payload);
+        this.helper.transaction = values;
+      } catch (error) {
+        this.$utility.setErrorContextSentry(error);
+        this.$sentry.captureMessage(
+          `${error.message} at processSearchTransaction in FormGuestMembership`,
+        );
+      } finally {
+        this.helper.loading.transaction = false;
       }
     },
 
@@ -634,14 +750,14 @@ export default {
         this.helper.loading.transaction = true;
         const payload = this.setPayloadTransaction();
         const { values, total_values } = await this.getDataResolution(payload);
-        this.transaction = values;
+        this.helper.transaction = values;
         if (total_values > 0) {
           this.data.selectedTransaction = values[0];
         }
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(
-          `${error.message} at processSearchTransaction in FormGuestMembership`
+          `${error.message} at processSearchTransaction in FormGuestMembership`,
         );
       } finally {
         this.helper.loading.transaction = false;
@@ -651,4 +767,13 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+@import "@/assets/init/_color.scss";
+
+.custom-hover {
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: mix(white, $primary, 90%);
+  }
+}
+</style>

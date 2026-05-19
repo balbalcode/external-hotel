@@ -277,6 +277,7 @@ export default {
     processSetLabelStatus(data, index) {
       let statusLabel = "DATA BERMASALAH";
       let cssClass = "danger";
+      let textClass = "text-white";
       if (data.status === "ACTIVE") {
         if (
           new Date().setHours(11, 59, 59, 0) >
@@ -286,6 +287,7 @@ export default {
         } else {
           statusLabel = "Aktif";
           cssClass = "primary";
+          textClass= "text-dark";
         }
       } else if (data.status === "CHECKEDOUT") {
         statusLabel = "Sudah Checkout";
@@ -295,7 +297,7 @@ export default {
       const status = {
         label: statusLabel,
         class: cssClass,
-        component: `<span class="badge px-2 py-1 badge-${cssClass} font-size-11 font-weight-bold">${statusLabel}</span>`,
+        component: `<span class="badge ${textClass} px-2 py-1 badge-${cssClass} font-size-11 font-weight-bold">${statusLabel}</span>`,
       };
 
       return status[`${index}`];

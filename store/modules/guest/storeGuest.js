@@ -147,6 +147,20 @@ const actions = {
       });
   },
 
+  async syncMembership({ dispatch }, payload) {
+    return await membershipService
+      .sync(payload)
+      .then(async (data) => {
+        return await data;
+      })
+      .catch((error) => {
+        throw {
+          step: "createMembership",
+          data: error,
+        };
+      });
+  },
+
   async getMembership({ commit, dispatch }, payload) {
     return await membershipService
       .get(payload.filter, payload.pagination, payload.order)

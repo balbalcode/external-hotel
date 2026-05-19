@@ -32,6 +32,7 @@
     <form-guest-membership
       :data="form.stepTwo"
       @submit="processStepThree"
+      :licensePlate="form.stepTwo"
       v-if="helper.currentStep > 2 && helper.currentStep < 4"
       :is-passed="helper.currentStep > 3"
     />

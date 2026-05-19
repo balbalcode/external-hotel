@@ -51,6 +51,7 @@ export const guestMethods = mapActions("modules/guest/storeGuest", [
   "getMembership",
   "createEmployee",
   "changePeriodMember",
+  "syncMembership"
 ]);
 
 export const ocrMethods = mapActions("modules/ocr/storeOcr", [
