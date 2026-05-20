@@ -13,6 +13,7 @@
         <detail-guest-information :data="data" />
         <div class="bg-white py-3 pb-3 px-3 mt-3 rounded border">
           <detail-logs-transaction
+            @refresh="helper.refresh = true"
             :data="data"
             @update="
               (updatedData) => {
@@ -21,7 +22,7 @@
             "
             @selected="handleSelected"
           />
-          <detail-guest-logs :data="data" @selected="handleSelected" />
+          <detail-guest-logs :data="data" @selected="handleSelected" :refresh="helper.refresh"  @ready="helper.refresh = false" />
         </div>
       </div>
     </div>
@@ -76,6 +77,7 @@ export default {
       selectedTransaction: null,
       helper: {
         loading: true,
+        refresh: false,
       },
       transactionData: {
         transactionIn: {},

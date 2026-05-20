@@ -312,7 +312,7 @@ export default {
         membership_id: this.membership.id,
         pos_in: this.stepThree.data.selectedTransaction.pos_in,
         vehicle_code: this.processConvertVehicleType(
-          this.stepThree.data.selectedTransaction.vehicle_code,
+          this.stepTwo.data.vehicleType,
         ),
         gate_code: this.stepThree.data.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
@@ -378,7 +378,7 @@ export default {
         rf_id: this.stepThree.data.rfId,
         product_id: this.stepTwo.data.productId.productId,
         employee_id: this.stepThree.data.selectedMembership.employee_detail.id,
-        license_plate: this.stepThree.data.licensePlate,
+        license_plate: this.stepTwo.data.licensePlate,
         second_license_plate: "",
         start: this.$utility.formatDateMoment(
           this.stepThree.data.selectedTransaction.time_in,
@@ -408,7 +408,7 @@ export default {
         productId: this.stepTwo.data.productId.productId,
         guestCheckout: this.stepTwo.data.end,
         guestVehicleCode: this.processConvertVehicleType(
-          this.stepThree.data.selectedTransaction.vehicle_code,
+          this.stepTwo.data.vehicleType
         ),
         type: "FREE_STAY",
         ocrFile: this.stepOne.ocrFile,

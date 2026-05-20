@@ -89,12 +89,24 @@ export default {
     data: {
       required: true,
     },
+    refresh: {
+      type: Boolean,
+      default: false,
+    },
   },
   watch: {
     data: {
       immediate: true,
       handler(value) {
         if (value.id) {
+          this.processSearchTransaction();
+        }
+      },
+    },
+    refresh: {
+      immediate: true,
+      handler(value) {
+        if (value) {
           this.processSearchTransaction();
         }
       },
@@ -130,7 +142,7 @@ export default {
         const timeIn = item.time_in;
         if (end !== 0) return start <= timeIn && timeIn <= end;
         else return start <= timeIn;
-      }); 
+      });
     },
 
     async processSearchTransaction() {
@@ -146,6 +158,7 @@ export default {
         );
       } finally {
         this.helper.isLoading = false;
+        this.$emit("ready");
       }
     },
   },

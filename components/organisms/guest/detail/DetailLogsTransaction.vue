@@ -12,7 +12,7 @@
           class="d-flex flex-column align-items-end h-100 justify-content-center"
         >
           <active-button
-            @click="modal.ocr = true"
+            @click="$emit('refresh')"
             text="Refresh"
             type="outline"
             variant="secondary"
@@ -116,12 +116,12 @@
           </div>
         </div>
 
-        <div class="">
+        <div class="" v-if="transaction.transactionOut.id">
           <div
             class="d-flex align-items-center justify-content-center h-100 px-3"
           >
             <i class="ic-arrow-right font-size-26 text-secondary"></i>
-          </div>        
+          </div>
         </div>
 
         <div class="bg-white">

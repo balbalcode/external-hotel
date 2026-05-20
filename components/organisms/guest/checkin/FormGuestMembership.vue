@@ -177,7 +177,7 @@
                       {{
                         $utility.momentAddDate(
                           trx.time_in,
-                          "7",
+                          "0",
                           "hours",
                           "DD-MM-YYYY HH:mm:ss",
                         )
