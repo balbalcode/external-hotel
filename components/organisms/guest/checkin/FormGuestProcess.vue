@@ -419,7 +419,7 @@ export default {
         oldMembershipId: !this.stepThree.data.isNewMembership
           ? this.stepThree.data.selectedMembership.id
           : "",
-        checkinTransactionId: this.transactionId,
+        checkinTransactionId: this.stepThree.data.selectedTransaction.id,
         rfid: this.stepThree.data.rfId,
         meta: JSON.stringify({
           stepOne: this.stepOne,
@@ -511,7 +511,7 @@ export default {
     async processCreateTransaction() {
       try {
         const PAYLOAD = await this.setPayloadCreateTransaction();
-        await this.createTransaction(PAYLOAD);
+        // await this.createTransaction(PAYLOAD);
       } catch (error) {
         this.$utility.setErrorContextSentry(error);
         this.$sentry.captureMessage(

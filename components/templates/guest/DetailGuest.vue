@@ -6,8 +6,8 @@
           :data="data"
           @duplicateRequest="modal.duplicate = true"
           @checkoutRequest="modal.checkout = true"
-          :transaction-out="data"
-          :transaction-in="data"
+          :transaction-out="transactionData.transactionOut"
+          :transaction-in="transactionData.transactionIn"
         />
       </div>
       <div class="col-12 col-lg-9">
@@ -115,6 +115,7 @@ export default {
 
     async processGetGuestDetail() {
       try {
+        this.helper.loading = true;
         const response = await this.getGuestDetail(
           this.setPayloadGuestDetail(),
         );

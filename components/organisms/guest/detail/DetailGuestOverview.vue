@@ -16,7 +16,8 @@
         <div class="mt-n1 pt-1 ml-1">
           <p class="font-weight-bold font-size-16 my-0">Ringkasan Informasi</p>
           <p class="text-muted font-size-10 font-size-8 my-0">
-            Tanggal Input: {{
+            Tanggal Input:
+            {{
               $utility.formatDateMoment(
                 new Date(data.created_at),
                 "DD/MM/YYYY HH:mm:ss",
@@ -46,12 +47,10 @@
           <div class="text-muted">Kendaraan</div>
           <div>
             <span class="font-weight-bold" v-if="processCheckVehicle()">
-              <i
-              class="ic-motorcycle font-size-14 "
-            ></i> Motor
+              <i class="ic-car-01  font-size-14"></i> Mobil
             </span>
             <span class="font-weight-bold" v-else>
-              <i class="ic-car-01 font-size-14 "></i> Mobil
+              <i class="ic-motorcycle font-size-14"></i> Motor
             </span>
           </div>
         </div>
@@ -78,7 +77,7 @@
             {{
               $utility.formatDateMoment(
                 new Date(data.guestCheckin),
-                "DD MMMM YYYY",
+                "DD MMMM YY",
               )
             }}
           </div>
@@ -118,7 +117,7 @@
               {{
                 $utility.formatDateMoment(
                   new Date(data.guestCheckout),
-                  "DD MMMM YYYY",
+                  "DD MMMM YY",
                 )
               }}
             </div>
@@ -189,9 +188,8 @@ export default {
 
     processCheckVehicle() {
       const vehicle = String(
-        this.transactionIn.vehicle_code ?? "MT2",
+        this.data.guestVehicleCode ?? "MT2",
       ).toLowerCase();
-
       if (vehicle.includes("mb")) {
         return true;
       } else {
