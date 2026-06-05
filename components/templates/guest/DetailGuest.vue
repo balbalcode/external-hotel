@@ -7,6 +7,7 @@
           @duplicateRequest="modal.duplicate = true"
           @checkoutRequest="modal.checkout = true"
           :transaction-out="data"
+          :transaction-in="data"
         />
       </div>
       <div class="col-12 col-lg-9">
