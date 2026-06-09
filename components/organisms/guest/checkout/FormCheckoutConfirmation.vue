@@ -614,10 +614,8 @@ export default {
       const expiredTimeIn = new Date(this.data.guestCheckout);
       expiredTimeIn.setHours(12, 0, 0, 0);
       const expiredTimeInTimestamp = expiredTimeIn.getTime();
-
-      const timeIn = !this.isExpiredForm
-        ? this.selectedTransaction.time_in
-        : expiredTimeInTimestamp;
+      const currentTime = new Date().getTime();
+      
 
       return {
         token: this.authTransactionData.access_token,
@@ -632,7 +630,7 @@ export default {
         vehicle_code: this.data.guestVehicleCode,
         gate_code: this.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
-        time_in: timeIn,
+        time_in: (currentTime  > expiredTimeInTimestamp ? currentTime  : expiredTimeInTimestamp) || currentTime, // use the calculated timeIn based on expiration and current time
         source: "FREE_STAY",
       };
     },
