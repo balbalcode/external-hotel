@@ -611,9 +611,9 @@ export default {
     async setPayloadCreateTransactionOut() {
       const transactionId = this.transactionId;
       const handshake = await this.processGetHash();
-      const expiredTimeIn = new Date(this.data.guestCheckout);
-      expiredTimeIn.setHours(12, 0, 0, 0);
-      const expiredTimeInTimestamp = expiredTimeIn.getTime();
+      const checkoutTime = new Date(this.data.guestCheckout);
+      checkoutTime.setHours(12, 0, 0, 0);
+      const checkoutTimeTimestamp = checkoutTime.getTime();
       const currentTime = new Date().getTime();
       
 
@@ -630,7 +630,7 @@ export default {
         vehicle_code: this.data.guestVehicleCode,
         gate_code: this.selectedTransaction.pos_in,
         created_at: new Date().getTime(),
-        time_in: (currentTime  > expiredTimeInTimestamp ? currentTime  : expiredTimeInTimestamp) || currentTime, // use the calculated timeIn based on expiration and current time
+        time_in: (currentTime  < checkoutTimeTimestamp ? currentTime  : checkoutTimeTimestamp) || currentTime, 
         source: "FREE_STAY",
       };
     },
