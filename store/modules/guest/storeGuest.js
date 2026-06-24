@@ -85,6 +85,26 @@ const actions = {
       });
   },
 
+  async readOcr64({ dispatch }, payload) {
+    return await guestService
+      .base64(payload)
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        dispatch(
+          "modules/utility/storeUtility/setDefaultErrorAlert",
+          {
+            message: error.response.data.message,
+            opener: payload.opener,
+          },
+          { root: true }
+        );
+        this.$sentry.captureException(error, `terjadi kesalahan: ${payload}`);
+        throw error;
+      });
+  },
+
   async updateGuest({ dispatch }, payload) {
     return await guestService
       .update(payload.id, payload)

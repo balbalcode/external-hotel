@@ -7,6 +7,7 @@ export const guestService = {
   update,
   remove,
   ocr,
+  base64,
 };
 
 async function get(filter) {
@@ -95,6 +96,19 @@ async function ocr(data) {
   axios.defaults.baseURL = process.env.OCR_URL;
   return axios
     .post(`${process.env.OCR_URL}/read`, data, { timeout: 25500 })
+    .then((data) => {
+      if ([200, 201].indexOf(data.status) >= 0) return data.data;
+    })
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+}
+
+async function base64(data) {
+  let axios = window.$nuxt.$axios;
+  axios.defaults.baseURL = process.env.OCR_URL;
+  return axios
+    .post(`${process.env.OCR_URL}/read/base64`, data, { timeout: 25500 })
     .then((data) => {
       if ([200, 201].indexOf(data.status) >= 0) return data.data;
     })
