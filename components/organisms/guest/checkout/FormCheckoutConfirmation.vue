@@ -638,8 +638,8 @@ export default {
     setPayloadChangePeriodMember() {
       const NEW_START_DATE = this.$utility.momentAddDate(
         new Date(),
-        -1, // for a while we cannot change -5 mins. so we're change to -1 day
-        "days",
+        -5,
+        "minutes",
         "YYYY-MM-DD HH:mm:ss",
       );
       return {
@@ -650,7 +650,10 @@ export default {
         data: {
           membership_id: this.membership.id,
           updated_data: {
-            end_date: NEW_START_DATE,
+            end_date: this.$utility.formatDateMoment(
+              NEW_START_DATE,
+              "YYYY-MM-DD",
+            ),
             hour_start: this.$utility.formatDateMoment(
               NEW_START_DATE,
               "HH:mm:ss",
@@ -772,7 +775,7 @@ export default {
       try {
         const PAYLOAD = this.setPayloadChangePeriodMember();
         console.log(PAYLOAD, "PAYLOAD CHANGE PERIOD - DISABLED FOR A WHILE");
-        // await this.changePeriodMember(PAYLOAD);
+        await this.changePeriodMember(PAYLOAD);
       } catch (error) {
         console.log("error at processChangePeriodMember", error);
         this.$utility.setErrorContextSentry(error);

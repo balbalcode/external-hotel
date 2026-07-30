@@ -92,9 +92,7 @@
                     variant="light"
                     type="outline"
                     additional_class="border-0 w-100 text-left p-2 rounded-0 text-nowrap"
-                    v-if="
-                      isHavingAction && logs.statusLabel !== 'Sudah Checkout'
-                    "
+                    
                     align="rtl"
                     @click="
                       () => {
